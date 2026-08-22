@@ -10,7 +10,7 @@ enum PasteColors {
     static let background = Color(nsColor: .windowBackgroundColor)
     static let surface = Color(nsColor: .controlBackgroundColor)
     static let surfaceRaised = Color(nsColor: .textBackgroundColor)
-    static let surfaceMuted = Color(nsColor: .underPageBackgroundColor)
+    static let surfaceMuted = Color(nsColor: .quaternarySystemFill)
     static let surfacePressed = Color(nsColor: .selectedControlColor).opacity(0.14)
     static let border = Color(nsColor: .separatorColor)
     static let borderStrong = Color(nsColor: .tertiaryLabelColor)

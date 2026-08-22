@@ -24,6 +24,14 @@ interface ClipboardRepository {
         expiresAt: Timestamp? = null,
     ): ClipboardItem
 
+    suspend fun createAutomaticText(
+        userId: String,
+        itemId: String,
+        content: String,
+        sourceDeviceId: String,
+        expiresAt: Timestamp? = null,
+    ): ClipboardItem
+
     suspend fun createBinary(
         userId: String,
         itemId: String,
@@ -31,6 +39,15 @@ interface ClipboardRepository {
         upload: StorageUploadResult,
         sourceDeviceId: String,
         targetDeviceId: String = "",
+        expiresAt: Timestamp? = null,
+    ): ClipboardItem
+
+    suspend fun createAutomaticBinary(
+        userId: String,
+        itemId: String,
+        type: ClipboardType,
+        upload: StorageUploadResult,
+        sourceDeviceId: String,
         expiresAt: Timestamp? = null,
     ): ClipboardItem
 
@@ -101,6 +118,49 @@ class FirestoreClipboardRepository(
         return item
     }
 
+    /**
+     * Creates a deterministic automatic text item once. A retry that finds the same payload is
+     * treated as success without updating timestamps or triggering another Firestore write.
+     */
+    override suspend fun createAutomaticText(
+        userId: String,
+        itemId: String,
+        content: String,
+        sourceDeviceId: String,
+        expiresAt: Timestamp?,
+    ): ClipboardItem {
+        requireValidDocumentId(userId, "사용자 ID")
+        requireValidDocumentId(itemId, "클립보드 항목 ID")
+        requireValidDocumentId(sourceDeviceId, "기기 ID")
+        require(content.isNotEmpty()) { "전송할 텍스트가 비어 있습니다." }
+        require(content.length <= MAX_TEXT_CHARACTERS) {
+            "텍스트는 ${MAX_TEXT_CHARACTERS}자 이하여야 합니다."
+        }
+
+        val document = clipboardCollection(userId).document(itemId)
+        val item = ClipboardItem(
+            id = itemId,
+            type = ClipboardType.TEXT.value,
+            content = content,
+            sourceDeviceId = sourceDeviceId,
+            createdAt = Timestamp.now(),
+            expiresAt = expiresAt ?: defaultExpiry(),
+        )
+        return firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(document)
+            if (snapshot.exists()) {
+                val existing = snapshot.toClipboardItem()
+                check(
+                    existing.type == ClipboardType.TEXT.value && existing.content == content,
+                ) { "자동 전송 문서 ID가 다른 텍스트에 이미 사용 중입니다." }
+                existing
+            } else {
+                transaction.set(document, item.toFirestoreMap())
+                item
+            }
+        }.awaitResult()
+    }
+
     override suspend fun createBinary(
         userId: String,
         itemId: String,
@@ -135,6 +195,54 @@ class FirestoreClipboardRepository(
             .set(item.toFirestoreMap())
             .awaitResult()
         return item
+    }
+
+    /** Same retry semantics as [createAutomaticText], for an already-uploaded binary payload. */
+    override suspend fun createAutomaticBinary(
+        userId: String,
+        itemId: String,
+        type: ClipboardType,
+        upload: StorageUploadResult,
+        sourceDeviceId: String,
+        expiresAt: Timestamp?,
+    ): ClipboardItem {
+        requireValidDocumentId(userId, "사용자 ID")
+        requireValidDocumentId(itemId, "클립보드 항목 ID")
+        requireValidDocumentId(sourceDeviceId, "기기 ID")
+        require(type == ClipboardType.IMAGE || type == ClipboardType.FILE) {
+            "바이너리 항목은 image 또는 file 타입이어야 합니다."
+        }
+        require(upload.storagePath.isNotBlank()) { "Storage 경로가 비어 있습니다." }
+
+        val document = clipboardCollection(userId).document(itemId)
+        val item = ClipboardItem(
+            id = itemId,
+            type = type.value,
+            storagePath = upload.storagePath,
+            fileName = upload.fileName,
+            fileSize = upload.fileSize,
+            mimeType = upload.mimeType,
+            sourceDeviceId = sourceDeviceId,
+            createdAt = Timestamp.now(),
+            expiresAt = expiresAt ?: defaultExpiry(),
+        )
+        return firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(document)
+            if (snapshot.exists()) {
+                val existing = snapshot.toClipboardItem()
+                check(
+                    existing.type == type.value &&
+                        existing.storagePath == upload.storagePath &&
+                        existing.fileName == upload.fileName &&
+                        existing.fileSize == upload.fileSize &&
+                        existing.mimeType == upload.mimeType,
+                ) { "자동 전송 문서 ID가 다른 파일에 이미 사용 중입니다." }
+                existing
+            } else {
+                transaction.set(document, item.toFirestoreMap())
+                item
+            }
+        }.awaitResult()
     }
 
     override suspend fun getItem(userId: String, itemId: String): ClipboardItem? {

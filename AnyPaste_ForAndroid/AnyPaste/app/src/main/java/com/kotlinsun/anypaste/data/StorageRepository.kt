@@ -3,6 +3,7 @@ package com.kotlinsun.anypaste.data
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.StorageException
 import com.kotlinsun.anypaste.model.StorageTransferProgress
 import com.kotlinsun.anypaste.model.StorageUploadResult
 import java.io.File
@@ -25,6 +26,12 @@ interface StorageRepository {
         mimeType: String? = null,
         onProgress: ((StorageTransferProgress) -> Unit)? = null,
     ): StorageUploadResult
+
+    suspend fun findUploadedFile(
+        userId: String,
+        itemId: String,
+        fileName: String,
+    ): StorageUploadResult?
 
     suspend fun downloadFile(
         storagePath: String,
@@ -96,6 +103,26 @@ class FirebaseStorageRepository(
             fileSize = snapshot.totalByteCount,
             mimeType = snapshot.metadata?.contentType ?: mimeType.orEmpty(),
         )
+    }
+
+    override suspend fun findUploadedFile(
+        userId: String,
+        itemId: String,
+        fileName: String,
+    ): StorageUploadResult? {
+        val normalizedName = normalizeFileName(fileName)
+        val reference = storage.reference.child(storagePath(userId, itemId, normalizedName))
+        return try {
+            val metadata = reference.metadata.awaitResult()
+            StorageUploadResult(
+                storagePath = reference.path.trimStart('/'),
+                fileName = normalizedName,
+                fileSize = metadata.sizeBytes,
+                mimeType = metadata.contentType.orEmpty(),
+            )
+        } catch (error: StorageException) {
+            if (error.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) null else throw error
+        }
     }
 
     override suspend fun downloadFile(

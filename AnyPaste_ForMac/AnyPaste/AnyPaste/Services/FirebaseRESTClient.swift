@@ -337,7 +337,8 @@ actor FirebaseRESTClient {
     func createClipboard(
         userId: String,
         record: ClipboardRecord,
-        idToken: String
+        idToken: String,
+        createOnly: Bool = false
     ) async throws -> ClipboardRecord {
         try requireToken(idToken)
         try requireDocumentID(userId, label: "사용자 ID")
@@ -422,7 +423,8 @@ actor FirebaseRESTClient {
             name: documentName(["users", userId, "clipboard", documentID]),
             fields: fields,
             updateMask: nil,
-            transforms: [serverTimestampTransform("createdAt")]
+            transforms: [serverTimestampTransform("createdAt")],
+            currentDocument: createOnly ? ["exists": false] : nil
         )
         let commitTime = try await commit(writes: [write], idToken: idToken)
 
@@ -580,6 +582,47 @@ actor FirebaseRESTClient {
         )
     }
 
+    func findUploadedClipboardData(
+        userId: String,
+        itemId: String,
+        fileName: String,
+        idToken: String
+    ) async throws -> StorageUploadResult? {
+        try requireToken(idToken)
+        try requireStoragePathComponent(userId, label: "사용자 ID")
+        try requireStoragePathComponent(itemId, label: "클립보드 항목 ID")
+
+        let fileName = try normalizedFileName(fileName)
+        let storagePath = "users/\(userId)/clipboard/\(itemId)/\(fileName)"
+        let request = authorizedRequest(
+            url: try storageObjectURL(objectName: storagePath),
+            method: "GET",
+            idToken: idToken
+        )
+
+        do {
+            let data = try await perform(request)
+            let response = try jsonObject(from: data)
+            let responsePath = response["name"] as? String ?? ""
+            guard responsePath == storagePath,
+                  let responseSize = int64(from: response["size"]),
+                  responseSize > 0,
+                  responseSize <= Self.maximumTransferBytes,
+                  let responseType = response["contentType"] as? String,
+                  !responseType.isEmpty else {
+                throw FirebaseRESTClientError.invalidServerResponse
+            }
+            return StorageUploadResult(
+                storagePath: responsePath,
+                fileName: fileName,
+                fileSize: responseSize,
+                mimeType: responseType
+            )
+        } catch FirebaseRESTClientError.notFound {
+            return nil
+        }
+    }
+
     func downloadStorageObject(
         path: String,
         maxBytes: Int64 = 50 * 1024 * 1024,
@@ -698,7 +741,8 @@ actor FirebaseRESTClient {
         name: String,
         fields: FirestoreFields,
         updateMask: [String]?,
-        transforms: [JSONObject]
+        transforms: [JSONObject],
+        currentDocument: JSONObject? = nil
     ) -> JSONObject {
         var write: JSONObject = [
             "update": [
@@ -711,6 +755,9 @@ actor FirebaseRESTClient {
         }
         if !transforms.isEmpty {
             write["updateTransforms"] = transforms
+        }
+        if let currentDocument {
+            write["currentDocument"] = currentDocument
         }
         return write
     }
@@ -969,10 +1016,19 @@ actor FirebaseRESTClient {
         let response = (try? JSONSerialization.jsonObject(with: data)) as? JSONObject
         let error = response?["error"] as? JSONObject
         let rawMessage = error?["message"] as? String ?? ""
+        let status = (error?["status"] as? String)?.uppercased() ?? ""
         let code = rawMessage
             .components(separatedBy: CharacterSet(charactersIn: " :\n"))
             .first?
             .uppercased() ?? ""
+
+        if status == "ALREADY_EXISTS"
+            || status == "FAILED_PRECONDITION"
+            || code == "ALREADY_EXISTS"
+            || code == "FAILED_PRECONDITION"
+            || statusCode == 409 {
+            return .alreadyExists
+        }
 
         switch code {
         case "EMAIL_EXISTS":
@@ -1183,6 +1239,7 @@ enum FirebaseRESTClientError: LocalizedError, Equatable {
     case invalidServerResponse
     case networkUnavailable
     case notFound
+    case alreadyExists
     case serverMessage(String)
 
     var errorDescription: String? {
@@ -1199,6 +1256,8 @@ enum FirebaseRESTClientError: LocalizedError, Equatable {
             return "네트워크 연결을 확인해 주세요."
         case .notFound:
             return "요청한 데이터를 찾을 수 없습니다."
+        case .alreadyExists:
+            return "같은 항목이 이미 존재합니다."
         }
     }
 }

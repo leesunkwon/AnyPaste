@@ -1,10 +1,34 @@
 import AppKit
 import Combine
+import CryptoKit
 import Foundation
 import UniformTypeIdentifiers
 
 @MainActor
 final class AppModel: ObservableObject {
+    private struct PreparedFile: Sendable {
+        let data: Data
+        let fileName: String
+        let mimeType: String
+        let kind: ClipboardKind
+    }
+
+    private struct AutomaticSendContext: Sendable {
+        let userID: String
+        let fingerprint: String
+        let inFlightKey: String
+        let observationSequence: UInt64
+
+        var recordID: String {
+            "auto-\(fingerprint.prefix(32))"
+        }
+    }
+
+    private struct AutomaticObservation: Sendable {
+        let sequence: UInt64
+        var fingerprint: String?
+    }
+
     @Published private(set) var authPhase: AppPhase
     @Published private(set) var currentUser: AppUser?
     @Published var selectedRoute: AppRoute = .home
@@ -75,6 +99,9 @@ final class AppModel: ObservableObject {
     private var heartbeatTask: Task<Void, Never>?
     private var networkCancellable: AnyCancellable?
     private var terminationObserver: NSObjectProtocol?
+    private var automaticSendKeysInFlight: Set<String> = []
+    private var automaticObservationSequenceByUser: [String: UInt64] = [:]
+    private var latestAutomaticObservationByUser: [String: AutomaticObservation] = [:]
     private var refreshIsRunning = false
     private var didStart = false
 
@@ -778,7 +805,10 @@ final class AppModel: ObservableObject {
     // MARK: - Clipboard sending
 
     private func handleLocalClipboardChange(_ payload: ClipboardPayload) async {
-        guard authPhase == .authenticated, autoSync else { return }
+        guard authPhase == .authenticated,
+              autoSync,
+              let observedUserID = authSession?.user.id else { return }
+        let observationSequence = beginAutomaticObservation(for: observedUserID)
         switch payload {
         case let .text(text):
             guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -786,63 +816,136 @@ final class AppModel: ObservableObject {
                 errorMessage = "클립보드 텍스트가 10만 자를 넘어 자동 전송하지 않았습니다."
                 return
             }
-            await sendTextInBackground(text)
+            await performAutomaticSend(
+                fingerprint: payload.fingerprint,
+                observedUserID: observedUserID,
+                observationSequence: observationSequence
+            ) { context in
+                try await self.sendTextInBackground(
+                    text,
+                    itemID: context.recordID,
+                    userID: context.userID
+                )
+            }
 
         case let .image(data, format):
             do {
                 let normalized = try Self.normalizedImageData(data, format: format)
-                try ensureTransferNetworkAvailable()
-                transferState = .preparing
-                _ = try await sendBinaryData(
-                    normalized,
-                    fileName: "clipboard-\(Self.fileTimestamp).png",
-                    mimeType: "image/png",
-                    kind: .image,
-                    targetDeviceID: nil
-                )
-                transferState = .succeeded
+                let fingerprint = await Task.detached(priority: .utility) {
+                    Self.automaticFingerprint(namespace: "image", components: [normalized])
+                }.value
+                let fileName = "clipboard_image"
+                await performAutomaticSend(
+                    fingerprint: fingerprint,
+                    observedUserID: observedUserID,
+                    observationSequence: observationSequence,
+                    updatesTransferState: true
+                ) { context in
+                    try await self.sendBinaryData(
+                        normalized,
+                        fileName: fileName,
+                        mimeType: "image/png",
+                        kind: .image,
+                        targetDeviceID: nil,
+                        automaticContext: context
+                    )
+                }
             } catch {
-                transferState = .failed
-                handle(error)
+                if authSession?.user.id == observedUserID {
+                    transferState = .failed
+                    handle(error)
+                }
             }
 
         case let .file(url):
             do {
-                try await sendFile(url, targetDeviceID: nil)
-                transferState = .succeeded
+                let prepared = try await prepareFile(url)
+                let fingerprint = await Task.detached(priority: .utility) {
+                    Self.automaticFingerprint(
+                        namespace: "file",
+                        components: [
+                            Data(prepared.kind.rawValue.utf8),
+                            Data(prepared.fileName.utf8),
+                            Data(prepared.mimeType.utf8),
+                            prepared.data
+                        ]
+                    )
+                }.value
+                await performAutomaticSend(
+                    fingerprint: fingerprint,
+                    observedUserID: observedUserID,
+                    observationSequence: observationSequence,
+                    updatesTransferState: true
+                ) { context in
+                    try await self.sendBinaryData(
+                        prepared.data,
+                        fileName: prepared.fileName,
+                        mimeType: prepared.mimeType,
+                        kind: prepared.kind,
+                        targetDeviceID: nil,
+                        automaticContext: context
+                    )
+                }
             } catch {
-                transferState = .failed
-                handle(error)
+                if authSession?.user.id == observedUserID {
+                    transferState = .failed
+                    handle(error)
+                }
             }
         }
     }
 
-    private func sendTextInBackground(_ text: String) async {
+    private func sendTextInBackground(
+        _ text: String,
+        itemID: String,
+        userID: String
+    ) async throws -> ClipboardRecord {
+        if let existing = try await fetchClipboardRecord(itemID: itemID, userID: userID) {
+            try validateAutomaticTextRecord(existing, text: text)
+            return existing
+        }
+
+        let record = ClipboardRecord(
+            id: itemID,
+            kind: .text,
+            content: text,
+            sourceDeviceId: currentDeviceID,
+            expiresAt: Date().addingTimeInterval(Self.clipboardTTL),
+            readBy: []
+        )
+
         do {
-            let record = ClipboardRecord(
-                id: UUID().uuidString.lowercased(),
-                kind: .text,
-                content: text,
-                sourceDeviceId: currentDeviceID,
-                expiresAt: Date().addingTimeInterval(Self.clipboardTTL),
-                readBy: []
-            )
-            let created: ClipboardRecord = try await withAuthenticatedSession { client, session in
+            return try await withAuthenticatedSession(forUserID: userID) { client, session in
                 try await client.createClipboard(
                     userId: session.user.id,
                     record: record,
-                    idToken: session.idToken
+                    idToken: session.idToken,
+                    createOnly: true
                 )
             }
-            insertOrReplace(created)
-            syncStatus = .upToDate
-        } catch {
-            handle(error)
+        } catch FirebaseRESTClientError.alreadyExists {
+            guard let existing = try await fetchClipboardRecord(itemID: itemID, userID: userID) else {
+                throw FirebaseRESTClientError.invalidServerResponse
+            }
+            try validateAutomaticTextRecord(existing, text: text)
+            return existing
         }
     }
 
     private func sendFile(_ url: URL, targetDeviceID: String?) async throws {
         try ensureTransferNetworkAvailable()
+        transferState = .preparing
+        let prepared = try await prepareFile(url)
+        _ = try await sendBinaryData(
+            prepared.data,
+            fileName: prepared.fileName,
+            mimeType: prepared.mimeType,
+            kind: prepared.kind,
+            targetDeviceID: targetDeviceID
+        )
+    }
+
+    private func prepareFile(_ url: URL) async throws -> PreparedFile {
         guard url.isFileURL else {
             throw AppModelError.invalidFile
         }
@@ -870,7 +973,6 @@ final class AppModel: ObservableObject {
             throw AppModelError.fileTooLarge
         }
 
-        transferState = .preparing
         let data = try await Task.detached(priority: .userInitiated) {
             try Data(contentsOf: url, options: [.mappedIfSafe])
         }.value
@@ -881,16 +983,15 @@ final class AppModel: ObservableObject {
             throw AppModelError.fileTooLarge
         }
 
-        let fileName = values.name ?? url.lastPathComponent
+        let fileName = try Self.normalizedUploadFileName(values.name ?? url.lastPathComponent)
         let contentType = values.contentType ?? UTType(filenameExtension: url.pathExtension)
         let mimeType = contentType?.preferredMIMEType ?? "application/octet-stream"
         let kind: ClipboardKind = contentType?.conforms(to: .image) == true ? .image : .file
-        _ = try await sendBinaryData(
-            data,
+        return PreparedFile(
+            data: data,
             fileName: fileName,
             mimeType: mimeType,
-            kind: kind,
-            targetDeviceID: targetDeviceID
+            kind: kind
         )
     }
 
@@ -899,24 +1000,68 @@ final class AppModel: ObservableObject {
         fileName: String,
         mimeType: String,
         kind: ClipboardKind,
-        targetDeviceID: String?
+        targetDeviceID: String?,
+        automaticContext: AutomaticSendContext? = nil
     ) async throws -> ClipboardRecord {
+        try ensureTransferNetworkAvailable()
         guard !data.isEmpty else { throw AppModelError.emptyFile }
         guard Int64(data.count) <= Self.maximumTransferBytes else {
             throw AppModelError.fileTooLarge
         }
 
-        transferState = .uploading
-        let itemID = UUID().uuidString.lowercased()
-        let upload: StorageUploadResult = try await withAuthenticatedSession { client, session in
-            try await client.uploadClipboardData(
-                userId: session.user.id,
-                itemId: itemID,
+        let itemID = automaticContext?.recordID ?? UUID().uuidString.lowercased()
+        if let automaticContext,
+           let existing = try await fetchClipboardRecord(
+               itemID: itemID,
+               userID: automaticContext.userID
+           ) {
+            try await validateAutomaticBinaryRecord(
+                existing,
                 data: data,
                 fileName: fileName,
                 mimeType: mimeType,
-                idToken: session.idToken
+                kind: kind,
+                userID: automaticContext.userID
             )
+            return existing
+        }
+
+        if let automaticContext,
+           authSession?.user.id != automaticContext.userID {
+            throw CancellationError()
+        }
+        transferState = .uploading
+        let upload: StorageUploadResult
+        do {
+            upload = try await withAuthenticatedSession(
+                forUserID: automaticContext?.userID
+            ) { client, session in
+                try await client.uploadClipboardData(
+                    userId: session.user.id,
+                    itemId: itemID,
+                    data: data,
+                    fileName: fileName,
+                    mimeType: mimeType,
+                    idToken: session.idToken
+                )
+            }
+        } catch let uploadError {
+            guard let automaticContext else { throw uploadError }
+            guard let recovered = try await findUploadedClipboardData(
+                itemID: itemID,
+                fileName: fileName,
+                userID: automaticContext.userID
+            ) else {
+                throw uploadError
+            }
+            try await validateRecoveredAutomaticUpload(
+                recovered,
+                data: data,
+                fileName: fileName,
+                mimeType: mimeType,
+                userID: automaticContext.userID
+            )
+            upload = recovered
         }
 
         let record = ClipboardRecord(
@@ -933,23 +1078,243 @@ final class AppModel: ObservableObject {
         )
 
         do {
-            let created: ClipboardRecord = try await withAuthenticatedSession { client, session in
+            let created: ClipboardRecord = try await withAuthenticatedSession(
+                forUserID: automaticContext?.userID
+            ) { client, session in
                 try await client.createClipboard(
                     userId: session.user.id,
                     record: record,
-                    idToken: session.idToken
+                    idToken: session.idToken,
+                    createOnly: automaticContext != nil
                 )
             }
-            insertOrReplace(created)
+            if automaticContext == nil || authSession?.user.id == automaticContext?.userID {
+                insertOrReplace(created)
+            }
             return created
+        } catch FirebaseRESTClientError.alreadyExists where automaticContext != nil {
+            guard let automaticContext,
+                  let existing = try await fetchClipboardRecord(
+                      itemID: itemID,
+                      userID: automaticContext.userID
+                  ) else {
+                throw FirebaseRESTClientError.invalidServerResponse
+            }
+            try await validateAutomaticBinaryRecord(
+                existing,
+                data: data,
+                fileName: fileName,
+                mimeType: mimeType,
+                kind: kind,
+                userID: automaticContext.userID
+            )
+            if authSession?.user.id == automaticContext.userID {
+                insertOrReplace(existing)
+            }
+            return existing
         } catch {
-            try? await withAuthenticatedSession { client, session in
-                try await client.deleteStorageObject(
-                    path: upload.storagePath,
-                    idToken: session.idToken
-                )
+            if automaticContext == nil {
+                try? await withAuthenticatedSession { client, session in
+                    try await client.deleteStorageObject(
+                        path: upload.storagePath,
+                        idToken: session.idToken
+                    )
+                }
             }
             throw error
+        }
+    }
+
+    private func performAutomaticSend(
+        fingerprint: String,
+        observedUserID: String,
+        observationSequence: UInt64,
+        updatesTransferState: Bool = false,
+        operation: (AutomaticSendContext) async throws -> ClipboardRecord
+    ) async {
+        registerAutomaticFingerprint(
+            fingerprint,
+            for: observedUserID,
+            observationSequence: observationSequence
+        )
+        guard let context = beginAutomaticSend(
+            fingerprint: fingerprint,
+            observedUserID: observedUserID,
+            observationSequence: observationSequence
+        ) else { return }
+        defer {
+            automaticSendKeysInFlight.remove(context.inFlightKey)
+        }
+
+        if updatesTransferState {
+            transferState = .preparing
+        }
+
+        do {
+            let record = try await operation(context)
+            if latestAutomaticObservationByUser[context.userID]?.fingerprint == context.fingerprint {
+                persistAutomaticFingerprint(context.fingerprint, for: context.userID)
+            }
+            if authSession?.user.id == context.userID {
+                if !record.isExpired {
+                    insertOrReplace(record)
+                }
+                syncStatus = .upToDate
+                if updatesTransferState {
+                    transferState = .succeeded
+                }
+            }
+        } catch {
+            if authSession?.user.id == context.userID {
+                if updatesTransferState {
+                    transferState = .failed
+                }
+                handle(error)
+            }
+        }
+    }
+
+    private func beginAutomaticSend(
+        fingerprint: String,
+        observedUserID: String,
+        observationSequence: UInt64
+    ) -> AutomaticSendContext? {
+        guard authSession?.user.id == observedUserID, !observedUserID.isEmpty else { return nil }
+        let userID = observedUserID
+        guard storedAutomaticFingerprint(for: userID) != fingerprint else { return nil }
+
+        let inFlightKey = "\(userID)\u{0}\(fingerprint)"
+        guard automaticSendKeysInFlight.insert(inFlightKey).inserted else { return nil }
+        return AutomaticSendContext(
+            userID: userID,
+            fingerprint: fingerprint,
+            inFlightKey: inFlightKey,
+            observationSequence: observationSequence
+        )
+    }
+
+    private func beginAutomaticObservation(for userID: String) -> UInt64 {
+        let sequence = (automaticObservationSequenceByUser[userID] ?? 0) &+ 1
+        automaticObservationSequenceByUser[userID] = sequence
+        latestAutomaticObservationByUser[userID] = AutomaticObservation(
+            sequence: sequence,
+            fingerprint: nil
+        )
+        return sequence
+    }
+
+    private func registerAutomaticFingerprint(
+        _ fingerprint: String,
+        for userID: String,
+        observationSequence: UInt64
+    ) {
+        guard var observation = latestAutomaticObservationByUser[userID],
+              observation.sequence == observationSequence else {
+            return
+        }
+        observation.fingerprint = fingerprint
+        latestAutomaticObservationByUser[userID] = observation
+    }
+
+    private func storedAutomaticFingerprint(for userID: String) -> String? {
+        defaults.dictionary(forKey: PreferenceKey.automaticFingerprintsByUser)?[userID] as? String
+    }
+
+    private func persistAutomaticFingerprint(_ fingerprint: String, for userID: String) {
+        var values = defaults.dictionary(forKey: PreferenceKey.automaticFingerprintsByUser) ?? [:]
+        values[userID] = fingerprint
+        defaults.set(values, forKey: PreferenceKey.automaticFingerprintsByUser)
+    }
+
+    private func fetchClipboardRecord(
+        itemID: String,
+        userID: String
+    ) async throws -> ClipboardRecord? {
+        try await withAuthenticatedSession(forUserID: userID) { client, session in
+            try await client.fetchClipboard(
+                userId: session.user.id,
+                itemId: itemID,
+                idToken: session.idToken
+            )
+        }
+    }
+
+    private func findUploadedClipboardData(
+        itemID: String,
+        fileName: String,
+        userID: String
+    ) async throws -> StorageUploadResult? {
+        try await withAuthenticatedSession(forUserID: userID) { client, session in
+            try await client.findUploadedClipboardData(
+                userId: session.user.id,
+                itemId: itemID,
+                fileName: fileName,
+                idToken: session.idToken
+            )
+        }
+    }
+
+    private func validateRecoveredAutomaticUpload(
+        _ upload: StorageUploadResult,
+        data: Data,
+        fileName: String,
+        mimeType: String,
+        userID: String
+    ) async throws {
+        guard upload.fileName == fileName,
+              upload.fileSize == Int64(data.count),
+              upload.mimeType == mimeType else {
+            throw AppModelError.automaticRecordConflict
+        }
+
+        let storedData: Data = try await withAuthenticatedSession(
+            forUserID: userID
+        ) { client, session in
+            try await client.downloadStorageObject(
+                path: upload.storagePath,
+                maxBytes: Self.maximumTransferBytes,
+                idToken: session.idToken
+            )
+        }
+        guard storedData == data else {
+            throw AppModelError.automaticRecordConflict
+        }
+    }
+
+    private func validateAutomaticTextRecord(
+        _ record: ClipboardRecord,
+        text: String
+    ) throws {
+        guard record.kind == .text,
+              record.content == text,
+              record.storagePath.isEmpty,
+              record.fileName.isEmpty,
+              record.fileSize == 0,
+              record.mimeType.isEmpty else {
+            throw AppModelError.automaticRecordConflict
+        }
+    }
+
+    private func validateAutomaticBinaryRecord(
+        _ record: ClipboardRecord,
+        data: Data,
+        fileName: String,
+        mimeType: String,
+        kind: ClipboardKind,
+        userID: String
+    ) async throws {
+        guard record.kind == kind,
+              record.content.isEmpty,
+              record.fileName == fileName,
+              record.fileSize == Int64(data.count),
+              record.mimeType == mimeType,
+              !record.storagePath.isEmpty else {
+            throw AppModelError.automaticRecordConflict
+        }
+
+        let storedData = try await download(record, userID: userID)
+        guard storedData == data else {
+            throw AppModelError.automaticRecordConflict
         }
     }
 
@@ -1005,11 +1370,14 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func download(_ record: ClipboardRecord) async throws -> Data {
+    private func download(
+        _ record: ClipboardRecord,
+        userID: String? = nil
+    ) async throws -> Data {
         try ensureTransferNetworkAvailable()
         guard !record.storagePath.isEmpty else { throw AppModelError.missingStoragePath }
         let path = record.storagePath
-        return try await withAuthenticatedSession { client, session in
+        return try await withAuthenticatedSession(forUserID: userID) { client, session in
             try await client.downloadStorageObject(
                 path: path,
                 maxBytes: Self.maximumTransferBytes,
@@ -1110,6 +1478,18 @@ final class AppModel: ObservableObject {
     }
 
     // MARK: - Session helpers
+
+    private func withAuthenticatedSession<Value: Sendable>(
+        forUserID expectedUserID: String?,
+        _ operation: @Sendable (FirebaseRESTClient, AuthSession) async throws -> Value
+    ) async throws -> Value {
+        try await withAuthenticatedSession { client, session in
+            if let expectedUserID, session.user.id != expectedUserID {
+                throw CancellationError()
+            }
+            return try await operation(client, session)
+        }
+    }
 
     private func withAuthenticatedSession<Value: Sendable>(
         _ operation: @Sendable (FirebaseRESTClient, AuthSession) async throws -> Value
@@ -1276,6 +1656,34 @@ final class AppModel: ObservableObject {
         return png
     }
 
+    nonisolated private static func automaticFingerprint(
+        namespace: String,
+        components: [Data]
+    ) -> String {
+        var hasher = SHA256()
+        hasher.update(data: Data(namespace.utf8))
+        hasher.update(data: Data([0]))
+        for component in components {
+            hasher.update(data: component)
+            hasher.update(data: Data([0]))
+        }
+        return hasher.finalize().map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func normalizedUploadFileName(_ rawValue: String) throws -> String {
+        let value = String(
+            rawValue
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "/", with: "_")
+                .replacingOccurrences(of: "\\", with: "_")
+                .prefix(180)
+        )
+        guard !value.isEmpty, value != ".", value != ".." else {
+            throw AppModelError.invalidFile
+        }
+        return value
+    }
+
     private static func storedBoolean(
         in defaults: UserDefaults,
         key: String,
@@ -1298,10 +1706,6 @@ final class AppModel: ObservableObject {
         let hostName = ProcessInfo.processInfo.hostName
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return hostName.isEmpty ? "Mac" : hostName
-    }
-
-    private static var fileTimestamp: String {
-        String(Int(Date().timeIntervalSince1970))
     }
 
     private static func cleanupExpiredCache() {
@@ -1350,6 +1754,7 @@ final class AppModel: ObservableObject {
 
 private enum PreferenceKey {
     static let autoSync = "settings.autoSync"
+    static let automaticFingerprintsByUser = "clipboard.automaticFingerprintsByUser"
     static let notificationsEnabled = "settings.notificationsEnabled"
     static let wifiOnlyTransfers = "settings.wifiOnlyTransfers"
     static let deviceID = "device.id"
@@ -1366,6 +1771,7 @@ private enum AppModelError: LocalizedError {
     case cacheUnavailable
     case fileOpenFailed
     case wifiRequired
+    case automaticRecordConflict
 
     var errorDescription: String? {
         switch self {
@@ -1389,6 +1795,8 @@ private enum AppModelError: LocalizedError {
             return "파일을 열 수 없습니다."
         case .wifiRequired:
             return "Wi-Fi 전용 전송이 켜져 있습니다. Wi-Fi에 연결한 뒤 다시 시도해 주세요."
+        case .automaticRecordConflict:
+            return "같은 자동 전송 ID에 다른 내용이 있어 전송을 중단했습니다."
         }
     }
 }

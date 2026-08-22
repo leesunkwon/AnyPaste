@@ -27,6 +27,7 @@ import com.kotlinsun.anypaste.data.FirestoreDeviceRepository
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
 import java.io.File
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.UUID
@@ -35,7 +36,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -69,11 +69,15 @@ class ClipboardSyncService : Service() {
     }
     private val notificationManager by lazy { AnyPasteNotificationManager(this) }
     private val appPreferences by lazy { AppPreferences(this) }
+    private val syncPreferences by lazy {
+        applicationContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    }
     private val deviceId by lazy { getOrCreateDeviceId(this) }
 
     private var syncJob: Job? = null
     private var maintenanceJob: Job? = null
     private var heartbeatJob: Job? = null
+    private var fingerprintJob: Job? = null
     private var currentUserId: String? = null
     private var syncStarted = false
     private var preserveTerminalState = false
@@ -235,6 +239,9 @@ class ClipboardSyncService : Service() {
                         )
                         return@collectLatest
                     }
+                    synchronized(dedupeLock) {
+                        lastObservedLocalFingerprint = lastHandledAutoFingerprint(userId)
+                    }
 
                     updateStatus(
                         phase = ClipboardSyncPhase.SYNCING,
@@ -271,17 +278,41 @@ class ClipboardSyncService : Service() {
     }
 
     private fun handleLocalClipboardChanged() {
+        fingerprintJob?.cancel()
         val userId = currentUserId ?: return
         val clipSnapshot = readLocalClip() ?: return
-        enqueueLocalClip(userId, clipSnapshot, checkClipboardLoop = true)
+        val job = serviceScope.launch {
+            try {
+                val fingerprint = clipSnapshot.automaticItemId()
+                if (currentUserId == userId) {
+                    enqueueLocalClip(
+                        userId = userId,
+                        clipSnapshot = clipSnapshot,
+                        fingerprint = fingerprint,
+                        checkClipboardLoop = true,
+                    )
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                updateStatus(
+                    phase = ClipboardSyncPhase.ERROR,
+                    message = "클립보드 내용을 확인하지 못했습니다",
+                )
+            }
+        }
+        fingerprintJob = job
+        job.invokeOnCompletion {
+            if (fingerprintJob === job) fingerprintJob = null
+        }
     }
 
     private fun enqueueLocalClip(
         userId: String,
         clipSnapshot: LocalClip,
+        fingerprint: String,
         checkClipboardLoop: Boolean,
     ) {
-        val fingerprint = clipSnapshot.fingerprintMaterial.sha256()
         val now = SystemClock.elapsedRealtime()
         val waitingForWifi = clipSnapshot is LocalClip.Image && !canTransferBinaryNow()
         var queuedBehindUpload = false
@@ -302,7 +333,8 @@ class ClipboardSyncService : Service() {
                 }
                 // The clipboard listener can fire more than once and maintenance also samples it.
                 // A stable value is ignored for the whole service session. Copying another value
-                // first changes this marker, so deliberately copying the same value later works.
+                // changes this marker; the repository still prevents a duplicate document if an
+                // older payload is encountered again.
                 if (lastObservedLocalFingerprint == fingerprint) return
                 lastObservedLocalFingerprint = fingerprint
             }
@@ -353,14 +385,20 @@ class ClipboardSyncService : Service() {
         val uploadJob = serviceScope.launch {
             try {
                 when (clipSnapshot) {
-                    is LocalClip.Text -> clipboardRepository.createText(
+                    is LocalClip.Text -> clipboardRepository.createAutomaticText(
                         userId = userId,
+                        itemId = fingerprint,
                         content = clipSnapshot.value,
                         sourceDeviceId = deviceId,
                     )
 
-                    is LocalClip.Image -> uploadLocalImage(userId, clipSnapshot)
+                    is LocalClip.Image -> uploadLocalImage(
+                        userId = userId,
+                        itemId = fingerprint,
+                        image = clipSnapshot,
+                    )
                 }
+                rememberLastHandledAutoFingerprint(userId, fingerprint)
                 synchronized(dedupeLock) {
                     if (pendingLocalClip?.fingerprint == fingerprint) {
                         pendingLocalClip = null
@@ -372,6 +410,17 @@ class ClipboardSyncService : Service() {
                 )
             } catch (error: CancellationException) {
                 throw error
+            } catch (error: AutomaticPayloadConflictException) {
+                rememberLastHandledAutoFingerprint(userId, fingerprint)
+                synchronized(dedupeLock) {
+                    if (pendingLocalClip?.fingerprint == fingerprint) {
+                        pendingLocalClip = null
+                    }
+                }
+                updateStatus(
+                    phase = ClipboardSyncPhase.ERROR,
+                    message = error.message ?: "자동 이미지 데이터가 일치하지 않아 전송을 중지했습니다",
+                )
             } catch (_: Exception) {
                 var willRetry = false
                 synchronized(dedupeLock) {
@@ -429,6 +478,7 @@ class ClipboardSyncService : Service() {
     private fun readLocalClip(): LocalClip? {
         return try {
             val description = clipboardManager.primaryClipDescription ?: return null
+            if (description.label?.toString() == REMOTE_CLIP_LABEL) return null
             if (description.isMarkedSensitive()) return null
             val clip = clipboardManager.primaryClip ?: return null
             if (clip.itemCount == 0) return null
@@ -448,7 +498,6 @@ class ClipboardSyncService : Service() {
                     if (metadata.sizeBytes !in 1L..MAX_SYNC_BINARY_BYTES) return null
                     LocalClip.Image(
                         uri = uri,
-                        fileName = metadata.fileName,
                         mimeType = metadata.mimeType,
                     )
                 }
@@ -464,33 +513,86 @@ class ClipboardSyncService : Service() {
         }
     }
 
-    private suspend fun uploadLocalImage(userId: String, image: LocalClip.Image) {
+    private suspend fun uploadLocalImage(
+        userId: String,
+        itemId: String,
+        image: LocalClip.Image,
+    ) {
         check(canTransferBinaryNow()) { "Wi-Fi 연결 후 이미지를 전송할 수 있습니다." }
-        val itemId = clipboardRepository.newItemId(userId)
-        var uploadedStoragePath: String? = null
-        try {
-            val upload = storageRepository.uploadFile(
+        val existing = clipboardRepository.getItem(userId, itemId)
+        if (existing != null) {
+            if (existing.type != ClipboardType.IMAGE.value ||
+                !existing.storagePath.startsWith("users/$userId/clipboard/$itemId/")
+            ) {
+                throw AutomaticPayloadConflictException(
+                    "자동 전송 문서 ID가 다른 이미지에 이미 사용 중입니다",
+                )
+            }
+            verifyAutomaticImagePayload(itemId, existing.storagePath)
+            return
+        }
+        val upload = try {
+            storageRepository.uploadFile(
                 userId = userId,
                 itemId = itemId,
                 source = image.uri,
-                fileName = image.fileName,
+                fileName = AUTO_IMAGE_STORAGE_FILE_NAME,
                 mimeType = image.mimeType,
             )
-            uploadedStoragePath = upload.storagePath
-            clipboardRepository.createBinary(
+        } catch (error: CancellationException) {
+            throw error
+        } catch (uploadError: Exception) {
+            // Storage rules allow create but not overwrite. If the first upload committed and its
+            // response was lost, recover that object instead of attempting another object create.
+            storageRepository.findUploadedFile(
+                userId = userId,
+                itemId = itemId,
+                fileName = AUTO_IMAGE_STORAGE_FILE_NAME,
+            ) ?: throw uploadError
+        }
+        verifyAutomaticImagePayload(itemId, upload.storagePath)
+        try {
+            clipboardRepository.createAutomaticBinary(
                 userId = userId,
                 itemId = itemId,
                 type = ClipboardType.IMAGE,
                 upload = upload,
                 sourceDeviceId = deviceId,
             )
-        } catch (error: Throwable) {
-            uploadedStoragePath?.let { path ->
-                withContext(NonCancellable) {
-                    runCatching { storageRepository.delete(path) }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (createError: Exception) {
+            val committed = clipboardRepository.getItem(userId, itemId) ?: throw createError
+            if (committed.type != ClipboardType.IMAGE.value) {
+                throw AutomaticPayloadConflictException(
+                    "자동 전송 문서 ID가 다른 항목에 이미 사용 중입니다",
+                )
+            }
+            verifyAutomaticImagePayload(itemId, committed.storagePath)
+            if (committed.storagePath != upload.storagePath) {
+                try {
+                    storageRepository.delete(upload.storagePath)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    // The orphan is bounded to this deterministic item ID and lifecycle cleanup.
                 }
             }
-            throw error
+        }
+    }
+
+    private suspend fun verifyAutomaticImagePayload(itemId: String, storagePath: String) {
+        val actualItemId = withContext(Dispatchers.IO) {
+            val bytes = storageRepository.downloadBytes(
+                storagePath = storagePath,
+                maxDownloadSizeBytes = MAX_SYNC_BINARY_BYTES,
+            )
+            automaticImageItemId(bytes)
+        }
+        if (actualItemId != itemId) {
+            throw AutomaticPayloadConflictException(
+                "저장된 이미지가 원본과 일치하지 않아 자동 전송을 중지했습니다",
+            )
         }
     }
 
@@ -505,16 +607,14 @@ class ClipboardSyncService : Service() {
                 .firstOrNull { it.startsWith(IMAGE_MIME_PREFIX) }
             ?: return null
 
-        var displayName: String? = null
         var sizeBytes = 0L
         contentResolver.query(
             uri,
-            arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE),
+            arrayOf(OpenableColumns.SIZE),
             null,
             null,
             null,
         )?.use { cursor ->
-            displayName = cursor.stringValue(OpenableColumns.DISPLAY_NAME)
             sizeBytes = cursor.longValue(OpenableColumns.SIZE) ?: 0L
         }
         if (sizeBytes <= 0L) {
@@ -523,20 +623,10 @@ class ClipboardSyncService : Service() {
             } ?: 0L
         }
 
-        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-            ?.takeIf(String::isNotBlank)
-            ?: DEFAULT_IMAGE_EXTENSION
-        val fallbackName = "clipboard_${System.currentTimeMillis()}.$extension"
         return LocalImageMetadata(
-            fileName = displayName?.takeIf(String::isNotBlank) ?: fallbackName,
             mimeType = mimeType,
             sizeBytes = sizeBytes,
         )
-    }
-
-    private fun Cursor.stringValue(columnName: String): String? {
-        val index = getColumnIndex(columnName)
-        return if (index >= 0 && moveToFirst() && !isNull(index)) getString(index) else null
     }
 
     private fun Cursor.longValue(columnName: String): Long? {
@@ -628,7 +718,7 @@ class ClipboardSyncService : Service() {
             val receivedFile = receivedImageFile(item)
             destination = receivedFile
             storageRepository.downloadFile(item.storagePath, receivedFile)
-            applyRemoteImage(receivedFile, item.mimeType)
+            applyRemoteImage(receivedFile)
             updateStatus(
                 phase = ClipboardSyncPhase.SYNCING,
                 message = "받은 이미지를 클립보드에 복사했습니다",
@@ -647,20 +737,15 @@ class ClipboardSyncService : Service() {
         }
     }
 
-    private fun applyRemoteImage(file: File, mimeType: String) {
+    private suspend fun applyRemoteImage(file: File) {
         val contentUri = FileProvider.getUriForFile(
             this,
             "$packageName.fileprovider",
             file,
         )
-        val normalizedMimeType = mimeType.takeIf { it.startsWith(IMAGE_MIME_PREFIX) }
-            ?: applicationContext.contentResolver.getType(contentUri)
-            ?: DEFAULT_IMAGE_MIME_TYPE
-        val fingerprint = LocalClip.Image(
-            uri = contentUri,
-            fileName = file.name,
-            mimeType = normalizedMimeType,
-        ).fingerprintMaterial.sha256()
+        val fingerprint = withContext(Dispatchers.IO) {
+            file.inputStream().use(::automaticImageItemId)
+        }
 
         synchronized(dedupeLock) {
             registerPendingRemoteFingerprint(fingerprint)
@@ -713,7 +798,7 @@ class ClipboardSyncService : Service() {
     }
 
     private fun applyRemoteText(text: String): Boolean {
-        val fingerprint = LocalClip.Text(text).fingerprintMaterial.sha256()
+        val fingerprint = automaticTextItemId(text)
         synchronized(dedupeLock) {
             registerPendingRemoteFingerprint(fingerprint)
         }
@@ -848,6 +933,7 @@ class ClipboardSyncService : Service() {
         enqueueLocalClip(
             userId = pending.userId,
             clipSnapshot = pending.clip,
+            fingerprint = pending.fingerprint,
             checkClipboardLoop = false,
         )
     }
@@ -902,6 +988,8 @@ class ClipboardSyncService : Service() {
     private fun clearUserScopedTracking() {
         heartbeatJob?.cancel()
         heartbeatJob = null
+        fingerprintJob?.cancel()
+        fingerprintJob = null
         lastHeartbeatElapsedRealtime = 0L
         val localJobs = synchronized(dedupeLock) {
             val jobs = localUploadJobs.values.toList()
@@ -978,32 +1066,87 @@ class ClipboardSyncService : Service() {
         notificationManager.updateSyncNotification(message)
     }
 
-    private fun String.sha256(): String {
-        val bytes = MessageDigest.getInstance("SHA-256")
-            .digest(toByteArray(StandardCharsets.UTF_8))
-        return bytes.take(FINGERPRINT_BYTES).joinToString(separator = "") { byte ->
-            "%02x".format(byte)
+    private suspend fun LocalClip.automaticItemId(): String = when (this) {
+        is LocalClip.Text -> automaticTextItemId(value)
+        is LocalClip.Image -> withContext(Dispatchers.IO) {
+            val input = applicationContext.contentResolver.openInputStream(uri)
+                ?: throw IllegalArgumentException("클립보드 이미지를 읽을 수 없습니다.")
+            input.use(::automaticImageItemId)
         }
     }
 
-    private sealed interface LocalClip {
-        val fingerprintMaterial: String
+    private fun automaticTextItemId(text: String): String =
+        "text\u0000$text".toByteArray(StandardCharsets.UTF_8).sha256AutomaticItemId()
 
-        data class Text(val value: String) : LocalClip {
-            override val fingerprintMaterial: String = "text:$value"
+    private fun automaticImageItemId(input: InputStream): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(IMAGE_FINGERPRINT_PREFIX)
+        val buffer = ByteArray(HASH_BUFFER_SIZE)
+        var totalBytes = 0L
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            totalBytes += count
+            require(totalBytes <= MAX_SYNC_BINARY_BYTES) {
+                "이미지는 ${MAX_SYNC_BINARY_BYTES / 1024L / 1024L}MB 이하여야 합니다."
+            }
+            digest.update(buffer, 0, count)
         }
+        require(totalBytes > 0L) { "빈 이미지는 전송할 수 없습니다." }
+        digest.update(IMAGE_FINGERPRINT_SUFFIX)
+        return digest.digest().toAutomaticItemId()
+    }
+
+    private fun automaticImageItemId(bytes: ByteArray): String {
+        require(bytes.isNotEmpty()) { "빈 이미지는 전송할 수 없습니다." }
+        require(bytes.size.toLong() <= MAX_SYNC_BINARY_BYTES) {
+            "이미지는 ${MAX_SYNC_BINARY_BYTES / 1024L / 1024L}MB 이하여야 합니다."
+        }
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(IMAGE_FINGERPRINT_PREFIX)
+        digest.update(bytes)
+        digest.update(IMAGE_FINGERPRINT_SUFFIX)
+        return digest.digest().toAutomaticItemId()
+    }
+
+    private fun ByteArray.sha256AutomaticItemId(): String =
+        MessageDigest.getInstance("SHA-256").digest(this).toAutomaticItemId()
+
+    private fun ByteArray.toAutomaticItemId(): String =
+        AUTO_ITEM_ID_PREFIX + toLowercaseHex().take(AUTO_ITEM_ID_HASH_LENGTH)
+
+    private fun ByteArray.toLowercaseHex(): String {
+        return buildString(size * 2) {
+            this@toLowercaseHex.forEach { byte ->
+                val unsigned = byte.toInt() and 0xff
+                append(LOWERCASE_HEX_DIGITS[unsigned ushr 4])
+                append(LOWERCASE_HEX_DIGITS[unsigned and 0x0f])
+            }
+        }
+    }
+
+    private fun lastHandledAutoFingerprint(userId: String): String? =
+        syncPreferences.getString(lastAutoFingerprintKey(userId), null)
+
+    private fun rememberLastHandledAutoFingerprint(userId: String, fingerprint: String) {
+        syncPreferences.edit()
+            .putString(lastAutoFingerprintKey(userId), fingerprint)
+            .apply()
+    }
+
+    private fun lastAutoFingerprintKey(userId: String): String =
+        "$KEY_LAST_AUTO_FINGERPRINT_PREFIX$userId"
+
+    private sealed interface LocalClip {
+        data class Text(val value: String) : LocalClip
 
         data class Image(
             val uri: Uri,
-            val fileName: String,
             val mimeType: String,
-        ) : LocalClip {
-            override val fingerprintMaterial: String = "image:$uri"
-        }
+        ) : LocalClip
     }
 
     private data class LocalImageMetadata(
-        val fileName: String,
         val mimeType: String,
         val sizeBytes: Long,
     )
@@ -1014,6 +1157,9 @@ class ClipboardSyncService : Service() {
         val fingerprint: String,
         val failureCount: Int,
     )
+
+    private class AutomaticPayloadConflictException(message: String) :
+        IllegalStateException(message)
 
     private enum class RemoteItemResult {
         HANDLED,
@@ -1028,12 +1174,17 @@ class ClipboardSyncService : Service() {
 
         private const val PREFERENCES_NAME = "anypaste_sync"
         private const val KEY_DEVICE_ID = "device_id"
+        private const val KEY_LAST_AUTO_FINGERPRINT_PREFIX = "last_auto_fingerprint."
+        private const val AUTO_ITEM_ID_PREFIX = "auto-"
+        private const val AUTO_ITEM_ID_HASH_LENGTH = 32
+        private const val LOWERCASE_HEX_DIGITS = "0123456789abcdef"
+        private const val HASH_BUFFER_SIZE = 64 * 1024
+        private const val AUTO_IMAGE_STORAGE_FILE_NAME = "clipboard_image"
         private const val REMOTE_CLIP_LABEL = "AnyPaste"
         private const val EXTRA_IS_SENSITIVE_COMPAT = "android.content.extra.IS_SENSITIVE"
         private const val IMAGE_MIME_PATTERN = "image/*"
         private const val IMAGE_MIME_PREFIX = "image/"
         private const val DEFAULT_IMAGE_EXTENSION = "png"
-        private const val DEFAULT_IMAGE_MIME_TYPE = "image/png"
         private const val RECEIVED_CACHE_DIRECTORY = "received"
         private const val MAX_CACHE_ID_LENGTH = 80
         private const val MAX_CACHE_FILE_NAME_LENGTH = 120
@@ -1045,7 +1196,6 @@ class ClipboardSyncService : Service() {
         private const val MAX_NOTIFIED_REMOTE_ITEMS = 500
         private const val MAX_LOCAL_RETRY_ATTEMPTS = 5
         private const val MAX_READ_RECEIPT_RETRY_ATTEMPTS = 5
-        private const val FINGERPRINT_BYTES = 16
         private const val REMOTE_LOOP_GUARD_MILLIS = 5_000L
         private const val INITIAL_RETRY_MILLIS = 1_000L
         private const val MAX_RETRY_MILLIS = 30_000L
@@ -1053,6 +1203,9 @@ class ClipboardSyncService : Service() {
         private const val MAINTENANCE_INTERVAL_MILLIS = 60_000L
         private const val HEARTBEAT_TIMEOUT_MILLIS = 5_000L
         private const val OFFLINE_UPDATE_TIMEOUT_MILLIS = 1_500L
+        private val IMAGE_FINGERPRINT_PREFIX =
+            "image\u0000".toByteArray(StandardCharsets.UTF_8)
+        private val IMAGE_FINGERPRINT_SUFFIX = byteArrayOf(0)
         private val UNSAFE_FILE_NAME = Regex("[^A-Za-z0-9._-]")
 
         private val running = AtomicBoolean(false)

@@ -1,24 +1,9 @@
-//
-//  ContentView.swift
-//  AnyPaste
-//
-//  Created by sunkwon on 8/22/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @ObservedObject var model: AppModel
 
-#Preview {
-    ContentView()
+    var body: some View {
+        AnyPasteRootView(model: model)
+    }
 }

@@ -23,6 +23,7 @@ captures/
 
 # Local Firebase project configuration
 google-services.json
+AnyPaste_ForMac/AnyPaste/Secrets.xcconfig
 firebase-debug.log
 firebase-debug.*.log
 .firebase/

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_24"
+        android:paddingTop="@dimen/space_16"
+        android:paddingBottom="@dimen/space_24">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icon_primary"
+            android:contentDescription="뒤로가기"
+            android:padding="10dp"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_32"
+            android:text="이메일로 계속하기"
+            android:textSize="27sp" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:text="가입한 이메일이 없다면 새 계정이 만들어집니다."
+            android:textSize="15sp" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_32"
+            android:text="이메일"
+            android:textSize="12sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            app:boxBackgroundColor="@color/surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
+            app:boxCornerRadiusBottomStart="@dimen/radius_s"
+            app:boxCornerRadiusTopEnd="@dimen/radius_s"
+            app:boxCornerRadiusTopStart="@dimen/radius_s"
+            app:boxStrokeColor="@color/primary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="name@example.com"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="@dimen/space_16"
+                android:textColor="@color/ink" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_20"
+            android:text="비밀번호"
+            android:textSize="12sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            app:boxBackgroundColor="@color/surface"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
+            app:boxCornerRadiusBottomStart="@dimen/radius_s"
+            app:boxCornerRadiusTopEnd="@dimen/radius_s"
+            app:boxCornerRadiusTopStart="@dimen/radius_s"
+            app:boxStrokeColor="@color/primary"
+            app:endIconMode="password_toggle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="8자 이상 입력"
+                android:inputType="textPassword"
+                android:paddingHorizontal="@dimen/space_16"
+                android:textColor="@color/ink" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/space_4"
+            android:gravity="center_vertical"
+            android:text="비밀번호를 잊으셨나요?"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:background="@drawable/bg_card_primary"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/space_16">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="안전한 로그인"
+                android:src="@drawable/ic_shield" />
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_8"
+                android:layout_weight="1"
+                android:text="계정과 동기화 데이터는 안전하게 보호됩니다."
+                android:textColor="@color/on_primary_container"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_email_continue"
+            style="@style/Widget.AnyPaste.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_32"
+            android:text="계속하기" />
+    </LinearLayout>
+</ScrollView>

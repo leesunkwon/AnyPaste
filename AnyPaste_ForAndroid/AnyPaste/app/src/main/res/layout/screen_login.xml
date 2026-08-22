@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_24"
+        android:paddingTop="@dimen/space_40"
+        android:paddingBottom="@dimen/space_24">
+
+        <TextView
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:background="@drawable/bg_circle_primary"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_24"
+            android:gravity="center"
+            android:text="AnyPaste에 오신 것을\n환영해요"
+            android:textSize="27sp" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:gravity="center"
+            android:text="같은 계정으로 로그인한 내 기기끼리\n클립보드를 안전하게 공유합니다."
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_32"
+            android:background="@drawable/bg_card_primary"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/space_16">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:contentDescription="보안"
+                android:src="@drawable/ic_shield" />
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_12"
+                android:layout_weight="1"
+                android:text="공유 항목은 내 계정의 기기에서만 볼 수 있어요."
+                android:textColor="@color/on_primary_container" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login"
+            style="@style/Widget.AnyPaste.Button.Outline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_32"
+            android:text="Google로 계속하기"
+            android:textSize="15sp"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_email"
+            style="@style/Widget.AnyPaste.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:text="이메일로 계속하기"
+            app:icon="@drawable/ic_text"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp" />
+
+        <TextView
+            android:id="@+id/btn_show_onboarding"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/space_12"
+            android:gravity="center"
+            android:text="AnyPaste 둘러보기"
+            android:textColor="@color/primary"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:gravity="center"
+            android:text="계속하면 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다."
+            android:textColor="@color/ink_tertiary"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>

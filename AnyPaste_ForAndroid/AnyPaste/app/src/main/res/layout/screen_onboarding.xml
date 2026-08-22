@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/space_24"
+        android:paddingTop="@dimen/space_32"
+        android:paddingBottom="@dimen/space_24">
+
+        <TextView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_circle_primary"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:letterSpacing="0.14"
+            android:text="ANYPASTE"
+            android:textColor="@color/primary"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            android:gravity="center"
+            android:text="복사한 모든 것을\n어디서나 붙여넣으세요"
+            android:textSize="27sp" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:gravity="center"
+            android:text="Mac과 Android 사이를 자연스럽게 연결해요."
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginTop="@dimen/space_32"
+            android:background="@drawable/bg_card_primary"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/space_20">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="124dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:contentDescription="Mac"
+                    android:src="@drawable/ic_desktop" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:text="Mac"
+                    android:textColor="@color/ink"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="↔"
+                android:textColor="@color/primary"
+                android:textSize="28sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="124dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:contentDescription="Android"
+                    android:src="@drawable/ic_phone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:text="Android"
+                    android:textColor="@color/ink"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_24"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_check"
+                android:drawablePadding="@dimen/space_12"
+                android:gravity="center_vertical"
+                android:text="텍스트, 이미지, 파일을 한 번에"
+                android:textColor="@color/ink"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:drawableStart="@drawable/ic_check"
+                android:drawablePadding="@dimen/space_12"
+                android:gravity="center_vertical"
+                android:text="내 기기에만 안전하게 동기화"
+                android:textColor="@color/ink"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_24"
+            android:gravity="center">
+
+            <View
+                android:layout_width="20dp"
+                android:layout_height="6dp"
+                android:background="@drawable/bg_progress_fill" />
+
+            <View
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginStart="@dimen/space_8"
+                android:background="@drawable/bg_circle_success" />
+
+            <View
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginStart="@dimen/space_8"
+                android:background="@drawable/bg_circle_success" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_continue"
+            style="@style/Widget.AnyPaste.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_24"
+            android:text="시작하기"
+            app:icon="@drawable/ic_arrow_right"
+            app:iconGravity="textEnd" />
+    </LinearLayout>
+</ScrollView>

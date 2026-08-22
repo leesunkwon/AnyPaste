@@ -6,7 +6,6 @@ import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kotlinsun.anypaste.data.FirebaseAuthRepository
 import com.kotlinsun.anypaste.data.FirebaseStorageRepository
@@ -102,22 +101,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun signInWithEmail(email: String, password: String) {
+        launchBusy { authRepository.signInWithEmail(email, password) }
+    }
+
+    fun signUpWithEmail(email: String, displayName: String, password: String) {
         launchBusy {
-            try {
-                authRepository.signInWithEmail(email, password)
-            } catch (error: FirebaseAuthInvalidUserException) {
-                authRepository.createAccountWithEmail(email, password)
-            } catch (error: FirebaseAuthException) {
-                if (error.errorCode == "ERROR_INVALID_CREDENTIAL") {
-                    // Firebase's email-enumeration protection intentionally returns the same
-                    // error for a missing account and a wrong password. The screen promises to
-                    // create missing accounts, so try creation; an existing email is mapped to a
-                    // clear password-check message by the common error handler.
-                    authRepository.createAccountWithEmail(email, password)
-                } else {
-                    throw error
-                }
-            }
+            val user = authRepository.createAccountWithEmail(
+                email = email,
+                password = password,
+                displayName = displayName,
+            )
+            mutableState.update { it.copy(user = user) }
         }
     }
 
@@ -504,10 +498,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 "ERROR_INVALID_EMAIL" -> "이메일 형식을 확인해 주세요."
                 "ERROR_WRONG_PASSWORD", "ERROR_INVALID_CREDENTIAL" ->
                     "이메일 또는 비밀번호를 확인해 주세요."
-                "ERROR_EMAIL_ALREADY_IN_USE" -> "이미 가입된 이메일입니다. 비밀번호를 확인해 주세요."
-                "ERROR_WEAK_PASSWORD" -> "비밀번호는 6자 이상 입력해 주세요."
+                "ERROR_USER_NOT_FOUND" -> "가입되지 않은 이메일입니다."
+                "ERROR_USER_DISABLED" -> "사용이 중지된 계정입니다."
+                "ERROR_EMAIL_ALREADY_IN_USE" -> "이미 가입된 이메일입니다. 로그인해 주세요."
+                "ERROR_WEAK_PASSWORD" -> "Firebase 비밀번호 보안 조건을 확인해 주세요."
                 "ERROR_OPERATION_NOT_ALLOWED" -> "Firebase Console에서 로그인 방식을 활성화해 주세요."
                 "ERROR_NETWORK_REQUEST_FAILED" -> "네트워크 연결을 확인해 주세요."
+                "ERROR_TOO_MANY_REQUESTS" -> "요청이 많습니다. 잠시 후 다시 시도해 주세요."
                 else -> message ?: "인증 요청을 완료하지 못했습니다."
             }
         }

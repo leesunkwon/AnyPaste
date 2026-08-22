@@ -85,10 +85,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
-            android:text="이메일로 계속하기"
+            android:text="이메일로 로그인"
             app:icon="@drawable/ic_text"
             app:iconGravity="textStart"
             app:iconPadding="12dp" />
+
+        <TextView
+            android:id="@+id/btn_sign_up"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/space_8"
+            android:gravity="center"
+            android:text="처음이신가요? 회원가입"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progress_login"

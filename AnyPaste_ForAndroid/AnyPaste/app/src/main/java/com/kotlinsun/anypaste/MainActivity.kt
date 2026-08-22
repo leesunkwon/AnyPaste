@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleAuthTransition(state: MainUiState) {
         if (!state.authResolved) return
+        if (state.isBusy && currentScreen in AUTH_SCREENS) return
         val userId = state.user?.uid
         val changed = !authTransitionHandled || userId != lastUserId
         if (!changed) return
@@ -263,10 +264,12 @@ class MainActivity : AppCompatActivity() {
             Screen.LOGIN -> {
                 root.onClick(R.id.btn_login) { beginGoogleSignIn() }
                 root.onClick(R.id.btn_login_email) { showScreen(Screen.EMAIL_LOGIN) }
+                root.onClick(R.id.btn_sign_up) { showScreen(Screen.SIGN_UP) }
                 root.onClick(R.id.btn_show_onboarding) { showScreen(Screen.ONBOARDING) }
             }
 
             Screen.EMAIL_LOGIN -> bindEmailActions(root)
+            Screen.SIGN_UP -> bindSignUpActions(root)
             Screen.HOME -> bindHomeActions(root)
             Screen.CLIPBOARD_LIST -> bindClipboardListActions(root)
             Screen.CLIPBOARD_DETAIL -> bindClipboardDetailActions(root)
@@ -282,6 +285,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindEmailActions(root: View) {
+        root.onClick(R.id.btn_sign_up) { showScreen(Screen.SIGN_UP) }
         root.onClick(R.id.btn_email_continue) {
             val email = root.findViewById<TextInputEditText>(R.id.input_email).text
                 ?.toString()?.trim().orEmpty()
@@ -309,6 +313,45 @@ class MainActivity : AppCompatActivity() {
                 viewModel.sendPasswordReset(email)
             }
         }
+    }
+
+    private fun bindSignUpActions(root: View) {
+        root.onClick(R.id.btn_create_account) {
+            val email = root.findViewById<TextInputEditText>(R.id.input_signup_email).text
+                ?.toString()?.trim().orEmpty()
+            val displayName = root.findViewById<TextInputEditText>(R.id.input_signup_name).text
+                ?.toString()?.trim().orEmpty()
+            val password = root.findViewById<TextInputEditText>(R.id.input_signup_password).text
+                ?.toString().orEmpty()
+            val passwordConfirmation = root
+                .findViewById<TextInputEditText>(R.id.input_signup_password_confirmation)
+                .text?.toString().orEmpty()
+            val emailLayout = root.findViewById<TextInputLayout>(R.id.layout_signup_email)
+            val nameLayout = root.findViewById<TextInputLayout>(R.id.layout_signup_name)
+            val passwordLayout = root.findViewById<TextInputLayout>(R.id.layout_signup_password)
+            val confirmationLayout = root
+                .findViewById<TextInputLayout>(R.id.layout_signup_password_confirmation)
+
+            listOf(emailLayout, nameLayout, passwordLayout, confirmationLayout).forEach {
+                it.error = null
+            }
+            root.findViewById<TextView>(R.id.tv_signup_error).isVisible = false
+
+            when {
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                    emailLayout.error = "올바른 이메일을 입력해 주세요."
+                displayName.isBlank() -> nameLayout.error = "이름을 입력해 주세요."
+                displayName.length > MAX_DISPLAY_NAME_LENGTH ->
+                    nameLayout.error = "이름은 ${MAX_DISPLAY_NAME_LENGTH}자 이하로 입력해 주세요."
+                password.length < MIN_SIGN_UP_PASSWORD_LENGTH ->
+                    passwordLayout.error =
+                        "비밀번호는 ${MIN_SIGN_UP_PASSWORD_LENGTH}자 이상 입력해 주세요."
+                password != passwordConfirmation ->
+                    confirmationLayout.error = "비밀번호가 일치하지 않습니다."
+                else -> viewModel.signUpWithEmail(email, displayName, password)
+            }
+        }
+        root.onClick(R.id.btn_go_to_login) { showScreen(Screen.EMAIL_LOGIN) }
     }
 
     private fun bindHomeActions(root: View) {
@@ -459,6 +502,7 @@ class MainActivity : AppCompatActivity() {
             Screen.ONBOARDING -> Unit
             Screen.LOGIN -> renderLogin(root, state)
             Screen.EMAIL_LOGIN -> renderEmail(root, state)
+            Screen.SIGN_UP -> renderSignUp(root, state)
             Screen.HOME -> renderHome(root, state)
             Screen.CLIPBOARD_LIST -> renderClipboardList(root, state)
             Screen.CLIPBOARD_DETAIL -> renderClipboardDetail(root, state)
@@ -474,13 +518,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderLogin(root: View, state: MainUiState) {
+        root.findViewById<ProgressBar>(R.id.progress_login).isVisible = state.isBusy
         root.findViewById<View>(R.id.btn_login).isEnabled = !state.isBusy
         root.findViewById<View>(R.id.btn_login_email).isEnabled = !state.isBusy
+        root.findViewById<View>(R.id.btn_sign_up).isEnabled = !state.isBusy
     }
 
     private fun renderEmail(root: View, state: MainUiState) {
         root.findViewById<ProgressBar>(R.id.progress_auth).isVisible = state.isBusy
         root.findViewById<View>(R.id.btn_email_continue).isEnabled = !state.isBusy
+        root.findViewById<View>(R.id.btn_sign_up).isEnabled = !state.isBusy
+    }
+
+    private fun renderSignUp(root: View, state: MainUiState) {
+        root.findViewById<ProgressBar>(R.id.progress_signup).isVisible = state.isBusy
+        root.findViewById<View>(R.id.btn_create_account).isEnabled = !state.isBusy
+        root.findViewById<View>(R.id.btn_go_to_login).isEnabled = !state.isBusy
     }
 
     private fun renderHome(root: View, state: MainUiState) {
@@ -1012,6 +1065,10 @@ class MainActivity : AppCompatActivity() {
                     text = event.text
                     isVisible = true
                 }
+                currentRoot?.findOptional<TextView>(R.id.tv_signup_error)?.apply {
+                    text = event.text
+                    isVisible = true
+                }
                 currentRoot?.findOptional<TextView>(R.id.tv_send_error)?.apply {
                     text = event.text
                     isVisible = true
@@ -1209,7 +1266,7 @@ class MainActivity : AppCompatActivity() {
     private fun navigateBack() {
         when (currentScreen) {
             Screen.HOME, Screen.LOGIN -> finish()
-            Screen.EMAIL_LOGIN, Screen.ONBOARDING -> showScreen(Screen.LOGIN)
+            Screen.EMAIL_LOGIN, Screen.SIGN_UP, Screen.ONBOARDING -> showScreen(Screen.LOGIN)
             Screen.CLIPBOARD_DETAIL, Screen.CLIPBOARD_LIST, Screen.SEND,
             Screen.TRANSFER_STATUS, Screen.NOTIFICATIONS, Screen.PERMISSIONS ->
                 showScreen(if (viewModel.state.value.user == null) Screen.LOGIN else Screen.HOME)
@@ -1504,6 +1561,7 @@ class MainActivity : AppCompatActivity() {
         ONBOARDING(R.layout.screen_onboarding),
         LOGIN(R.layout.screen_login),
         EMAIL_LOGIN(R.layout.screen_email_login),
+        SIGN_UP(R.layout.screen_sign_up),
         HOME(R.layout.screen_home),
         CLIPBOARD_LIST(R.layout.screen_clipboard_list),
         SEND(R.layout.screen_send),
@@ -1526,8 +1584,15 @@ class MainActivity : AppCompatActivity() {
         const val STATE_SEND_TYPE = "send_type"
         const val ONLINE_WINDOW_MILLIS = 2L * 60L * 1000L
         const val MAX_PREVIEW_DIMENSION = 2_048
+        const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
+        const val MAX_DISPLAY_NAME_LENGTH = 50
 
-        val AUTH_SCREENS = setOf(Screen.LOGIN, Screen.EMAIL_LOGIN, Screen.ONBOARDING)
+        val AUTH_SCREENS = setOf(
+            Screen.LOGIN,
+            Screen.EMAIL_LOGIN,
+            Screen.SIGN_UP,
+            Screen.ONBOARDING,
+        )
 
         val CLIPBOARD_CARD_IDS = listOf(
             ClipboardCardIds(

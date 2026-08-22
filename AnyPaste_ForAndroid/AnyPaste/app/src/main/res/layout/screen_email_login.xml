@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
-            android:text="이메일로 계속하기"
+            android:text="이메일 로그인"
             android:textSize="27sp" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
-            android:text="가입한 이메일이 없다면 새 계정이 만들어집니다."
+            android:text="가입한 이메일과 비밀번호로 로그인해 주세요."
             android:textSize="15sp" />
 
         <TextView
@@ -96,7 +96,7 @@
                 android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:hint="8자 이상 입력"
+                android:hint="비밀번호 입력"
                 android:inputType="textPassword"
                 android:paddingHorizontal="@dimen/space_16"
                 android:textColor="@color/ink" />
@@ -155,7 +155,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
-            android:text="계속하기" />
+            android:text="로그인" />
+
+        <TextView
+            android:id="@+id/btn_sign_up"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_8"
+            android:gravity="center"
+            android:text="계정이 없으신가요? 회원가입"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/progress_auth"

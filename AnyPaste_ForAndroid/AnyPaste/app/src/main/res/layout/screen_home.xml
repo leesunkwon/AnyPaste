@@ -26,6 +26,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tv_home_avatar"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_circle_primary"
@@ -43,6 +44,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_home_account_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="AnyPaste"
@@ -51,6 +53,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_home_sync_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -70,6 +73,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_home_greeting"
                 style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,6 +82,7 @@
                 android:textSize="23sp" />
 
             <LinearLayout
+                android:id="@+id/card_home_device_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
@@ -87,6 +92,7 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
+                    android:id="@+id/view_home_sync_indicator"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:background="@drawable/bg_circle_success" />
@@ -99,6 +105,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_home_device_summary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2대의 기기가 연결되어 있어요"
@@ -106,6 +113,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_home_last_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -266,6 +274,28 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <ProgressBar
+                android:id="@+id/progress_home_recent"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/space_12"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_home_recent_empty"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_card_stroke"
+                android:gravity="center"
+                android:padding="@dimen/space_24"
+                android:text="아직 동기화된 항목이 없어요."
+                android:textSize="13sp"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:id="@+id/item_clipboard_first"
                 android:layout_width="match_parent"
@@ -280,6 +310,7 @@
                 android:padding="@dimen/space_16">
 
                 <ImageView
+                    android:id="@+id/iv_clipboard_first_type"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_primary"
@@ -295,6 +326,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_clipboard_first_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -305,6 +337,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_clipboard_first_meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -334,6 +367,7 @@
                 android:padding="@dimen/space_16">
 
                 <ImageView
+                    android:id="@+id/iv_clipboard_second_type"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_teal"
@@ -349,6 +383,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_clipboard_second_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -359,6 +394,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_clipboard_second_meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -388,6 +424,7 @@
                 android:padding="@dimen/space_16">
 
                 <ImageView
+                    android:id="@+id/iv_clipboard_third_type"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_purple"
@@ -403,6 +440,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_clipboard_third_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -413,6 +451,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_clipboard_third_meta"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"

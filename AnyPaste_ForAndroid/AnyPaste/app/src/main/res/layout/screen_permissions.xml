@@ -38,6 +38,7 @@
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/layout_permissions_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -60,11 +61,14 @@
                 android:textSize="14sp" />
 
             <LinearLayout
+                android:id="@+id/card_permission_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
                 android:background="@drawable/bg_card"
+                android:clickable="true"
                 android:elevation="1dp"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -101,6 +105,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tv_notification_permission_status"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:background="@drawable/bg_card_warning"
@@ -113,11 +118,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/card_permission_clipboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
+                android:clickable="true"
                 android:elevation="1dp"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -150,11 +158,24 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="Android 정책상 백그라운드에서는 알림 또는 앱 실행이 필요할 수 있어요."
-                        android:textSize="12sp" />
+                    android:textSize="12sp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_clipboard_permission_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_card_primary"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/space_8"
+                    android:text="안내"
+                    android:textColor="@color/primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/card_permission_expiry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -196,12 +217,14 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_auto_expiry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/card_permissions_sensitive_warning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_24"

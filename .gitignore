@@ -23,3 +23,10 @@ captures/
 
 # Local Firebase project configuration
 google-services.json
+firebase-debug.log
+firebase-debug.*.log
+.firebase/
+functions/node_modules/
+functions/.env
+functions/.env.*
+!functions/.env.example

@@ -1,0 +1,201 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function hasExactFields(required) {
+      return request.resource.data.keys().hasAll(required)
+        && request.resource.data.keys().hasOnly(required);
+    }
+
+    function hasValidOptionalUserFields(userId) {
+      return request.resource.data.keys().hasOnly([
+          'id',
+          'displayName',
+          'email',
+          'photoUrl',
+          'createdAt',
+          'lastActiveAt'
+        ])
+        && request.resource.data.get('id', userId) == userId
+        && request.resource.data.get('displayName', '') is string
+        && request.resource.data.get('displayName', '').size() <= 100
+        && request.resource.data.get('email', '') is string
+        && request.resource.data.get('email', '').size() <= 320
+        && request.resource.data.get('photoUrl', '') is string
+        && request.resource.data.get('photoUrl', '').size() <= 2048
+        && request.resource.data.get('createdAt', request.time) is timestamp
+        && request.resource.data.get('lastActiveAt', request.time) is timestamp;
+    }
+
+    function isValidDevice(deviceId) {
+      return deviceId.size() > 0
+        && deviceId.size() <= 128
+        && request.resource.data.keys().hasAll([
+          'platform',
+          'deviceName',
+          'lastSeenAt',
+          'isOnline'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'platform',
+          'deviceName',
+          'fcmToken',
+          'lastSeenAt',
+          'isOnline'
+        ])
+        && request.resource.data.platform in ['android', 'macos']
+        && request.resource.data.deviceName is string
+        && request.resource.data.deviceName.size() > 0
+        && request.resource.data.deviceName.size() <= 100
+        && request.resource.data.get('fcmToken', '') is string
+        && request.resource.data.get('fcmToken', '').size() <= 4096
+        && request.resource.data.lastSeenAt is timestamp
+        && request.resource.data.lastSeenAt == request.time
+        && request.resource.data.isOnline is bool;
+    }
+
+    function hasClipboardFields() {
+      return hasExactFields([
+        'type',
+        'content',
+        'storagePath',
+        'fileName',
+        'fileSize',
+        'mimeType',
+        'sourceDeviceId',
+        'targetDeviceId',
+        'createdAt',
+        'expiresAt',
+        'readBy'
+      ]);
+    }
+
+    function hasValidClipboardStoredFields(itemId) {
+      return itemId.size() > 0
+        && itemId.size() <= 128
+        && request.resource.data.type in ['text', 'image', 'file']
+        && request.resource.data.sourceDeviceId is string
+        && request.resource.data.sourceDeviceId.size() > 0
+        && request.resource.data.sourceDeviceId.size() <= 128
+        && request.resource.data.targetDeviceId is string
+        && request.resource.data.targetDeviceId.size() <= 128
+        && (
+          request.resource.data.targetDeviceId == ''
+          || request.resource.data.targetDeviceId != request.resource.data.sourceDeviceId
+        )
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.resource.data.createdAt
+        && request.resource.data.expiresAt
+          <= request.resource.data.createdAt + duration.value(25, 'h');
+    }
+
+    function hasValidClipboardCreateFields(itemId) {
+      return hasValidClipboardStoredFields(itemId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(25, 'h')
+        && request.resource.data.readBy is list
+        && request.resource.data.readBy.size() == 0;
+    }
+
+    function hasValidMimeType() {
+      return request.resource.data.mimeType is string
+        && request.resource.data.mimeType.size() > 0
+        && request.resource.data.mimeType.size() <= 255
+        && request.resource.data.mimeType.matches(
+          '[A-Za-z0-9][A-Za-z0-9!#$&^_.+*-]*/[A-Za-z0-9*][A-Za-z0-9!#$&^_.+*-]*'
+        );
+    }
+
+    function isValidTextClipboard() {
+      return request.resource.data.type == 'text'
+        && request.resource.data.content is string
+        && request.resource.data.content.size() > 0
+        && request.resource.data.content.size() <= 100000
+        && request.resource.data.storagePath is string
+        && request.resource.data.storagePath == ''
+        && request.resource.data.fileName is string
+        && request.resource.data.fileName == ''
+        && request.resource.data.fileSize is int
+        && request.resource.data.fileSize == 0
+        && request.resource.data.mimeType is string
+        && request.resource.data.mimeType == '';
+    }
+
+    function isValidBinaryClipboard(userId, itemId) {
+      return request.resource.data.type in ['image', 'file']
+        && request.resource.data.content is string
+        && request.resource.data.content == ''
+        && request.resource.data.storagePath is string
+        && request.resource.data.fileName is string
+        && request.resource.data.fileName.size() > 0
+        && request.resource.data.fileName.size() <= 180
+        && request.resource.data.fileName.matches('[^/]{1,180}')
+        && request.resource.data.storagePath
+          == 'users/' + userId + '/clipboard/' + itemId + '/'
+            + request.resource.data.fileName
+        && request.resource.data.fileSize is int
+        && request.resource.data.fileSize > 0
+        && request.resource.data.fileSize <= 50 * 1024 * 1024
+        && hasValidMimeType()
+        && (
+          request.resource.data.type != 'image'
+          || request.resource.data.mimeType.matches('image/.*')
+        );
+    }
+
+    function isValidReadReceiptUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy'])
+        && request.resource.data.readBy is list
+        && resource.data.readBy is list
+        && request.resource.data.readBy.size() <= 100
+        && request.resource.data.readBy.size() >= resource.data.readBy.size()
+        && request.resource.data.readBy.size() <= resource.data.readBy.size() + 1
+        && request.resource.data.readBy.toSet().hasAll(resource.data.readBy.toSet());
+    }
+
+    match /users/{userId} {
+      allow read, delete: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && hasValidOptionalUserFields(userId)
+        && request.resource.data.get('createdAt', request.time) == request.time
+        && request.resource.data.get('lastActiveAt', request.time) == request.time;
+      allow update: if isOwner(userId)
+        && hasValidOptionalUserFields(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName',
+          'photoUrl',
+          'lastActiveAt'
+        ])
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastActiveAt'])
+          || request.resource.data.lastActiveAt == request.time
+        );
+
+      match /devices/{deviceId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidDevice(deviceId);
+      }
+
+      match /clipboard/{itemId} {
+        allow read, delete: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && hasClipboardFields()
+          && hasValidClipboardCreateFields(itemId)
+          && (isValidTextClipboard() || isValidBinaryClipboard(userId, itemId));
+
+        allow update: if isOwner(userId)
+          && hasClipboardFields()
+          && hasValidClipboardStoredFields(itemId)
+          && (isValidTextClipboard() || isValidBinaryClipboard(userId, itemId))
+          && isValidReadReceiptUpdate();
+      }
+    }
+  }
+}

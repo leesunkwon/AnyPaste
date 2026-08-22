@@ -60,10 +60,13 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/btn_type_text"
                     android:layout_width="0dp"
                     android:layout_height="82dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_primary"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -74,6 +77,7 @@
                         android:src="@drawable/ic_text" />
 
                     <TextView
+                        android:id="@+id/tv_type_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -84,11 +88,14 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/btn_type_image"
                     android:layout_width="0dp"
                     android:layout_height="82dp"
                     android:layout_marginStart="@dimen/space_12"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_stroke"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -99,6 +106,7 @@
                         android:src="@drawable/ic_image" />
 
                     <TextView
+                        android:id="@+id/tv_type_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -108,11 +116,14 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/btn_type_file"
                     android:layout_width="0dp"
                     android:layout_height="82dp"
                     android:layout_marginStart="@dimen/space_12"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_stroke"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -123,6 +134,7 @@
                         android:src="@drawable/ic_file" />
 
                     <TextView
+                        android:id="@+id/tv_type_file"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -141,6 +153,7 @@
                 android:textSize="12sp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_send_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -154,16 +167,99 @@
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_send_text"
                     android:layout_width="match_parent"
                     android:layout_height="148dp"
                     android:gravity="top"
+                    android:hint="보낼 내용을 입력해 주세요"
                     android:padding="@dimen/space_16"
-                    android:text="회의 노트 정리 후 공유할게요.\n\n• Firebase 보안 규칙 초안 검토\n• Android 권한 흐름 확인"
                     android:textColor="@color/ink"
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
+                android:id="@+id/card_select_file"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:background="@drawable/bg_card_stroke"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_16"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/iv_send_file_type"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_icon_teal"
+                    android:contentDescription="전송할 파일 선택"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_file" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_12"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_send_file_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:text="파일을 선택해 주세요"
+                        android:textColor="@color/ink"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_send_file_info"
+                        style="@style/TextAppearance.AnyPaste.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:text="이미지 또는 파일 탐색기에서 선택"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btn_select_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:text="선택"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_send_image_preview"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginTop="@dimen/space_12"
+                android:adjustViewBounds="true"
+                android:background="@drawable/bg_input"
+                android:contentDescription="전송 이미지 미리보기"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_send_error"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:textColor="@color/warning"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/card_send_sensitive_warning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -201,15 +297,19 @@
                 android:textSize="12sp" />
 
             <LinearLayout
+                android:id="@+id/card_send_target_device"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:background="@drawable/bg_card_stroke"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
 
                 <ImageView
+                    android:id="@+id/iv_send_target_device"
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:background="@drawable/bg_icon_primary"
@@ -225,6 +325,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_send_target_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="MacBook Pro"
@@ -232,6 +333,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_send_target_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -241,11 +343,25 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/iv_send_target_selected"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="선택됨"
                     android:src="@drawable/ic_check" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_send_device_empty"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:background="@drawable/bg_card_stroke"
+                android:gravity="center"
+                android:padding="@dimen/space_20"
+                android:text="전송할 수 있는 다른 기기가 없어요."
+                android:textSize="13sp"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 
@@ -259,4 +375,12 @@
         app:icon="@drawable/ic_send"
         app:iconGravity="textStart"
         app:iconPadding="10dp" />
+
+    <ProgressBar
+        android:id="@+id/progress_send"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
 </LinearLayout>

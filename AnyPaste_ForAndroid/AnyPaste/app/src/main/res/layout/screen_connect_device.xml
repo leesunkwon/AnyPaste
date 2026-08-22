@@ -38,6 +38,7 @@
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/layout_connect_device_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -189,6 +190,24 @@
                     android:textColor="@color/on_primary_container"
                     android:textSize="12sp" />
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_device_discovery"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="@dimen/space_20"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_device_discovery_status"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:gravity="center"
+                android:text="새 기기를 기다리는 중이에요."
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

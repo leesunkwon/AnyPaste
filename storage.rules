@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{userId}/clipboard/{itemId}/{fileName} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow read: if isOwner();
+      allow delete: if isOwner();
+      allow create: if isOwner()
+        && itemId.size() > 0
+        && itemId.size() <= 128
+        && fileName.size() > 0
+        && fileName.size() <= 180
+        && request.resource.size > 0
+        && request.resource.size <= 50 * 1024 * 1024
+        && request.resource.contentType is string
+        && request.resource.contentType.size() > 0
+        && request.resource.contentType.size() <= 255
+        && request.resource.contentType.matches(
+          '[A-Za-z0-9][A-Za-z0-9!#$&^_.+*-]*/[A-Za-z0-9*][A-Za-z0-9!#$&^_.+*-]*'
+        )
+        && request.resource.metadata.originalFileName is string
+        && request.resource.metadata.originalFileName == fileName;
+    }
+  }
+}

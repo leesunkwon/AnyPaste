@@ -48,6 +48,7 @@
             android:textSize="12sp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -60,6 +61,7 @@
             app:boxStrokeColor="@color/primary">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:hint="name@example.com"
@@ -77,6 +79,7 @@
             android:textSize="12sp" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -90,6 +93,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:hint="8자 이상 입력"
@@ -99,6 +103,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/btn_forgot_password"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/space_4"
@@ -107,6 +112,16 @@
             android:textColor="@color/primary"
             android:textSize="13sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_auth_error"
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            android:textColor="@color/warning"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -141,5 +156,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
             android:text="계속하기" />
+
+        <ProgressBar
+            android:id="@+id/progress_auth"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_12"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

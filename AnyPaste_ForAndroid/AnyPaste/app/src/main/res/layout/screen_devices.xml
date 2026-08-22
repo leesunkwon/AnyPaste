@@ -10,15 +10,18 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:clipToPadding="false">
 
         <LinearLayout
+            android:id="@+id/layout_devices_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="@dimen/space_12">
 
             <LinearLayout
+                android:id="@+id/card_devices_summary"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:gravity="center_vertical"
@@ -62,165 +65,62 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
+                    android:id="@+id/view_devices_summary_indicator"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:background="@drawable/bg_circle_success" />
 
                 <TextView
+                    android:id="@+id/tv_devices_summary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_12"
                     android:layout_weight="1"
-                    android:text="2대 중 2대가 현재 온라인이에요"
                     android:textColor="@color/on_primary_container"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:contentDescription="정상"
+                    android:contentDescription="연결 상태"
                     android:src="@drawable/ic_check" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_devices_count"
                 style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="연결된 기기 2"
                 android:textSize="12sp" />
 
-            <LinearLayout
-                android:id="@+id/item_device_phone"
+            <ProgressBar
+                android:id="@+id/progress_devices"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/space_16"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_devices_empty"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:elevation="1dp"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="@dimen/space_16">
-
-                <ImageView
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_icon_primary"
-                    android:contentDescription="이 Android"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_phone" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_12"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Galaxy S24"
-                        android:textColor="@color/ink"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_4"
-                        android:text="이 기기 · Android"
-                        android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/bg_circle_success" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_4"
-                        android:text="온라인"
-                        android:textColor="@color/success"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+                android:background="@drawable/bg_card_stroke"
+                android:gravity="center"
+                android:padding="@dimen/space_24"
+                android:text="연결된 기기가 없어요."
+                android:textSize="13sp"
+                android:visibility="gone" />
 
             <LinearLayout
-                android:id="@+id/item_device_mac"
+                android:id="@+id/layout_device_items"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card"
-                android:clickable="true"
-                android:elevation="1dp"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="@dimen/space_16">
-
-                <ImageView
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:background="@drawable/bg_icon_purple"
-                    android:contentDescription="MacBook Pro"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_desktop" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_12"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MacBook Pro"
-                        android:textColor="@color/ink"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_4"
-                        android:text="macOS · 마지막 동기화 방금 전"
-                        android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/bg_circle_success" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_4"
-                        android:text="온라인"
-                        android:textColor="@color/success"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:layout_width="match_parent"

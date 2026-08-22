@@ -40,6 +40,7 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
+                    android:id="@+id/tv_settings_avatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@drawable/bg_circle_primary"
@@ -57,6 +58,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_settings_account_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="수진"
@@ -65,6 +67,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_settings_account_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -126,6 +129,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_auto_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true" />
@@ -166,6 +170,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_wifi_only"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true" />
@@ -227,6 +232,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_receive_notifications"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true" />
@@ -295,6 +301,7 @@
                 android:textSize="12sp" />
 
             <TextView
+                android:id="@+id/tv_app_version"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="@dimen/space_12"
@@ -304,6 +311,17 @@
                 android:text="AnyPaste 1.0.0"
                 android:textColor="@color/ink_secondary"
                 android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btn_logout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_card_warning"
+                android:gravity="center"
+                android:text="로그아웃"
+                android:textColor="@color/danger"
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 

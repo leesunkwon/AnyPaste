@@ -90,6 +90,25 @@
             app:iconGravity="textStart"
             app:iconPadding="12dp" />
 
+        <ProgressBar
+            android:id="@+id/progress_login"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="@dimen/space_12"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_login_error"
+            style="@style/TextAppearance.AnyPaste.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            android:gravity="center"
+            android:textColor="@color/danger"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/btn_show_onboarding"
             android:layout_width="wrap_content"

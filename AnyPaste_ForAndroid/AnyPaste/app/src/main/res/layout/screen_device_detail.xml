@@ -38,6 +38,7 @@
         android:layout_weight="1">
 
         <LinearLayout
+            android:id="@+id/layout_device_detail_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -45,7 +46,15 @@
             android:paddingTop="@dimen/space_24"
             android:paddingBottom="@dimen/space_32">
 
+            <ProgressBar
+                android:id="@+id/progress_device_detail"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
             <ImageView
+                android:id="@+id/iv_device_detail_type"
                 android:layout_width="76dp"
                 android:layout_height="76dp"
                 android:background="@drawable/bg_icon_purple"
@@ -54,6 +63,7 @@
                 android:src="@drawable/ic_desktop" />
 
             <TextView
+                android:id="@+id/tv_device_detail_name"
                 style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,6 +73,7 @@
                 android:textSize="23sp" />
 
             <LinearLayout
+                android:id="@+id/badge_device_detail_status"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="@dimen/space_8"
@@ -71,11 +82,13 @@
                 android:paddingHorizontal="@dimen/space_12">
 
                 <TextView
+                    android:id="@+id/view_device_detail_status"
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:background="@drawable/bg_circle_success" />
 
                 <TextView
+                    android:id="@+id/tv_device_detail_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_4"
@@ -114,6 +127,7 @@
                         android:textColor="@color/ink_secondary" />
 
                     <TextView
+                        android:id="@+id/tv_device_detail_platform"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="macOS 15.6"
@@ -135,6 +149,7 @@
                         android:textColor="@color/ink_secondary" />
 
                     <TextView
+                        android:id="@+id/tv_device_detail_last_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="방금 전"
@@ -156,6 +171,7 @@
                         android:textColor="@color/ink_secondary" />
 
                     <TextView
+                        android:id="@+id/tv_device_detail_connected_at"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2026. 08. 22"
@@ -205,6 +221,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_device_auto_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true" />
@@ -243,12 +260,14 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_device_file_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/btn_disconnect_device"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="@dimen/space_24"
@@ -257,6 +276,17 @@
                 android:text="이 기기 연결 해제"
                 android:textColor="@color/danger"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_device_detail_error"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:gravity="center"
+                android:textColor="@color/danger"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

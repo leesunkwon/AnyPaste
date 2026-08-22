@@ -1,0 +1,22 @@
+# macOS Finder metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Android Studio and Gradle
+.gradle/
+.idea/
+*.iml
+local.properties
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Android build outputs and generated files
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.log

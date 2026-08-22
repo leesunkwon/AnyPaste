@@ -20,3 +20,6 @@ captures/
 *.dex
 *.class
 *.log
+
+# Local Firebase project configuration
+google-services.json

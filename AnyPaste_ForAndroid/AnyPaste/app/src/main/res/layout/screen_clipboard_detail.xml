@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
                 android:background="@drawable/bg_input"
-                android:fontFamily="monospace"
+                android:typeface="monospace"
                 android:lineSpacingExtra="5dp"
                 android:padding="@dimen/space_20"
                 android:text="git checkout -b feature/clipboard\n\n# 클립보드 동기화 작업 브랜치\ngit push -u origin feature/clipboard"

@@ -21,7 +21,6 @@
         <item name="textInputStyle">@style/Widget.AnyPaste.TextInputLayout</item>
         <item name="switchStyle">@style/Widget.AnyPaste.Switch</item>
         <item name="android:colorAccent">@color/primary_contrast</item>
-        <item name="android:fontFamily">sans</item>
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>

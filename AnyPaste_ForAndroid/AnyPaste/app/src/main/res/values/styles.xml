@@ -1,13 +1,29 @@
 <resources>
     <style name="TextAppearance.AnyPaste.Overline" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textColor">@color/ink_secondary</item>
-        <item name="android:letterSpacing">0.08</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextAppearance.AnyPaste.Title" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/ink</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textFontWeight">700</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.ScreenTitle" parent="TextAppearance.AnyPaste.Title">
+        <item name="android:lineHeight">35sp</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.TopNavigation" parent="TextAppearance.AnyPaste.Title">
+        <item name="android:lineHeight">24sp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.SectionTitle" parent="TextAppearance.AnyPaste.Title">
+        <item name="android:lineHeight">24sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="TextAppearance.AnyPaste.Body" parent="TextAppearance.Material3.BodyMedium">
@@ -15,32 +31,95 @@
         <item name="android:lineSpacingExtra">2dp</item>
     </style>
 
+    <style name="TextAppearance.AnyPaste.BodyStrong" parent="TextAppearance.AnyPaste.Body">
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textColor">@color/ink</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:textColor">@color/ink_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="Widget.AnyPaste.Button.Primary" parent="Widget.Material3.Button">
-        <item name="android:minHeight">52dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="backgroundTint">@color/primary</item>
-        <item name="iconTint">@color/white</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textColor">@color/button_primary_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="backgroundTint">@color/button_primary_background</item>
+        <item name="elevation">0dp</item>
+        <item name="iconTint">@color/button_primary_content</item>
         <item name="cornerRadius">@dimen/radius_s</item>
     </style>
 
     <style name="Widget.AnyPaste.Button.Secondary" parent="Widget.Material3.Button">
-        <item name="android:minHeight">52dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="backgroundTint">@color/primary_container</item>
-        <item name="iconTint">@color/primary</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textColor">@color/button_secondary_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="backgroundTint">@color/button_secondary_background</item>
+        <item name="elevation">0dp</item>
+        <item name="iconTint">@color/button_secondary_content</item>
         <item name="cornerRadius">@dimen/radius_s</item>
     </style>
 
     <style name="Widget.AnyPaste.Button.Outline" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:minHeight">50dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="strokeColor">@color/line</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textColor">@color/button_outline_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="elevation">0dp</item>
+        <item name="iconTint">@color/button_outline_content</item>
+        <item name="strokeColor">@color/button_outline_stroke</item>
+        <item name="strokeWidth">1dp</item>
         <item name="cornerRadius">@dimen/radius_s</item>
+    </style>
+
+    <style name="Widget.AnyPaste.Button.Critical" parent="Widget.AnyPaste.Button.Primary">
+        <item name="backgroundTint">@color/button_critical_background</item>
+    </style>
+
+    <style name="Widget.AnyPaste.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/surface</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_s</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_s</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_s</item>
+        <item name="boxCornerRadiusTopStart">@dimen/radius_s</item>
+        <item name="boxStrokeColor">@color/input_stroke</item>
+        <item name="boxStrokeErrorColor">@color/danger</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="errorTextColor">@color/danger_foreground</item>
+        <item name="hintEnabled">false</item>
+        <item name="hintTextColor">@color/input_hint</item>
+    </style>
+
+    <style name="Widget.AnyPaste.TextInputEditText" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:minHeight">@dimen/control_height_large</item>
+        <item name="android:paddingStart">@dimen/space_16</item>
+        <item name="android:paddingEnd">@dimen/space_16</item>
+        <item name="android:textColor">@color/input_text</item>
+        <item name="android:textColorHint">@color/input_hint</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Widget.AnyPaste.Switch" parent="Widget.Material3.CompoundButton.Switch">
+        <item name="android:minHeight">@dimen/touch_target</item>
+        <item name="android:minWidth">@dimen/space_52</item>
+        <item name="switchMinWidth">@dimen/space_52</item>
+        <item name="thumbTint">@color/switch_thumb</item>
+        <item name="trackTint">@color/switch_track</item>
     </style>
 </resources>

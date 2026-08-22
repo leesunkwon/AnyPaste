@@ -6,11 +6,11 @@
     android:layout_marginTop="@dimen/space_12"
     android:background="@drawable/bg_card"
     android:clickable="true"
-    android:elevation="1dp"
     android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="@dimen/space_16">
+    android:paddingHorizontal="@dimen/space_16"
+    android:paddingVertical="@dimen/space_12">
 
     <ImageView
         android:id="@+id/iv_device_type"
@@ -41,7 +41,7 @@
             android:id="@+id/tv_device_meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_4"
+            android:layout_marginTop="@dimen/space_2"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/ink_secondary"
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_4"
-            android:textColor="@color/success"
+            android:textColor="@color/success_foreground"
             android:textSize="12sp"
             android:textStyle="bold" />
     </LinearLayout>

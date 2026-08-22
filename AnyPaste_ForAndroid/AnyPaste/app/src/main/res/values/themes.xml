@@ -1,13 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.AnyPaste" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimary">@color/primary_contrast</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/primary_container</item>
         <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+        <item name="colorSecondary">@color/ink</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorError">@color/danger_foreground</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorErrorContainer">@color/danger_container</item>
+        <item name="colorOnErrorContainer">@color/danger_foreground</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/ink</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/ink_secondary</item>
         <item name="colorOutline">@color/line</item>
+        <item name="colorOutlineVariant">@color/line</item>
+        <item name="colorControlActivated">@color/primary_contrast</item>
+        <item name="colorControlNormal">@color/ink_secondary</item>
+        <item name="textInputStyle">@style/Widget.AnyPaste.TextInputLayout</item>
+        <item name="switchStyle">@style/Widget.AnyPaste.Switch</item>
+        <item name="android:colorAccent">@color/primary_contrast</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowBackground">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
     </style>

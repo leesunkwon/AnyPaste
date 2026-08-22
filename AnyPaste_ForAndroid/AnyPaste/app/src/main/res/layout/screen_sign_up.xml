@@ -10,60 +10,53 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/space_24"
+        android:paddingHorizontal="@dimen/screen_gutter"
         android:paddingTop="@dimen/space_16"
-        android:paddingBottom="@dimen/space_32">
+        android:paddingBottom="@dimen/screen_bottom_space">
 
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_icon_primary"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
-            android:padding="10dp"
+            android:padding="@dimen/space_12"
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Title"
+            style="@style/TextAppearance.AnyPaste.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_24"
-            android:text="회원가입"
-            android:textSize="27sp" />
+            android:layout_marginTop="@dimen/nav_title_gap"
+            android:text="회원가입" />
 
         <TextView
             style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
+            android:layout_marginTop="@dimen/space_6"
             android:text="하나의 계정으로 내 기기의 클립보드를 연결해 보세요."
-            android:textSize="15sp" />
+            android:textSize="16sp" />
 
         <TextView
             style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
-            android:text="이메일"
-            android:textSize="12sp" />
+            android:text="이메일" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
-            app:boxBackgroundColor="@color/surface"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
-            app:boxCornerRadiusBottomStart="@dimen/radius_s"
-            app:boxCornerRadiusTopEnd="@dimen/radius_s"
-            app:boxCornerRadiusTopStart="@dimen/radius_s"
-            app:boxStrokeColor="@color/primary">
+            android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_email"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/control_height_large"
                 android:autofillHints="emailAddress"
                 android:hint="name@example.com"
                 android:imeOptions="actionNext"
@@ -76,27 +69,21 @@
             style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_16"
-            android:text="이름"
-            android:textSize="12sp" />
+            android:layout_marginTop="@dimen/component_gap"
+            android:text="이름" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_8"
-            app:boxBackgroundColor="@color/surface"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
-            app:boxCornerRadiusBottomStart="@dimen/radius_s"
-            app:boxCornerRadiusTopEnd="@dimen/radius_s"
-            app:boxCornerRadiusTopStart="@dimen/radius_s"
-            app:boxStrokeColor="@color/primary">
+            android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_name"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/control_height_large"
                 android:autofillHints="name"
                 android:hint="사용할 이름"
                 android:imeOptions="actionNext"
@@ -110,28 +97,22 @@
             style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_16"
-            android:text="비밀번호"
-            android:textSize="12sp" />
+            android:layout_marginTop="@dimen/component_gap"
+            android:text="비밀번호" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
-            app:boxBackgroundColor="@color/surface"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
-            app:boxCornerRadiusBottomStart="@dimen/radius_s"
-            app:boxCornerRadiusTopEnd="@dimen/radius_s"
-            app:boxCornerRadiusTopStart="@dimen/radius_s"
-            app:boxStrokeColor="@color/primary"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_password"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/control_height_large"
                 android:autofillHints="newPassword"
                 android:hint="8자 이상 입력"
                 android:imeOptions="actionNext"
@@ -144,28 +125,22 @@
             style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_16"
-            android:text="비밀번호 확인"
-            android:textSize="12sp" />
+            android:layout_marginTop="@dimen/component_gap"
+            android:text="비밀번호 확인" />
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_password_confirmation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
-            app:boxBackgroundColor="@color/surface"
-            app:boxBackgroundMode="outline"
-            app:boxCornerRadiusBottomEnd="@dimen/radius_s"
-            app:boxCornerRadiusBottomStart="@dimen/radius_s"
-            app:boxCornerRadiusTopEnd="@dimen/radius_s"
-            app:boxCornerRadiusTopStart="@dimen/radius_s"
-            app:boxStrokeColor="@color/primary"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_password_confirmation"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/control_height_large"
                 android:autofillHints="newPassword"
                 android:hint="비밀번호 다시 입력"
                 android:imeOptions="actionDone"
@@ -180,7 +155,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
-            android:textColor="@color/danger"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="@color/danger_foreground"
             android:textSize="12sp"
             android:visibility="gone" />
 
@@ -198,7 +174,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/space_12"
-            android:indeterminateTint="@color/primary"
+            android:indeterminateTint="@color/primary_contrast"
             android:visibility="gone" />
 
         <TextView
@@ -209,7 +185,7 @@
             android:layout_marginTop="@dimen/space_4"
             android:gravity="center"
             android:text="이미 계정이 있으신가요? 로그인"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_contrast"
             android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>

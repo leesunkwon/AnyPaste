@@ -4,32 +4,31 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/space_20"
+    android:paddingHorizontal="@dimen/screen_gutter"
     android:paddingTop="@dimen/space_12">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_icon_primary"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
-            android:padding="10dp"
+            android:padding="@dimen/space_12"
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Title"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
             android:layout_weight="1"
-            android:text="권한 및 개인정보"
-            android:textSize="20sp" />
+            android:text="권한 및 개인정보" />
     </LinearLayout>
 
     <ScrollView
@@ -50,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="더 매끄러운 동기화를\n위해 권한이 필요해요"
-                android:textSize="23sp" />
+                android:textSize="24sp" />
 
             <TextView
                 style="@style/TextAppearance.AnyPaste.Body"
@@ -67,7 +66,6 @@
                 android:layout_marginTop="@dimen/space_28"
                 android:background="@drawable/bg_card"
                 android:clickable="true"
-                android:elevation="1dp"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -112,7 +110,7 @@
                     android:gravity="center"
                     android:paddingHorizontal="@dimen/space_8"
                     android:text="필요"
-                    android:textColor="@color/warning"
+                    android:textColor="@color/warning_foreground"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -124,7 +122,6 @@
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
                 android:clickable="true"
-                android:elevation="1dp"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -169,7 +166,7 @@
                     android:gravity="center"
                     android:paddingHorizontal="@dimen/space_8"
                     android:text="안내"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/primary_contrast"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -180,7 +177,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -217,6 +213,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_auto_expiry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -238,7 +235,7 @@
                     android:layout_height="28dp"
                     android:gravity="center"
                     android:text="!"
-                    android:textColor="@color/warning"
+                    android:textColor="@color/warning_foreground"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -249,7 +246,7 @@
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="비밀번호나 인증번호처럼 민감한 내용은 동기화하지 않는 것을 권장해요."
-                    android:textColor="@color/warning"
+                    android:textColor="@color/warning_foreground"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

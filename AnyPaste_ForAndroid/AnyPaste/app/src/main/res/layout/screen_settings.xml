@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/space_20"
+    android:paddingHorizontal="@dimen/screen_gutter"
     android:paddingTop="@dimen/space_16">
 
     <ScrollView
@@ -21,10 +21,10 @@
             <TextView
                 style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
                 android:text="설정"
-                android:textSize="23sp" />
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:id="@+id/btn_account"
@@ -33,7 +33,6 @@
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
                 android:clickable="true"
-                android:elevation="1dp"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -88,15 +87,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="동기화"
-                android:textSize="12sp" />
+                android:text="동기화" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:orientation="vertical"
                 android:padding="@dimen/space_16">
 
@@ -129,6 +126,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_auto_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -170,6 +168,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_wifi_only"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -182,15 +181,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="알림 및 개인정보"
-                android:textSize="12sp" />
+                android:text="알림 및 개인정보" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:orientation="vertical"
                 android:padding="@dimen/space_16">
 
@@ -232,6 +229,7 @@
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_receive_notifications"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -297,8 +295,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="앱 정보"
-                android:textSize="12sp" />
+                android:text="앱 정보" />
 
             <TextView
                 android:id="@+id/tv_app_version"
@@ -315,12 +312,12 @@
             <TextView
                 android:id="@+id/btn_logout"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/control_height_large"
                 android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card_warning"
+                android:background="@drawable/bg_action_critical"
                 android:gravity="center"
                 android:text="로그아웃"
-                android:textColor="@color/danger"
+                android:textColor="@color/white"
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>

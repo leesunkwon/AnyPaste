@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/space_20"
+    android:paddingHorizontal="@dimen/screen_gutter"
     android:paddingTop="@dimen/space_16">
 
     <ScrollView
@@ -21,9 +21,8 @@
             android:paddingBottom="@dimen/space_12">
 
             <LinearLayout
-                android:id="@+id/card_devices_summary"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -33,16 +32,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="내 기기"
-                    android:textSize="23sp" />
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/btn_add_device"
                     android:layout_width="96dp"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/touch_target"
                     android:background="@drawable/bg_card_primary"
                     android:gravity="center"
                     android:text="+ 기기 연결"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/primary_contrast"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -56,6 +55,7 @@
                 android:textSize="14sp" />
 
             <LinearLayout
+                android:id="@+id/card_devices_summary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
@@ -80,6 +80,7 @@
                     android:textStyle="bold" />
 
                 <ImageView
+                    android:id="@+id/iv_devices_summary_status"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="연결 상태"
@@ -91,8 +92,7 @@
                 style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_28"
-                android:textSize="12sp" />
+                android:layout_marginTop="@dimen/space_28" />
 
             <ProgressBar
                 android:id="@+id/progress_devices"
@@ -100,7 +100,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/space_16"
-                android:indeterminateTint="@color/primary"
+                android:indeterminateTint="@color/primary_contrast"
                 android:visibility="gone" />
 
             <TextView
@@ -144,7 +144,7 @@
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="모르는 기기가 보이면 즉시 연결을 해제하세요."
-                    android:textColor="@color/warning"
+                    android:textColor="@color/warning_foreground"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

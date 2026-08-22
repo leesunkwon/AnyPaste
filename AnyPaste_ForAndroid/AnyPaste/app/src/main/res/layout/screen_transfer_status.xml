@@ -4,32 +4,31 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/space_20"
+    android:paddingHorizontal="@dimen/screen_gutter"
     android:paddingTop="@dimen/space_12">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_icon_primary"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
-            android:padding="10dp"
+            android:padding="@dimen/space_12"
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Title"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
             android:layout_weight="1"
-            android:text="전송 상태"
-            android:textSize="20sp" />
+            android:text="전송 상태" />
     </LinearLayout>
 
     <ScrollView
@@ -43,7 +42,7 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingTop="@dimen/space_32"
-            android:paddingBottom="@dimen/space_24">
+            android:paddingBottom="@dimen/screen_bottom_space">
 
             <TextView
                 android:id="@+id/tv_transfer_state_icon"
@@ -53,7 +52,7 @@
                 android:gravity="center"
                 android:text="↗"
                 android:textColor="@color/white"
-                android:textSize="38sp" />
+                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/tv_transfer_title"
@@ -81,7 +80,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:orientation="vertical"
                 android:padding="@dimen/space_20">
 
@@ -132,7 +130,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="68%"
-                        android:textColor="@color/primary"
+                        android:textColor="@color/primary_contrast"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -146,7 +144,7 @@
                     android:max="100"
                     android:progress="68"
                     android:progressBackgroundTint="@color/primary_container"
-                    android:progressTint="@color/primary" />
+                    android:progressTint="@color/primary_contrast" />
 
                 <TextView
                     android:id="@+id/tv_transfer_network_status"
@@ -183,13 +181,13 @@
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="완료되면 Mac의 클립보드에 바로 추가돼요."
-                    android:textColor="@color/success"
+                    android:textColor="@color/success_foreground"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_retry_transfer"
-                style="@style/Widget.AnyPaste.Button.Secondary"
+                style="@style/Widget.AnyPaste.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"

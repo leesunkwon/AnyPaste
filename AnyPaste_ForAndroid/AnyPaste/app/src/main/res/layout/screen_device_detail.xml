@@ -4,32 +4,31 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/space_20"
+    android:paddingHorizontal="@dimen/screen_gutter"
     android:paddingTop="@dimen/space_12">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_icon_primary"
+            android:layout_width="@dimen/touch_target"
+            android:layout_height="@dimen/touch_target"
+            android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
-            android:padding="10dp"
+            android:padding="@dimen/space_12"
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Title"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
             android:layout_weight="1"
-            android:text="기기 상세"
-            android:textSize="20sp" />
+            android:text="기기 상세" />
     </LinearLayout>
 
     <ScrollView
@@ -44,13 +43,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingTop="@dimen/space_24"
-            android:paddingBottom="@dimen/space_32">
+            android:paddingBottom="@dimen/screen_bottom_space">
 
             <ProgressBar
                 android:id="@+id/progress_device_detail"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:indeterminateTint="@color/primary"
+                android:indeterminateTint="@color/primary_contrast"
                 android:visibility="gone" />
 
             <ImageView
@@ -70,7 +69,7 @@
                 android:layout_marginTop="@dimen/space_16"
                 android:gravity="center"
                 android:text="MacBook Pro"
-                android:textSize="23sp" />
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:id="@+id/badge_device_detail_status"
@@ -93,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_4"
                     android:text="온라인 · 동기화 가능"
-                    android:textColor="@color/success"
+                    android:textColor="@color/success_foreground"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -110,8 +109,7 @@
                     style="@style/TextAppearance.AnyPaste.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="기기 정보"
-                    android:textSize="12sp" />
+                    android:text="기기 정보" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -185,15 +183,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="이 기기의 동기화"
-                android:textSize="12sp" />
+                android:text="이 기기의 동기화" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -221,6 +217,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_device_auto_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -232,7 +229,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card"
-                android:elevation="1dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -260,6 +256,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_device_file_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -269,12 +266,12 @@
             <TextView
                 android:id="@+id/btn_disconnect_device"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="@dimen/control_height_large"
                 android:layout_marginTop="@dimen/space_24"
-                android:background="@drawable/bg_card_warning"
+                android:background="@drawable/bg_action_critical"
                 android:gravity="center"
                 android:text="이 기기 연결 해제"
-                android:textColor="@color/danger"
+                android:textColor="@color/white"
                 android:textStyle="bold" />
 
             <TextView
@@ -284,7 +281,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
-                android:textColor="@color/danger"
+                android:textColor="@color/danger_foreground"
                 android:textSize="12sp"
                 android:visibility="gone" />
         </LinearLayout>

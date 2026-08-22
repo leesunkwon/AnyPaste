@@ -1,15 +1,35 @@
 <resources>
     <dimen name="space_2">2dp</dimen>
     <dimen name="space_4">4dp</dimen>
+    <dimen name="space_6">6dp</dimen>
     <dimen name="space_8">8dp</dimen>
+    <dimen name="space_10">10dp</dimen>
     <dimen name="space_12">12dp</dimen>
+    <dimen name="space_14">14dp</dimen>
     <dimen name="space_16">16dp</dimen>
+    <dimen name="space_18">18dp</dimen>
     <dimen name="space_20">20dp</dimen>
     <dimen name="space_24">24dp</dimen>
     <dimen name="space_28">28dp</dimen>
     <dimen name="space_32">32dp</dimen>
+    <dimen name="space_36">36dp</dimen>
     <dimen name="space_40">40dp</dimen>
+    <dimen name="space_48">48dp</dimen>
+    <dimen name="space_52">52dp</dimen>
+    <dimen name="space_56">56dp</dimen>
+    <dimen name="space_64">64dp</dimen>
+
+    <dimen name="radius_xs">8dp</dimen>
     <dimen name="radius_s">12dp</dimen>
-    <dimen name="radius_m">18dp</dimen>
+    <dimen name="radius_m">16dp</dimen>
     <dimen name="radius_l">24dp</dimen>
+    <dimen name="radius_full">999dp</dimen>
+
+    <dimen name="screen_gutter">16dp</dimen>
+    <dimen name="screen_bottom_space">56dp</dimen>
+    <dimen name="component_gap">12dp</dimen>
+    <dimen name="nav_title_gap">20dp</dimen>
+    <dimen name="touch_target">48dp</dimen>
+    <dimen name="top_navigation_height">56dp</dimen>
+    <dimen name="control_height_large">52dp</dimen>
 </resources>

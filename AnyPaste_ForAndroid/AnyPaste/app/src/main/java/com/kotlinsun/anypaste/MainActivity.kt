@@ -5,6 +5,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -259,6 +260,22 @@ class MainActivity : AppCompatActivity() {
         onClick(R.id.nav_settings) { showScreen(Screen.SETTINGS) }
         onClick(R.id.btn_send) { openSend(ClipboardType.TEXT) }
         onClick(R.id.btn_back) { navigateBack() }
+        updateBottomNavigationSelection(this)
+    }
+
+    private fun updateBottomNavigationSelection(root: View) {
+        val selectedId = when (currentScreen) {
+            Screen.HOME -> R.id.nav_home
+            Screen.DEVICES -> R.id.nav_devices
+            Screen.SETTINGS -> R.id.nav_settings
+            else -> View.NO_ID
+        }
+        listOf(R.id.nav_home, R.id.nav_devices, R.id.nav_settings).forEach { itemId ->
+            root.findViewById<View>(itemId)?.let { item ->
+                item.isSelected = itemId == selectedId
+                ViewCompat.setStateDescription(item, if (item.isSelected) "선택됨" else null)
+            }
+        }
     }
 
     private fun bindScreenActions(root: View, screen: Screen) {
@@ -561,6 +578,15 @@ class MainActivity : AppCompatActivity() {
             else "현재 ${onlineCount}대 온라인 · ${lastItemTime(state.clipboardItems)}",
         )
         root.setText(R.id.tv_home_sync_status, syncStatusText())
+        val hasOnlineDevice = onlineCount > 0
+        root.findViewById<View>(R.id.card_home_device_status).setBackgroundResource(
+            if (hasOnlineDevice) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
+        )
+        root.findViewById<View>(R.id.view_home_sync_indicator).isVisible = hasOnlineDevice
+        root.findViewById<ImageView>(R.id.iv_home_device_status).isVisible = hasOnlineDevice
+        root.findViewById<TextView>(R.id.tv_home_device_summary).setTextColor(
+            ContextCompat.getColor(this, if (hasOnlineDevice) R.color.success_foreground else R.color.ink),
+        )
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
@@ -662,9 +688,9 @@ class MainActivity : AppCompatActivity() {
             selectedFile?.let { "${it.mimeType} · ${formatSize(it.size)}" }
                 ?: "이미지 또는 파일 탐색기에서 선택",
         )
-        renderSendType(root, R.id.btn_type_text, R.id.tv_type_text, sendType == ClipboardType.TEXT)
-        renderSendType(root, R.id.btn_type_image, R.id.tv_type_image, sendType == ClipboardType.IMAGE)
-        renderSendType(root, R.id.btn_type_file, R.id.tv_type_file, sendType == ClipboardType.FILE)
+        renderSendType(root, R.id.btn_type_text, sendType == ClipboardType.TEXT)
+        renderSendType(root, R.id.btn_type_image, sendType == ClipboardType.IMAGE)
+        renderSendType(root, R.id.btn_type_file, sendType == ClipboardType.FILE)
 
         val remoteDevices = remoteDevices(state)
         val remote = viewModel.selectedDevice()
@@ -693,7 +719,7 @@ class MainActivity : AppCompatActivity() {
         transferCompleted = state.transferStatus == TransferStatus.SUCCEEDED
         transferFailed = state.transferStatus == TransferStatus.FAILED
         val progress = if (transferCompleted) 100 else state.transferProgress ?: 0
-        root.findViewById<ProgressBar>(R.id.progress_transfer).apply {
+        val progressView = root.findViewById<ProgressBar>(R.id.progress_transfer).apply {
             isIndeterminate = state.isBusy && state.transferProgress == null
             max = 100
             setProgress(progress, true)
@@ -718,21 +744,84 @@ class MainActivity : AppCompatActivity() {
                 root.setText(R.id.tv_transfer_title, "전송이 완료됐어요")
                 root.setText(R.id.tv_transfer_message, "연결된 기기에서 바로 확인할 수 있습니다.")
                 root.setText(R.id.tv_transfer_network_status, "Firebase 동기화 완료")
+                applyTransferTone(
+                    root = root,
+                    progressView = progressView,
+                    stateBackground = R.drawable.bg_circle_success,
+                    progressColor = R.color.success_foreground,
+                    progressTrackColor = R.color.success_container,
+                    noticeBackground = R.drawable.bg_card_success,
+                    noticeTextColor = R.color.success_foreground,
+                    showNoticeIcon = true,
+                    showNotice = true,
+                )
             }
             transferFailed -> {
                 root.setText(R.id.tv_transfer_state_icon, "!")
                 root.setText(R.id.tv_transfer_title, "전송하지 못했어요")
                 root.setText(R.id.tv_transfer_message, "네트워크와 Firebase 설정을 확인해 주세요.")
                 root.setText(R.id.tv_transfer_network_status, "재시도할 수 있습니다")
+                applyTransferTone(
+                    root = root,
+                    progressView = progressView,
+                    stateBackground = R.drawable.bg_circle_danger,
+                    progressColor = R.color.danger_foreground,
+                    progressTrackColor = R.color.danger_container,
+                    noticeBackground = R.drawable.bg_card_success,
+                    noticeTextColor = R.color.danger_foreground,
+                    showNoticeIcon = false,
+                    showNotice = false,
+                )
             }
             else -> {
                 root.setText(R.id.tv_transfer_state_icon, "↗")
                 root.setText(R.id.tv_transfer_title, "연결된 기기로 보내는 중")
                 root.setText(R.id.tv_transfer_message, "앱을 열어 둔 상태에서 전송을 완료해 주세요.")
                 root.setText(R.id.tv_transfer_network_status, "보안 연결로 업로드 중")
+                applyTransferTone(
+                    root = root,
+                    progressView = progressView,
+                    stateBackground = R.drawable.bg_circle_primary,
+                    progressColor = R.color.primary_contrast,
+                    progressTrackColor = R.color.primary_container,
+                    noticeBackground = R.drawable.bg_card_primary,
+                    noticeTextColor = R.color.on_primary_container,
+                    showNoticeIcon = false,
+                    showNotice = true,
+                )
             }
         }
         root.findViewById<View>(R.id.btn_retry_transfer).isVisible = transferFailed
+    }
+
+    private fun applyTransferTone(
+        root: View,
+        progressView: ProgressBar,
+        @DrawableRes stateBackground: Int,
+        progressColor: Int,
+        progressTrackColor: Int,
+        @DrawableRes noticeBackground: Int,
+        noticeTextColor: Int,
+        showNoticeIcon: Boolean,
+        showNotice: Boolean,
+    ) {
+        root.findViewById<View>(R.id.tv_transfer_state_icon).setBackgroundResource(stateBackground)
+        val progressTint = ColorStateList.valueOf(ContextCompat.getColor(this, progressColor))
+        progressView.progressTintList = progressTint
+        progressView.indeterminateTintList = progressTint
+        progressView.progressBackgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(this, progressTrackColor))
+        root.findViewById<TextView>(R.id.tv_transfer_percent).setTextColor(
+            ContextCompat.getColor(this, progressColor),
+        )
+        root.findViewById<View>(R.id.card_transfer_notice).apply {
+            isVisible = showNotice
+            setBackgroundResource(noticeBackground)
+        }
+        root.findViewById<ImageView>(R.id.iv_transfer_notice).isVisible = showNoticeIcon
+        root.findViewById<TextView>(R.id.tv_transfer_notice).setTextColor(
+            ContextCompat.getColor(this, noticeTextColor),
+        )
     }
 
     private fun renderDevices(root: View, state: MainUiState) {
@@ -744,7 +833,15 @@ class MainActivity : AppCompatActivity() {
             else "${state.devices.size}대 중 ${online}대가 현재 온라인이에요",
         )
         root.setText(R.id.tv_devices_count, "연결된 기기 ${state.devices.size}")
-        root.findViewById<View>(R.id.view_devices_summary_indicator).isVisible = online > 0
+        val hasOnlineDevice = online > 0
+        root.findViewById<View>(R.id.card_devices_summary).setBackgroundResource(
+            if (hasOnlineDevice) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
+        )
+        root.findViewById<View>(R.id.view_devices_summary_indicator).isVisible = hasOnlineDevice
+        root.findViewById<ImageView>(R.id.iv_devices_summary_status).isVisible = hasOnlineDevice
+        root.findViewById<TextView>(R.id.tv_devices_summary).setTextColor(
+            ContextCompat.getColor(this, if (hasOnlineDevice) R.color.success_foreground else R.color.ink),
+        )
         root.findViewById<ProgressBar>(R.id.progress_devices).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_devices_empty).isVisible =
             state.authResolved && state.devices.isEmpty()
@@ -757,9 +854,27 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<View>(R.id.layout_device_detail_content).isVisible = device != null
         if (device == null) return
         val online = isDeviceOnline(device)
-        root.findViewById<ImageView>(R.id.iv_device_detail_type).setImageResource(deviceIcon(device))
+        root.findViewById<ImageView>(R.id.iv_device_detail_type).apply {
+            setImageResource(deviceIcon(device))
+            setBackgroundResource(
+                if (device.resolvedPlatform() == DevicePlatform.MACOS) {
+                    R.drawable.bg_icon_purple
+                } else {
+                    R.drawable.bg_icon_primary
+                },
+            )
+        }
         root.setText(R.id.tv_device_detail_name, device.deviceName)
         root.setText(R.id.tv_device_detail_status, if (online) "온라인 · 동기화 가능" else "오프라인")
+        root.findViewById<View>(R.id.badge_device_detail_status).setBackgroundResource(
+            if (online) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
+        )
+        root.findViewById<View>(R.id.view_device_detail_status).setBackgroundResource(
+            if (online) R.drawable.bg_circle_success else R.drawable.bg_circle_neutral,
+        )
+        root.findViewById<TextView>(R.id.tv_device_detail_status).setTextColor(
+            ContextCompat.getColor(this, if (online) R.color.success_foreground else R.color.ink_secondary),
+        )
         root.setText(
             R.id.tv_device_detail_platform,
             if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android",
@@ -936,7 +1051,7 @@ class MainActivity : AppCompatActivity() {
                 setTextColor(
                     ContextCompat.getColor(
                         this@MainActivity,
-                        if (online) R.color.success else R.color.ink_secondary,
+                        if (online) R.color.success_foreground else R.color.ink_secondary,
                     ),
                 )
             }
@@ -1309,24 +1424,17 @@ class MainActivity : AppCompatActivity() {
             R.id.filter_file to ClipboardFilter.FILE,
         ).forEach { (id, filter) ->
             root.findViewById<TextView>(id).apply {
-                val selected = filter == clipboardFilter
-                setBackgroundResource(if (selected) R.drawable.bg_card_primary else R.drawable.bg_card_stroke)
-                setTextColor(
-                    ContextCompat.getColor(
-                        this@MainActivity,
-                        if (selected) R.color.primary else R.color.ink_secondary,
-                    ),
-                )
+                isSelected = filter == clipboardFilter
+                ViewCompat.setStateDescription(this, if (isSelected) "선택됨" else null)
             }
         }
     }
 
-    private fun renderSendType(root: View, @IdRes cardId: Int, @IdRes textId: Int, selected: Boolean) {
-        root.findViewById<View>(cardId)
-            .setBackgroundResource(if (selected) R.drawable.bg_card_primary else R.drawable.bg_card_stroke)
-        root.findViewById<TextView>(textId).setTextColor(
-            ContextCompat.getColor(this, if (selected) R.color.primary else R.color.ink_secondary),
-        )
+    private fun renderSendType(root: View, @IdRes cardId: Int, selected: Boolean) {
+        root.findViewById<View>(cardId).apply {
+            isSelected = selected
+            ViewCompat.setStateDescription(this, if (isSelected) "선택됨" else null)
+        }
     }
 
     private fun showSendError(message: String) {

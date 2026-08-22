@@ -6,11 +6,11 @@
     android:layout_marginTop="@dimen/space_12"
     android:background="@drawable/bg_card"
     android:clickable="true"
-    android:elevation="1dp"
     android:focusable="true"
     android:gravity="top"
     android:orientation="horizontal"
-    android:padding="@dimen/space_16">
+    android:paddingHorizontal="@dimen/space_16"
+    android:paddingVertical="@dimen/space_12">
 
     <ImageView
         android:id="@+id/iv_notification_type"
@@ -40,7 +40,7 @@
             style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_4"
+            android:layout_marginTop="@dimen/space_2"
             android:ellipsize="end"
             android:maxLines="2"
             android:textSize="12sp" />

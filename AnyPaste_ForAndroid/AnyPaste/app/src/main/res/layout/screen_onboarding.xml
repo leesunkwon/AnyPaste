@@ -11,9 +11,9 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/space_24"
+        android:paddingHorizontal="@dimen/screen_gutter"
         android:paddingTop="@dimen/space_32"
-        android:paddingBottom="@dimen/space_24">
+        android:paddingBottom="@dimen/screen_bottom_space">
 
         <TextView
             android:layout_width="52dp"
@@ -31,18 +31,17 @@
             android:layout_marginTop="@dimen/space_16"
             android:letterSpacing="0.14"
             android:text="ANYPASTE"
-            android:textColor="@color/primary"
+            android:textColor="@color/primary_contrast"
             android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Title"
+            style="@style/TextAppearance.AnyPaste.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
             android:gravity="center"
-            android:text="복사한 모든 것을\n어디서나 붙여넣으세요"
-            android:textSize="27sp" />
+            android:text="복사한 모든 것을\n어디서나 붙여넣으세요" />
 
         <TextView
             style="@style/TextAppearance.AnyPaste.Body"
@@ -51,7 +50,7 @@
             android:layout_marginTop="@dimen/space_12"
             android:gravity="center"
             android:text="Mac과 Android 사이를 자연스럽게 연결해요."
-            android:textSize="15sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -90,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="↔"
-                android:textColor="@color/primary"
+                android:textColor="@color/primary_contrast"
                 android:textSize="28sp" />
 
             <LinearLayout

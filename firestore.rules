@@ -58,6 +58,18 @@ service cloud.firestore {
         && request.resource.data.isOnline is bool;
     }
 
+    function isDeviceRevoked(userId, deviceId) {
+      return exists(
+        /databases/$(database)/documents/users/$(userId)/revokedDevices/$(deviceId)
+      );
+    }
+
+    function isActiveDevice(userId, deviceId) {
+      return exists(
+        /databases/$(database)/documents/users/$(userId)/devices/$(deviceId)
+      ) && !isDeviceRevoked(userId, deviceId);
+    }
+
     function hasClipboardFields() {
       return hasExactFields([
         'type',
@@ -179,13 +191,21 @@ service cloud.firestore {
 
       match /devices/{deviceId} {
         allow read, delete: if isOwner(userId);
-        allow create, update: if isOwner(userId) && isValidDevice(deviceId);
+        allow create, update: if isOwner(userId)
+          && !isDeviceRevoked(userId, deviceId)
+          && isValidDevice(deviceId);
+      }
+
+      match /revokedDevices/{deviceId} {
+        allow read: if isOwner(userId);
+        allow write: if false;
       }
 
       match /clipboard/{itemId} {
         allow read, delete: if isOwner(userId);
 
         allow create: if isOwner(userId)
+          && isActiveDevice(userId, request.resource.data.sourceDeviceId)
           && hasClipboardFields()
           && hasValidClipboardCreateFields(itemId)
           && (isValidTextClipboard() || isValidBinaryClipboard(userId, itemId));

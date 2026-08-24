@@ -267,6 +267,28 @@ actor FirebaseRESTClient {
         return documents.compactMap(deviceRecord(from:))
     }
 
+    func isDeviceSessionRevoked(
+        userId: String,
+        deviceId: String,
+        idToken: String
+    ) async throws -> Bool {
+        try requireToken(idToken)
+        try requireDocumentID(userId, label: "사용자 ID")
+        try requireDocumentID(deviceId, label: "기기 ID")
+
+        let request = authorizedRequest(
+            url: try firestoreDocumentURL(["users", userId, "revokedDevices", deviceId]),
+            method: "GET",
+            idToken: idToken
+        )
+        do {
+            _ = try await perform(request)
+            return true
+        } catch FirebaseRESTClientError.notFound {
+            return false
+        }
+    }
+
     func heartbeatDevice(userId: String, deviceId: String, idToken: String) async throws {
         try requireToken(idToken)
         try requireDocumentID(userId, label: "사용자 ID")
@@ -322,14 +344,21 @@ actor FirebaseRESTClient {
         _ = try await commit(writes: [write], idToken: idToken)
     }
 
-    func deleteDevice(userId: String, deviceId: String, idToken: String) async throws {
+    func revokeDeviceSession(userId: String, deviceId: String, idToken: String) async throws {
         try requireToken(idToken)
         try requireDocumentID(userId, label: "사용자 ID")
         try requireDocumentID(deviceId, label: "기기 ID")
-        try await deleteDocument(
-            ["users", userId, "devices", deviceId],
+
+        var request = authorizedRequest(
+            url: try callableFunctionURL(name: "revokeDeviceSession"),
+            method: "POST",
             idToken: idToken
         )
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: ["data": ["deviceId": deviceId]]
+        )
+        _ = try await perform(request)
     }
 
     // MARK: - Clipboard
@@ -1102,6 +1131,16 @@ actor FirebaseRESTClient {
         guard let project = encodedPathComponent(configuration.firebaseProjectID),
               let url = URL(
                 string: "https://firestore.googleapis.com/v1/projects/\(project)/databases/(default)/documents"
+              ) else {
+            throw FirebaseRESTClientError.invalidRequest
+        }
+        return url
+    }
+
+    private func callableFunctionURL(name: String) throws -> URL {
+        guard let project = encodedPathComponent(configuration.firebaseProjectID),
+              let url = URL(
+                string: "https://asia-northeast3-\(project).cloudfunctions.net/\(name)"
               ) else {
             throw FirebaseRESTClientError.invalidRequest
         }

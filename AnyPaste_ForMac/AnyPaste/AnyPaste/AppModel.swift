@@ -4,6 +4,13 @@ import CryptoKit
 import Foundation
 import UniformTypeIdentifiers
 
+struct FailedTransferRecord: Identifiable, Equatable {
+    let id: UUID
+    let title: String
+    let meta: String
+    let reason: String
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     private struct PreparedFile: Sendable {
@@ -29,6 +36,29 @@ final class AppModel: ObservableObject {
         var fingerprint: String?
     }
 
+    private enum RetryableTransfer {
+        case text(value: String, targetDeviceID: String?)
+        case files(urls: [URL], targetDeviceID: String?)
+
+        var title: String {
+            switch self {
+            case let .text(value, _):
+                return String(value.split(separator: "\n", maxSplits: 1).first ?? "텍스트").prefix(60).description
+            case let .files(urls, _):
+                return urls.count == 1 ? (urls.first?.lastPathComponent ?? "파일") : "파일 \(urls.count)개"
+            }
+        }
+
+        var meta: String {
+            switch self {
+            case let .text(value, _):
+                return "텍스트 · \(value.lengthOfBytes(using: .utf8)) B"
+            case .files:
+                return "파일"
+            }
+        }
+    }
+
     @Published private(set) var authPhase: AppPhase
     @Published private(set) var currentUser: AppUser?
     @Published var selectedRoute: AppRoute = .home
@@ -39,6 +69,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var syncStatus: SyncStatus = .stopped
     @Published private(set) var transferState: TransferState = .idle
+    @Published private(set) var failedTransfers: [FailedTransferRecord] = []
 
     @Published var autoSync: Bool {
         didSet {
@@ -104,12 +135,14 @@ final class AppModel: ObservableObject {
     private var latestAutomaticObservationByUser: [String: AutomaticObservation] = [:]
     private var refreshIsRunning = false
     private var didStart = false
+    private var retryableTransfers: [UUID: RetryableTransfer] = [:]
 
     private static let maximumTextLength = 100_000
     private static let maximumTransferBytes: Int64 = 50 * 1024 * 1024
     private static let clipboardTTL: TimeInterval = 24 * 60 * 60
     private static let pollingNanoseconds: UInt64 = 2_000_000_000
     private static let heartbeatNanoseconds: UInt64 = 60_000_000_000
+    private static let maximumFailedTransfers = 20
 
     init(
         defaults: UserDefaults = .standard,
@@ -276,6 +309,28 @@ final class AppModel: ObservableObject {
     }
 
     func sendText(_ text: String, targetDeviceID: String? = nil) async {
+        await sendText(
+            text,
+            targetDeviceID: targetDeviceID,
+            retryID: UUID()
+        )
+    }
+
+    func retryFailedTransfer(_ id: UUID) async {
+        guard !isLoading, let transfer = retryableTransfers[id] else { return }
+        switch transfer {
+        case let .text(value, targetDeviceID):
+            await sendText(value, targetDeviceID: targetDeviceID, retryID: id)
+        case let .files(urls, targetDeviceID):
+            await sendFiles(urls, targetDeviceID: targetDeviceID, retryID: id)
+        }
+    }
+
+    private func sendText(
+        _ text: String,
+        targetDeviceID: String?,
+        retryID: UUID
+    ) async {
         guard !isLoading else { return }
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = "전송할 텍스트를 입력해 주세요."
@@ -312,13 +367,31 @@ final class AppModel: ObservableObject {
             insertOrReplace(created)
             transferState = .succeeded
             syncStatus = .upToDate
+            resolveFailedTransfer(retryID)
         } catch {
             transferState = .failed
+            recordFailedTransfer(
+                id: retryID,
+                transfer: .text(value: text, targetDeviceID: targetDeviceID),
+                error: error
+            )
             handle(error)
         }
     }
 
     func sendFiles(_ urls: [URL], targetDeviceID: String? = nil) async {
+        await sendFiles(
+            urls,
+            targetDeviceID: targetDeviceID,
+            retryID: UUID()
+        )
+    }
+
+    private func sendFiles(
+        _ urls: [URL],
+        targetDeviceID: String?,
+        retryID: UUID
+    ) async {
         guard !isLoading else { return }
         guard !urls.isEmpty else {
             errorMessage = "전송할 파일을 선택해 주세요."
@@ -331,14 +404,23 @@ final class AppModel: ObservableObject {
         transferState = .preparing
         defer { isLoading = false }
 
+        var activeURL: URL?
         do {
             for url in urls {
+                activeURL = url
                 try await sendFile(url, targetDeviceID: targetDeviceID)
             }
             transferState = .succeeded
             syncStatus = .upToDate
+            resolveFailedTransfer(retryID)
         } catch {
             transferState = .failed
+            let retryURLs = activeURL.map { [$0] } ?? urls
+            recordFailedTransfer(
+                id: retryID,
+                transfer: .files(urls: retryURLs, targetDeviceID: targetDeviceID),
+                error: error
+            )
             handle(error)
         }
     }
@@ -393,7 +475,7 @@ final class AppModel: ObservableObject {
 
         do {
             try await withAuthenticatedSession { client, session in
-                try await client.deleteDevice(
+                try await client.revokeDeviceSession(
                     userId: session.user.id,
                     deviceId: device.id,
                     idToken: session.idToken
@@ -427,6 +509,8 @@ final class AppModel: ObservableObject {
         clipboardItems = []
         devices = []
         selectedItem = nil
+        failedTransfers = []
+        retryableTransfers = [:]
         selectedRoute = .home
         transferState = .idle
         syncStatus = .stopped
@@ -609,6 +693,8 @@ final class AppModel: ObservableObject {
         clipboardItems = []
         devices = []
         selectedItem = nil
+        failedTransfers = []
+        retryableTransfers = [:]
         syncStatus = .stopped
         transferState = .idle
         authPhase = .signedOut
@@ -726,13 +812,22 @@ final class AppModel: ObservableObject {
         )
         do {
             let registered: DeviceRecord = try await withAuthenticatedSession { client, session in
-                try await client.registerDevice(
+                if try await client.isDeviceSessionRevoked(
+                    userId: session.user.id,
+                    deviceId: currentDeviceID,
+                    idToken: session.idToken
+                ) {
+                    throw AppModelError.deviceSessionRevoked
+                }
+                return try await client.registerDevice(
                     userId: session.user.id,
                     device: device,
                     idToken: session.idToken
                 )
             }
             insertOrReplace(registered)
+        } catch AppModelError.deviceSessionRevoked {
+            invalidateSession(message: AppModelError.deviceSessionRevoked.localizedDescription)
         } catch {
             if reportErrors {
                 handle(error)
@@ -745,6 +840,13 @@ final class AppModel: ObservableObject {
         let deviceID = currentDeviceID
         do {
             let refreshedDevices: [DeviceRecord] = try await withAuthenticatedSession { client, session in
+                if try await client.isDeviceSessionRevoked(
+                    userId: session.user.id,
+                    deviceId: deviceID,
+                    idToken: session.idToken
+                ) {
+                    throw AppModelError.deviceSessionRevoked
+                }
                 try await client.heartbeatDevice(
                     userId: session.user.id,
                     deviceId: deviceID,
@@ -756,6 +858,8 @@ final class AppModel: ObservableObject {
                 )
             }
             updateDevices(refreshedDevices)
+        } catch AppModelError.deviceSessionRevoked {
+            invalidateSession(message: AppModelError.deviceSessionRevoked.localizedDescription)
         } catch FirebaseRESTClientError.invalidSession {
             invalidateSession(message: "로그인 정보가 만료되었습니다. 다시 로그인해 주세요.")
         } catch {
@@ -1565,6 +1669,32 @@ final class AppModel: ObservableObject {
         }
     }
 
+    private func recordFailedTransfer(
+        id: UUID,
+        transfer: RetryableTransfer,
+        error: Error
+    ) {
+        guard !(error is CancellationError) else { return }
+        retryableTransfers[id] = transfer
+        let record = FailedTransferRecord(
+            id: id,
+            title: transfer.title,
+            meta: transfer.meta,
+            reason: Self.message(for: error)
+        )
+        failedTransfers.removeAll { $0.id == id }
+        failedTransfers.append(record)
+        if failedTransfers.count > Self.maximumFailedTransfers {
+            let expired = failedTransfers.removeFirst()
+            retryableTransfers.removeValue(forKey: expired.id)
+        }
+    }
+
+    private func resolveFailedTransfer(_ id: UUID) {
+        retryableTransfers.removeValue(forKey: id)
+        failedTransfers.removeAll { $0.id == id }
+    }
+
     private func validateTargetDevice(_ deviceID: String?) -> Bool {
         guard let deviceID, !deviceID.isEmpty else { return true }
         guard deviceID != currentDeviceID else {
@@ -1588,6 +1718,10 @@ final class AppModel: ObservableObject {
         if invalidatesExpiredSession,
            case FirebaseRESTClientError.invalidSession = error {
             invalidateSession(message: "로그인 정보가 만료되었습니다. 다시 로그인해 주세요.")
+            return
+        }
+        if case .some(.deviceSessionRevoked) = error as? AppModelError {
+            invalidateSession(message: AppModelError.deviceSessionRevoked.localizedDescription)
             return
         }
         errorMessage = Self.message(for: error)
@@ -1772,6 +1906,7 @@ private enum AppModelError: LocalizedError {
     case fileOpenFailed
     case wifiRequired
     case automaticRecordConflict
+    case deviceSessionRevoked
 
     var errorDescription: String? {
         switch self {
@@ -1797,6 +1932,8 @@ private enum AppModelError: LocalizedError {
             return "Wi-Fi 전용 전송이 켜져 있습니다. Wi-Fi에 연결한 뒤 다시 시도해 주세요."
         case .automaticRecordConflict:
             return "같은 자동 전송 ID에 다른 내용이 있어 전송을 중단했습니다."
+        case .deviceSessionRevoked:
+            return "이 기기의 연결이 해제되어 로그아웃되었습니다. 다시 사용하려면 새 기기로 연결해 주세요."
         }
     }
 }

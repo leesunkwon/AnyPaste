@@ -34,6 +34,7 @@ import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -102,7 +103,9 @@ class MainActivity : AppCompatActivity() {
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        if (!granted) toast("알림 권한 없이도 앱 안에서 수신 항목을 확인할 수 있습니다.")
+        if (!granted) {
+            toast("알림 권한이 없으면 동기화 상태를 놓칠 수 있습니다. 앱 설정에서 언제든 허용할 수 있어요.")
+        }
         if (pendingStartSyncAfterPermission) {
             pendingStartSyncAfterPermission = false
             startClipboardSyncFromUserAction()
@@ -174,7 +177,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (ClipboardSyncService.isRunning) ClipboardSyncService.captureNow(this)
+        if (ClipboardSyncService.isRunning) {
+            ClipboardSyncService.captureNow(this)
+        } else if (preferences.autoSyncEnabled && viewModel.state.value.user != null) {
+            // A foreground service killed by the system can only be restarted safely while this
+            // Activity is visible. Android force-stop still requires the user to open the app.
+            startClipboardSyncFromUserAction(showRecoveryMessage = false)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -468,8 +477,18 @@ class MainActivity : AppCompatActivity() {
             }
         root.onClick(R.id.btn_disconnect_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
-            viewModel.removeDevice(device)
-            showScreen(Screen.DEVICES)
+            AlertDialog.Builder(this)
+                .setTitle("기기 연결을 해제할까요?")
+                .setMessage(
+                    "${device.deviceName}에서 로그아웃되고 이후 동기화가 차단됩니다. " +
+                        "다시 사용하려면 새 기기로 연결해야 합니다.",
+                )
+                .setNegativeButton("취소", null)
+                .setPositiveButton("연결 해제") { _, _ ->
+                    viewModel.removeDevice(device)
+                    showScreen(Screen.DEVICES)
+                }
+                .show()
         }
     }
 
@@ -791,7 +810,20 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        root.findViewById<View>(R.id.btn_retry_transfer).isVisible = transferFailed
+        val failureReason = state.transferFailureReason.orEmpty()
+        root.findViewById<View>(R.id.tv_transfer_failure_reason).isVisible =
+            transferFailed && failureReason.isNotBlank()
+        root.setText(R.id.tv_transfer_failure_reason, failureReason)
+        val retryQueue = state.failedTransfers
+        root.findViewById<View>(R.id.tv_transfer_retry_queue).isVisible = retryQueue.isNotEmpty()
+        root.setText(
+            R.id.tv_transfer_retry_queue,
+            if (retryQueue.isEmpty()) "" else "재전송 대기 ${retryQueue.size}건 · ${retryQueue.last().title}",
+        )
+        root.findViewById<TextView>(R.id.btn_retry_transfer).apply {
+            isVisible = transferFailed && retryQueue.isNotEmpty()
+            text = if (retryQueue.size > 1) "다시 시도 (${retryQueue.size})" else "다시 시도"
+        }
     }
 
     private fun applyTransferTone(
@@ -931,6 +963,10 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<SwitchMaterial>(R.id.switch_receive_notifications).setCheckedSilently(
             preferences.incomingNotificationsEnabled,
         ) { checked -> setIncomingNotifications(checked) }
+        val guidance = ClipboardSyncService.backgroundSyncGuidance(this)
+            ?: preferences.backgroundSyncNotice.takeIf(String::isNotBlank)
+        root.findViewById<View>(R.id.tv_background_sync_guidance).isVisible = guidance != null
+        root.setText(R.id.tv_background_sync_guidance, guidance.orEmpty())
     }
 
     private fun renderPermissions(root: View) {
@@ -1148,32 +1184,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun retryTransfer() {
         transferFailed = false
-        when (sendType) {
-            ClipboardType.TEXT -> {
-                toast("텍스트 내용을 다시 확인해 주세요.")
-                showScreen(Screen.SEND)
-            }
-            ClipboardType.IMAGE, ClipboardType.FILE -> {
-                val file = selectedFile
-                if (file == null) {
-                    showScreen(Screen.SEND)
-                    openDocument(sendType)
-                } else {
-                    val targetDeviceId = viewModel.selectedDevice()?.id
-                        ?.takeIf { selectedId ->
-                            remoteDevices(viewModel.state.value).any { it.id == selectedId }
-                        }
-                        ?: remoteDevices(viewModel.state.value).firstOrNull()?.id.orEmpty()
-                    viewModel.sendFile(
-                        file.uri,
-                        file.name,
-                        file.mimeType,
-                        file.size,
-                        targetDeviceId,
-                    )
-                }
-            }
-        }
+        viewModel.retryLastFailedTransfer()
+        renderCurrent(viewModel.state.value)
     }
 
     private fun handleUiEvent(event: MainUiEvent) {
@@ -1357,7 +1369,7 @@ class MainActivity : AppCompatActivity() {
         renderCurrent(viewModel.state.value)
     }
 
-    private fun startClipboardSyncFromUserAction() {
+    private fun startClipboardSyncFromUserAction(showRecoveryMessage: Boolean = true) {
         if (viewModel.state.value.user == null) {
             preferences.autoSyncEnabled = false
             toast("로그인 후 동기화를 켜 주세요.")
@@ -1365,9 +1377,14 @@ class MainActivity : AppCompatActivity() {
         }
         try {
             ClipboardSyncService.start(this)
+            if (showRecoveryMessage) {
+                ClipboardSyncService.backgroundSyncGuidance(this)?.let(::toast)
+            }
         } catch (_: RuntimeException) {
             preferences.autoSyncEnabled = false
-            toast("앱이 화면에 보일 때 클립보드 동기화를 다시 켜 주세요.")
+            preferences.backgroundSyncNotice =
+                "Android가 백그라운드에서 동기화 시작을 제한했습니다. 앱을 연 뒤 다시 켜 주세요."
+            toast(preferences.backgroundSyncNotice)
         }
     }
 
@@ -1557,7 +1574,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun syncStatusText(): String = when (ClipboardSyncService.state.value.phase) {
-        ClipboardSyncPhase.STOPPED -> "자동 동기화 꺼짐"
+        ClipboardSyncPhase.STOPPED -> preferences.backgroundSyncNotice
+            .takeIf(String::isNotBlank) ?: "자동 동기화 꺼짐"
         ClipboardSyncPhase.WAITING_FOR_AUTH -> "로그인 대기 중"
         ClipboardSyncPhase.SYNCING -> ClipboardSyncService.state.value.message ?: "동기화 중"
         ClipboardSyncPhase.ERROR -> ClipboardSyncService.state.value.message ?: "동기화 확인 필요"

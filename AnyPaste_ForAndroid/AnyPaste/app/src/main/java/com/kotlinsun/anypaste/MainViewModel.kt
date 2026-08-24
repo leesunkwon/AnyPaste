@@ -5,12 +5,16 @@ import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.storage.StorageException
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kotlinsun.anypaste.data.FirebaseAuthRepository
 import com.kotlinsun.anypaste.data.FirebaseStorageRepository
 import com.kotlinsun.anypaste.data.FirestoreClipboardRepository
 import com.kotlinsun.anypaste.data.FirestoreDeviceRepository
+import com.kotlinsun.anypaste.data.DeviceSessionRevokedException
 import com.kotlinsun.anypaste.data.awaitResult
 import com.kotlinsun.anypaste.model.AuthUser
 import com.kotlinsun.anypaste.model.ClipboardItem
@@ -48,10 +52,19 @@ data class MainUiState(
     val transferTitle: String = "",
     val transferMeta: String = "",
     val transferType: ClipboardType = ClipboardType.TEXT,
+    val transferFailureReason: String? = null,
+    val failedTransfers: List<FailedTransfer> = emptyList(),
     val pendingEvents: List<QueuedUiEvent> = emptyList(),
 )
 
 enum class TransferStatus { IDLE, SENDING, SUCCEEDED, FAILED }
+
+data class FailedTransfer(
+    val id: String,
+    val title: String,
+    val meta: String,
+    val reason: String,
+)
 
 data class QueuedUiEvent(
     val id: Long,
@@ -79,12 +92,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var sessionJob: Job? = null
     private var nextEventId = 0L
+    private val retryableTransfers = LinkedHashMap<String, PendingTransfer>()
 
     init {
         viewModelScope.launch {
             authRepository.authState.collect { user ->
                 mutableState.update {
                     val userChanged = it.user?.uid != user?.uid
+                    if (userChanged) retryableTransfers.clear()
                     it.copy(
                         authResolved = true,
                         user = user,
@@ -92,6 +107,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         devices = if (user == null) emptyList() else it.devices,
                         selectedItemId = if (userChanged) null else it.selectedItemId,
                         selectedDeviceId = if (userChanged) null else it.selectedDeviceId,
+                        transferFailureReason = if (userChanged) null else it.transferFailureReason,
+                        failedTransfers = if (userChanged) emptyList() else it.failedTransfers,
                         pendingEvents = if (userChanged) emptyList() else it.pendingEvents,
                     )
                 }
@@ -132,24 +149,60 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sendText(content: String, targetDeviceId: String = "") {
-        val userId = requireUserId() ?: return
         val normalizedContent = content.trim()
+        if (normalizedContent.isEmpty()) {
+            postMessage("보낼 텍스트를 입력해 주세요.")
+            return
+        }
+        sendTextTransfer(
+            PendingTransfer.Text(
+                id = UUID.randomUUID().toString(),
+                content = normalizedContent,
+                targetDeviceId = targetDeviceId,
+            ),
+        )
+    }
+
+    fun retryLastFailedTransfer() {
+        val pending = state.value.failedTransfers.lastOrNull()?.let { retryableTransfers[it.id] }
+        if (pending == null) {
+            postMessage("다시 시도할 전송 항목이 없습니다.")
+            return
+        }
+        when (pending) {
+            is PendingTransfer.Text -> sendTextTransfer(pending)
+            is PendingTransfer.File -> sendFileTransfer(pending)
+        }
+    }
+
+    private fun sendTextTransfer(transfer: PendingTransfer.Text) {
+        val userId = requireUserId() ?: return
         mutableState.update {
             it.copy(
                 transferStatus = TransferStatus.SENDING,
-                transferTitle = normalizedContent.lineSequence().firstOrNull().orEmpty().take(60),
-                transferMeta = "텍스트 · ${normalizedContent.toByteArray().size} B",
+                transferTitle = transfer.title,
+                transferMeta = transfer.meta,
                 transferType = ClipboardType.TEXT,
                 transferProgress = null,
+                transferFailureReason = null,
             )
         }
-        launchBusy(successEvent = MainUiEvent.TransferCompleted) {
-            clipboardRepository.createText(
-                userId = userId,
-                content = normalizedContent,
-                sourceDeviceId = deviceId,
-                targetDeviceId = targetDeviceId,
-            )
+        viewModelScope.launch {
+            mutableState.update { it.copy(isBusy = true) }
+            try {
+                clipboardRepository.createText(
+                    userId = userId,
+                    content = transfer.content,
+                    sourceDeviceId = deviceId,
+                    targetDeviceId = transfer.targetDeviceId,
+                )
+                completeTransfer(transfer.id)
+            } catch (error: Throwable) {
+                if (error is CancellationException) throw error
+                failTransfer(transfer, error)
+            } finally {
+                mutableState.update { it.copy(isBusy = false, transferProgress = null) }
+            }
         }
     }
 
@@ -160,7 +213,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         fileSize: Long,
         targetDeviceId: String = "",
     ) {
-        val userId = requireUserId() ?: return
         if (fileSize == 0L) {
             postMessage("빈 파일은 전송할 수 없습니다.")
             return
@@ -169,33 +221,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             postMessage("파일은 50MB 이하만 전송할 수 있습니다.")
             return
         }
-
         val type = if (mimeType.startsWith("image/")) ClipboardType.IMAGE else ClipboardType.FILE
+        sendFileTransfer(
+            PendingTransfer.File(
+                id = UUID.randomUUID().toString(),
+                source = source,
+                fileName = fileName,
+                mimeType = mimeType,
+                fileSize = fileSize,
+                targetDeviceId = targetDeviceId,
+                type = type,
+            ),
+        )
+    }
+
+    private fun sendFileTransfer(transfer: PendingTransfer.File) {
+        val userId = requireUserId() ?: return
         viewModelScope.launch {
             mutableState.update {
                 it.copy(
                     isBusy = true,
                     transferProgress = 0,
                     transferStatus = TransferStatus.SENDING,
-                    transferTitle = fileName,
-                    transferMeta = "${if (type == ClipboardType.IMAGE) "이미지" else "파일"} · " +
-                        formatByteCount(fileSize),
-                    transferType = type,
+                    transferTitle = transfer.fileName,
+                    transferMeta = transfer.meta,
+                    transferType = transfer.type,
+                    transferFailureReason = null,
                 )
             }
             val itemId = clipboardRepository.newItemId(userId)
             var uploadedPath: String? = null
             var temporaryUpload: File? = null
             try {
-                val uploadSource = if (fileSize < 0L) {
-                    copyUnknownSizeSource(source).also { temporaryUpload = it }.let(Uri::fromFile)
+                val uploadSource = if (transfer.fileSize < 0L) {
+                    copyUnknownSizeSource(transfer.source).also { temporaryUpload = it }.let(Uri::fromFile)
                 } else {
-                    source
+                    transfer.source
                 }
-                val resolvedSize = temporaryUpload?.length() ?: fileSize
+                val resolvedSize = temporaryUpload?.length() ?: transfer.fileSize
                 mutableState.update {
                     it.copy(
-                        transferMeta = "${if (type == ClipboardType.IMAGE) "이미지" else "파일"} · " +
+                        transferMeta = "${if (transfer.type == ClipboardType.IMAGE) "이미지" else "파일"} · " +
                             formatByteCount(resolvedSize),
                     )
                 }
@@ -203,8 +269,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     userId = userId,
                     itemId = itemId,
                     source = uploadSource,
-                    fileName = fileName,
-                    mimeType = mimeType,
+                    fileName = transfer.fileName,
+                    mimeType = transfer.mimeType,
                     onProgress = { progress ->
                         mutableState.update { state ->
                             state.copy(transferProgress = progress.percentage)
@@ -215,23 +281,66 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 clipboardRepository.createBinary(
                     userId = userId,
                     itemId = itemId,
-                    type = type,
+                    type = transfer.type,
                     upload = upload,
                     sourceDeviceId = deviceId,
-                    targetDeviceId = targetDeviceId,
+                    targetDeviceId = transfer.targetDeviceId,
                 )
-                mutableState.update { it.copy(transferStatus = TransferStatus.SUCCEEDED) }
-                postEvent(MainUiEvent.TransferCompleted)
+                completeTransfer(transfer.id)
             } catch (error: Throwable) {
                 if (error is CancellationException) throw error
                 uploadedPath?.let { path -> runCatching { storageRepository.delete(path) } }
-                mutableState.update { it.copy(transferStatus = TransferStatus.FAILED) }
-                postEvent(MainUiEvent.Message(error.toKoreanMessage()))
+                failTransfer(transfer, error)
             } finally {
                 temporaryUpload?.delete()
                 mutableState.update { it.copy(isBusy = false, transferProgress = null) }
             }
         }
+    }
+
+    private fun completeTransfer(transferId: String) {
+        retryableTransfers.remove(transferId)
+        mutableState.update { state ->
+            state.copy(
+                transferStatus = TransferStatus.SUCCEEDED,
+                transferFailureReason = null,
+                failedTransfers = state.failedTransfers.filterNot { it.id == transferId },
+            )
+        }
+        postEvent(MainUiEvent.TransferCompleted)
+    }
+
+    private fun failTransfer(transfer: PendingTransfer, error: Throwable) {
+        if (error is DeviceSessionRevokedException) {
+            mutableState.update { it.copy(transferStatus = TransferStatus.FAILED) }
+            endRevokedDeviceSession()
+            return
+        }
+        val reason = error.toKoreanMessage()
+        retryableTransfers[transfer.id] = transfer
+        val failed = FailedTransfer(
+            id = transfer.id,
+            title = transfer.title,
+            meta = transfer.meta,
+            reason = reason,
+        )
+        mutableState.update { state ->
+            state.copy(
+                transferStatus = TransferStatus.FAILED,
+                transferFailureReason = reason,
+                failedTransfers = (state.failedTransfers.filterNot { it.id == transfer.id } + failed)
+                    .takeLast(MAX_FAILED_TRANSFERS),
+            )
+        }
+        while (retryableTransfers.size > MAX_FAILED_TRANSFERS) {
+            retryableTransfers.entries.iterator().let { iterator ->
+                if (iterator.hasNext()) {
+                    iterator.next()
+                    iterator.remove()
+                }
+            }
+        }
+        postMessage(reason)
     }
 
     fun download(item: ClipboardItem, destination: File) {
@@ -414,6 +523,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         delay(HEARTBEAT_INTERVAL_MILLIS)
                         if (!ClipboardSyncService.isRunning) {
                             runCatching { deviceRepository.heartbeat(user.uid, deviceId) }
+                                .onFailure(::handleDeviceSessionError)
                         }
                     }
                 }
@@ -433,7 +543,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 platform = DevicePlatform.ANDROID,
                 fcmToken = token,
             )
-        }.onFailure { postMessage(it.toKoreanMessage()) }
+        }.onFailure(::handleDeviceSessionError)
     }
 
     private fun launchBusy(
@@ -455,7 +565,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (successEvent == MainUiEvent.TransferCompleted) {
                     mutableState.update { it.copy(transferStatus = TransferStatus.FAILED) }
                 }
-                postEvent(MainUiEvent.Message(error.toKoreanMessage()))
+                handleDeviceSessionError(error)
             } finally {
                 mutableState.update { it.copy(isBusy = false) }
             }
@@ -469,6 +579,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun postMessage(message: String) {
         postEvent(MainUiEvent.Message(message))
+    }
+
+    private fun handleDeviceSessionError(error: Throwable) {
+        if (error is DeviceSessionRevokedException) {
+            endRevokedDeviceSession()
+        } else {
+            postMessage(error.toKoreanMessage())
+        }
+    }
+
+    private fun endRevokedDeviceSession() {
+        sessionJob?.cancel()
+        sessionJob = null
+        ClipboardSyncService.stop(getApplication<Application>())
+        authRepository.signOut()
+        postMessage("이 기기의 연결이 해제되어 로그아웃되었습니다.")
     }
 
     private fun postEvent(event: MainUiEvent) {
@@ -493,6 +619,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun Throwable.toKoreanMessage(): String {
         if (this is IllegalArgumentException) return message ?: "입력 내용을 확인해 주세요."
+        if (this is FirebaseNetworkException) return "네트워크 연결이 끊겼습니다. 연결을 확인한 뒤 다시 시도해 주세요."
+        if (this is FirebaseFirestoreException) {
+            return when (code) {
+                FirebaseFirestoreException.Code.PERMISSION_DENIED ->
+                    "전송 권한이 없습니다. 로그인 상태와 연결된 기기를 확인해 주세요."
+                FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED ->
+                    "서비스 사용량 한도에 도달했습니다. 잠시 후 다시 시도해 주세요."
+                FirebaseFirestoreException.Code.UNAVAILABLE ->
+                    "서버에 연결할 수 없습니다. 네트워크를 확인한 뒤 다시 시도해 주세요."
+                FirebaseFirestoreException.Code.UNAUTHENTICATED ->
+                    "로그인 정보가 만료되었습니다. 다시 로그인해 주세요."
+                else -> message ?: "전송 정보를 저장하지 못했습니다."
+            }
+        }
+        if (this is StorageException) {
+            return when (errorCode) {
+                StorageException.ERROR_QUOTA_EXCEEDED ->
+                    "저장 공간 또는 전송 한도를 초과했습니다. 파일 크기를 확인해 주세요."
+                StorageException.ERROR_NOT_AUTHENTICATED,
+                StorageException.ERROR_NOT_AUTHORIZED ->
+                    "파일 전송 권한이 없습니다. 다시 로그인해 주세요."
+                StorageException.ERROR_RETRY_LIMIT_EXCEEDED ->
+                    "파일 업로드 시간이 초과되었습니다. 네트워크를 확인한 뒤 다시 시도해 주세요."
+                StorageException.ERROR_CANCELED -> "파일 전송이 취소되었습니다."
+                else -> message ?: "파일을 업로드하지 못했습니다."
+            }
+        }
         if (this is FirebaseAuthException) {
             return when (errorCode) {
                 "ERROR_INVALID_EMAIL" -> "이메일 형식을 확인해 주세요."
@@ -561,5 +714,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         const val MAX_PREVIEW_BYTES = 8L * 1024L * 1024L
         const val HEARTBEAT_INTERVAL_MILLIS = 60_000L
         const val MAX_PENDING_EVENTS = 20
+        const val MAX_FAILED_TRANSFERS = 20
+
+        fun formatTransferSize(bytes: Long): String = when {
+            bytes < 0L -> "크기 정보 없음"
+            bytes < 1_024L -> "$bytes B"
+            bytes < 1_024L * 1_024L -> "${bytes / 1_024L} KB"
+            else -> "${bytes / (1_024L * 1_024L)} MB"
+        }
+    }
+
+    private sealed interface PendingTransfer {
+        val id: String
+        val title: String
+        val meta: String
+
+        data class Text(
+            override val id: String,
+            val content: String,
+            val targetDeviceId: String,
+        ) : PendingTransfer {
+            override val title: String = content.lineSequence().firstOrNull().orEmpty().take(60)
+            override val meta: String = "텍스트 · ${content.toByteArray().size} B"
+        }
+
+        data class File(
+            override val id: String,
+            val source: Uri,
+            val fileName: String,
+            val mimeType: String,
+            val fileSize: Long,
+            val targetDeviceId: String,
+            val type: ClipboardType,
+        ) : PendingTransfer {
+            override val title: String = fileName
+            override val meta: String =
+                "${if (type == ClipboardType.IMAGE) "이미지" else "파일"} · ${formatTransferSize(fileSize)}"
+        }
     }
 }

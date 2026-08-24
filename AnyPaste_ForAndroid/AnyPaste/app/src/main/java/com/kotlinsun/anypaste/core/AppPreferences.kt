@@ -28,6 +28,10 @@ class AppPreferences(context: Context) {
         get() = preferences.getBoolean(KEY_INCOMING_NOTIFICATIONS, true)
         set(value) = preferences.edit().putBoolean(KEY_INCOMING_NOTIFICATIONS, value).apply()
 
+    var backgroundSyncNotice: String
+        get() = preferences.getString(KEY_BACKGROUND_SYNC_NOTICE, "").orEmpty()
+        set(value) = preferences.edit().putString(KEY_BACKGROUND_SYNC_NOTICE, value).apply()
+
     companion object {
         const val PREFERENCES_NAME = "anypaste_settings"
         const val KEY_INCOMING_NOTIFICATIONS = "incoming_notifications"
@@ -36,5 +40,6 @@ class AppPreferences(context: Context) {
         private const val KEY_AUTO_SYNC = "auto_sync"
         private const val KEY_PERMISSIONS_CONFIGURED = "permissions_configured"
         private const val KEY_WIFI_ONLY_FILES = "wifi_only_files"
+        private const val KEY_BACKGROUND_SYNC_NOTICE = "background_sync_notice"
     }
 }

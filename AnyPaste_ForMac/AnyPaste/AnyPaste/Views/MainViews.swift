@@ -723,6 +723,10 @@ struct SendClipboardView: View {
                         sendAction
                     }
                 }
+
+                if !model.failedTransfers.isEmpty {
+                    failedTransferQueue
+                }
             }
             .pastePagePadding()
         }
@@ -910,6 +914,46 @@ struct SendClipboardView: View {
         }
     }
 
+    private var failedTransferQueue: some View {
+        PasteCard {
+            VStack(alignment: .leading, spacing: PasteSpacing.md) {
+                PasteSectionHeader(
+                    title: "재전송 대기",
+                    subtitle: "실패 원인을 확인하고 각 항목을 다시 전송할 수 있습니다."
+                )
+                ForEach(model.failedTransfers) { transfer in
+                    HStack(alignment: .top, spacing: PasteSpacing.md) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(PasteColors.warning)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: PasteSpacing.xs) {
+                            Text(transfer.title)
+                                .font(PasteTypography.bodyStrong)
+                                .foregroundStyle(PasteColors.text)
+                                .lineLimit(1)
+                            Text(transfer.meta)
+                                .font(PasteTypography.caption)
+                                .foregroundStyle(PasteColors.textSecondary)
+                            Text(transfer.reason)
+                                .font(PasteTypography.caption)
+                                .foregroundStyle(PasteColors.warning)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: PasteSpacing.sm)
+                        Button("다시 시도") {
+                            Task { await model.retryFailedTransfer(transfer.id) }
+                        }
+                        .buttonStyle(PasteSecondaryButtonStyle())
+                        .disabled(isTransferring)
+                    }
+                    .padding(PasteSpacing.md)
+                    .background(PasteColors.warningSurface)
+                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.small, style: .continuous))
+                }
+            }
+        }
+    }
+
     private var transferBadge: some View {
         PasteStatusBadge(
             label: WorkspacePresentation.transferLabel(model.transferState),
@@ -1039,14 +1083,14 @@ struct DevicesView: View {
             }
         }
         .alert(
-            "기기를 목록에서 제거할까요?",
+            "기기 연결을 해제할까요?",
             isPresented: Binding(
                 get: { devicePendingRemoval != nil },
                 set: { if !$0 { devicePendingRemoval = nil } }
             ),
             presenting: devicePendingRemoval
         ) { device in
-            Button("목록에서 제거", role: .destructive) {
+            Button("연결 해제", role: .destructive) {
                 Task {
                     await model.removeDevice(device)
                     if selectedDeviceID == device.id {
@@ -1059,7 +1103,7 @@ struct DevicesView: View {
                 devicePendingRemoval = nil
             }
         } message: { device in
-            Text("‘\(device.deviceName)’의 등록 정보를 삭제합니다. 해당 기기에서 앱을 계속 사용하면 다시 나타날 수 있습니다.")
+            Text("‘\(device.deviceName)’에서 로그아웃되고 이후 동기화가 차단됩니다. 다시 사용하려면 새 기기로 연결해야 합니다.")
         }
     }
 

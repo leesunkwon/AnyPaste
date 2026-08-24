@@ -1,5 +1,5 @@
 const {initializeApp} = require("firebase-admin/app");
-const {getFirestore, Timestamp} = require("firebase-admin/firestore");
+const {getFirestore, Timestamp, FieldValue} = require("firebase-admin/firestore");
 const {getMessaging} = require("firebase-admin/messaging");
 const {getStorage} = require("firebase-admin/storage");
 const {logger} = require("firebase-functions");
@@ -8,6 +8,7 @@ const {
   onDocumentDeleted,
 } = require("firebase-functions/v2/firestore");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
 
 initializeApp();
 
@@ -22,6 +23,81 @@ const MAX_FCM_SEND_ATTEMPTS = 3;
 const INITIAL_FCM_RETRY_DELAY_MILLIS = 500;
 const EXPIRED_QUERY_BATCH_SIZE = 400;
 const MAX_EXPIRED_BATCHES_PER_RUN = 5;
+const MAX_DEVICE_ID_LENGTH = 128;
+const SESSION_REVOKED_EVENT = "sessionRevoked";
+
+/**
+ * Disconnects one registered device without revoking every session for the user.
+ *
+ * Firebase Auth can only revoke refresh tokens for an entire user.  A per-device
+ * revocation record therefore acts as this app's device session allow-list: client
+ * registration, heartbeats and sends are blocked after the record is created.
+ */
+exports.revokeDeviceSession = onCall(
+    {
+      region: REGION,
+    },
+    async (request) => {
+      const userId = request.auth?.uid;
+      if (!userId) {
+        throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
+      }
+
+      const deviceId = boundedString(request.data?.deviceId, MAX_DEVICE_ID_LENGTH);
+      if (!deviceId || deviceId.includes("/")) {
+        throw new HttpsError("invalid-argument", "기기 ID 형식이 올바르지 않습니다.");
+      }
+
+      const firestore = getFirestore();
+      const deviceReference = firestore
+          .collection("users")
+          .doc(userId)
+          .collection("devices")
+          .doc(deviceId);
+      const revokedReference = firestore
+          .collection("users")
+          .doc(userId)
+          .collection("revokedDevices")
+          .doc(deviceId);
+
+      const token = await firestore.runTransaction(async (transaction) => {
+        const device = await transaction.get(deviceReference);
+        if (!device.exists) {
+          throw new HttpsError("not-found", "연결된 기기를 찾을 수 없습니다.");
+        }
+        const fcmToken = boundedString(device.get("fcmToken"), MAX_FCM_TOKEN_LENGTH);
+        transaction.set(revokedReference, {
+          revokedAt: FieldValue.serverTimestamp(),
+        });
+        transaction.delete(deviceReference);
+        return fcmToken;
+      });
+
+      if (token) {
+        try {
+          await getMessaging().send({
+            token,
+            data: {
+              event: SESSION_REVOKED_EVENT,
+              deviceId,
+            },
+            android: {priority: "high"},
+          });
+        } catch (error) {
+          // The persisted revocation record is authoritative. A failed push is
+          // recovered by the device's next heartbeat or app launch.
+          logger.warn("Failed to send a device session revocation", {
+            userId,
+            deviceId,
+            error,
+          });
+        }
+      }
+
+      logger.info("Device session revoked", {userId, deviceId});
+      return {revoked: true};
+    },
+);
 
 exports.notifyClipboardCreated = onDocumentCreated(
     {

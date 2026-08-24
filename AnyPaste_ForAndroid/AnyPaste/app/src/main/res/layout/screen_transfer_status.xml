@@ -185,6 +185,30 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tv_transfer_failure_reason"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:background="@drawable/bg_card_warning"
+                android:padding="@dimen/space_16"
+                android:textColor="@color/warning_foreground"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_transfer_retry_queue"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_card_stroke"
+                android:padding="@dimen/space_16"
+                android:textColor="@color/ink_secondary"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_retry_transfer"
                 style="@style/Widget.AnyPaste.Button.Primary"

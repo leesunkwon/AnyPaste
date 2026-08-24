@@ -19,12 +19,20 @@ class AnyPasteMessagingService : FirebaseMessagingService() {
     private val appPreferences by lazy { AppPreferences(this) }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        val localDeviceId = ClipboardSyncService.getOrCreateDeviceId(this)
+        if (message.data[KEY_EVENT] == EVENT_SESSION_REVOKED &&
+            message.data[KEY_DEVICE_ID] == localDeviceId
+        ) {
+            appPreferences.autoSyncEnabled = false
+            ClipboardSyncService.stop(this)
+            authRepository.signOut()
+            return
+        }
         if (!appPreferences.incomingNotificationsEnabled) return
 
         val itemId = message.data[KEY_ITEM_ID]?.takeIf(String::isNotBlank) ?: return
         val expiresAtEpochMillis = message.data[KEY_EXPIRES_AT_EPOCH_MS]?.toLongOrNull()
         if (expiresAtEpochMillis != null && expiresAtEpochMillis <= System.currentTimeMillis()) return
-        val localDeviceId = ClipboardSyncService.getOrCreateDeviceId(this)
         val payloadSourceDeviceId = message.data[KEY_SOURCE_DEVICE_ID]
         if (payloadSourceDeviceId == localDeviceId) return
 
@@ -118,6 +126,10 @@ class AnyPasteMessagingService : FirebaseMessagingService() {
         const val KEY_SOURCE_DEVICE_ID = "sourceDeviceId"
         const val KEY_FILE_NAME = "fileName"
         const val KEY_EXPIRES_AT_EPOCH_MS = "expiresAtEpochMs"
+        const val KEY_EVENT = "event"
+        const val KEY_DEVICE_ID = "deviceId"
+
+        const val EVENT_SESSION_REVOKED = "sessionRevoked"
 
         const val FIREBASE_LOOKUP_TIMEOUT_MILLIS = 8_000L
         const val FIREBASE_TOKEN_TIMEOUT_MILLIS = 8_000L

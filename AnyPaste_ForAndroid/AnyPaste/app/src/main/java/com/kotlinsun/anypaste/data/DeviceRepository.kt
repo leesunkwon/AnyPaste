@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.functions.FirebaseFunctions
 import com.kotlinsun.anypaste.model.Device
 import com.kotlinsun.anypaste.model.DevicePlatform
 import kotlinx.coroutines.channels.awaitClose
@@ -30,8 +31,14 @@ interface DeviceRepository {
     suspend fun removeDevice(userId: String, deviceId: String)
 }
 
+/** Raised when this installation has been disconnected from the account elsewhere. */
+class DeviceSessionRevokedException : IllegalStateException(
+    "이 기기는 연결이 해제되었습니다. 다시 사용하려면 새 기기로 연결해 주세요.",
+)
+
 class FirestoreDeviceRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance(Fields.REGION),
 ) : DeviceRepository {
     override fun observeDevices(userId: String): Flow<List<Device>> = callbackFlow {
         requireValidDocumentId(userId, "사용자 ID")
@@ -56,6 +63,7 @@ class FirestoreDeviceRepository(
     ): Device {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(deviceId, "기기 ID")
+        ensureDeviceSessionActive(userId, deviceId)
         val normalizedName = deviceName.trim()
         require(normalizedName.isNotEmpty()) { "기기 이름을 입력해 주세요." }
 
@@ -93,6 +101,7 @@ class FirestoreDeviceRepository(
     override suspend fun heartbeat(userId: String, deviceId: String) {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(deviceId, "기기 ID")
+        ensureDeviceSessionActive(userId, deviceId)
         devicesCollection(userId).document(deviceId)
             .set(
                 mapOf(
@@ -108,6 +117,7 @@ class FirestoreDeviceRepository(
     override suspend fun updateFcmToken(userId: String, deviceId: String, fcmToken: String) {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(deviceId, "기기 ID")
+        ensureDeviceSessionActive(userId, deviceId)
         require(fcmToken.isNotBlank()) { "FCM 토큰이 비어 있습니다." }
         devicesCollection(userId).document(deviceId)
             .update(
@@ -122,6 +132,7 @@ class FirestoreDeviceRepository(
     override suspend fun markOffline(userId: String, deviceId: String) {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(deviceId, "기기 ID")
+        ensureDeviceSessionActive(userId, deviceId)
         devicesCollection(userId).document(deviceId)
             .set(
                 mapOf(
@@ -136,7 +147,21 @@ class FirestoreDeviceRepository(
     override suspend fun removeDevice(userId: String, deviceId: String) {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(deviceId, "기기 ID")
-        devicesCollection(userId).document(deviceId).delete().awaitResult()
+        functions
+            .getHttpsCallable(Fields.FUNCTION_REVOKE_DEVICE_SESSION)
+            .call(mapOf("deviceId" to deviceId))
+            .awaitResult()
+    }
+
+    private suspend fun ensureDeviceSessionActive(userId: String, deviceId: String) {
+        val isRevoked = firestore.collection(Collections.USERS)
+            .document(userId)
+            .collection(Collections.REVOKED_DEVICES)
+            .document(deviceId)
+            .get()
+            .awaitResult()
+            .exists()
+        if (isRevoked) throw DeviceSessionRevokedException()
     }
 
     private suspend fun touchUser(userId: String) {
@@ -169,6 +194,7 @@ class FirestoreDeviceRepository(
     private object Collections {
         const val USERS = "users"
         const val DEVICES = "devices"
+        const val REVOKED_DEVICES = "revokedDevices"
     }
 
     private object Fields {
@@ -178,5 +204,7 @@ class FirestoreDeviceRepository(
         const val LAST_SEEN_AT = "lastSeenAt"
         const val IS_ONLINE = "isOnline"
         const val LAST_ACTIVE_AT = "lastActiveAt"
+        const val FUNCTION_REVOKE_DEVICE_SESSION = "revokeDeviceSession"
+        const val REGION = "asia-northeast3"
     }
 }

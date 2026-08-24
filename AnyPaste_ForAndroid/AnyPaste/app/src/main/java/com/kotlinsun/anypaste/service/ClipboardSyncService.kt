@@ -13,6 +13,7 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
@@ -24,6 +25,7 @@ import com.kotlinsun.anypaste.data.FirebaseAuthRepository
 import com.kotlinsun.anypaste.data.FirebaseStorageRepository
 import com.kotlinsun.anypaste.data.FirestoreClipboardRepository
 import com.kotlinsun.anypaste.data.FirestoreDeviceRepository
+import com.kotlinsun.anypaste.data.DeviceSessionRevokedException
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
 import java.io.File
@@ -151,6 +153,8 @@ class ClipboardSyncService : Service() {
     override fun onTimeout(startId: Int, fgsType: Int) {
         preserveTerminalState = true
         appPreferences.autoSyncEnabled = false
+        appPreferences.backgroundSyncNotice =
+            "Android의 백그라운드 동기화 시간 제한으로 중지되었습니다. 앱을 열어 다시 켜 주세요."
         setState(
             ClipboardSyncState(
                 phase = ClipboardSyncPhase.STOPPED,
@@ -164,6 +168,7 @@ class ClipboardSyncService : Service() {
         if (syncStarted) return
         stopRequested = false
         preserveTerminalState = false
+        appPreferences.backgroundSyncNotice = ""
         syncStarted = true
         running.set(true)
         setState(
@@ -1019,6 +1024,9 @@ class ClipboardSyncService : Service() {
             try {
                 deviceRepository.heartbeat(userId, deviceId)
                 true
+            } catch (_: DeviceSessionRevokedException) {
+                terminateRevokedDeviceSession()
+                false
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {
@@ -1031,6 +1039,19 @@ class ClipboardSyncService : Service() {
             }
             // Retried by the maintenance loop; clipboard sync can continue independently.
         }
+    }
+
+    private fun terminateRevokedDeviceSession() {
+        appPreferences.autoSyncEnabled = false
+        preserveTerminalState = true
+        setState(
+            ClipboardSyncState(
+                phase = ClipboardSyncPhase.STOPPED,
+                message = "이 기기의 연결이 해제되어 동기화를 중지했습니다.",
+            ),
+        )
+        authRepository.signOut()
+        requestStop(markDeviceOffline = false)
     }
 
     private fun scheduleHeartbeat(userId: String) {
@@ -1260,6 +1281,30 @@ class ClipboardSyncService : Service() {
             val generated = UUID.randomUUID().toString()
             preferences.edit().putString(KEY_DEVICE_ID, generated).apply()
             return generated
+        }
+
+        /**
+         * Explains settings that can limit an otherwise running foreground service. The app never
+         * attempts to bypass these platform policies; it gives the user a recovery path instead.
+         */
+        fun backgroundSyncGuidance(context: Context): String? {
+            val appContext = context.applicationContext
+            val notificationBlocked = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(
+                    appContext,
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (notificationBlocked) {
+                return "알림 권한이 꺼져 있어 동기화 상태 알림을 볼 수 없습니다."
+            }
+            val powerManager = appContext.getSystemService(PowerManager::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                powerManager != null &&
+                !powerManager.isIgnoringBatteryOptimizations(appContext.packageName)
+            ) {
+                return "절전 모드에서는 동기화가 늦어질 수 있습니다. 앱 배터리를 ‘제한 없음’으로 설정해 주세요."
+            }
+            return null
         }
 
         private fun setState(state: ClipboardSyncState) {

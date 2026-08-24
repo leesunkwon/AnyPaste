@@ -37,21 +37,21 @@ final class AppModel: ObservableObject {
     }
 
     private enum RetryableTransfer {
-        case text(value: String, targetDeviceID: String?)
-        case files(urls: [URL], targetDeviceID: String?)
+        case text(value: String, targetDeviceID: String?, retention: ClipboardRetention)
+        case files(urls: [URL], targetDeviceID: String?, retention: ClipboardRetention)
 
         var title: String {
             switch self {
-            case let .text(value, _):
+            case let .text(value, _, _):
                 return String(value.split(separator: "\n", maxSplits: 1).first ?? "텍스트").prefix(60).description
-            case let .files(urls, _):
+            case let .files(urls, _, _):
                 return urls.count == 1 ? (urls.first?.lastPathComponent ?? "파일") : "파일 \(urls.count)개"
             }
         }
 
         var meta: String {
             switch self {
-            case let .text(value, _):
+            case let .text(value, _, _):
                 return "텍스트 · \(value.lengthOfBytes(using: .utf8)) B"
             case .files:
                 return "파일"
@@ -70,6 +70,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var syncStatus: SyncStatus = .stopped
     @Published private(set) var transferState: TransferState = .idle
     @Published private(set) var failedTransfers: [FailedTransferRecord] = []
+    @Published private(set) var deviceDisplayName = ""
 
     @Published var autoSync: Bool {
         didSet {
@@ -104,12 +105,24 @@ final class AppModel: ObservableObject {
 
     let currentDeviceID: String
 
+    var storageUsageBytes: Int64 {
+        clipboardItems.lazy
+            .filter { !$0.isExpired && $0.fileSize > 0 }
+            .reduce(Int64(0)) { $0 + $1.fileSize }
+    }
+
+    var storageLimitBytes: Int64 { Self.maximumStorageBytes }
+
     var onlineDevices: [DeviceRecord] {
         devices.filter { $0.isRecentlyOnline() }
     }
 
     var unreadCount: Int {
         clipboardItems.lazy.filter(isUnreadIncomingRecord).count
+    }
+
+    private var pendingIncomingCount: Int {
+        clipboardItems.lazy.filter(isPendingIncomingRecord).count
     }
 
     var isConnected: Bool {
@@ -139,6 +152,7 @@ final class AppModel: ObservableObject {
 
     private static let maximumTextLength = 100_000
     private static let maximumTransferBytes: Int64 = 50 * 1024 * 1024
+    private static let maximumStorageBytes: Int64 = 1024 * 1024 * 1024
     private static let clipboardTTL: TimeInterval = 24 * 60 * 60
     private static let pollingNanoseconds: UInt64 = 2_000_000_000
     private static let heartbeatNanoseconds: UInt64 = 60_000_000_000
@@ -173,6 +187,7 @@ final class AppModel: ObservableObject {
             defaultValue: false
         )
         currentDeviceID = Self.resolveDeviceID(defaults: defaults)
+        deviceDisplayName = defaults.string(forKey: PreferenceKey.deviceDisplayName) ?? ""
 
         do {
             let configuration = try AppConfiguration.load()
@@ -308,10 +323,59 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func sendText(_ text: String, targetDeviceID: String? = nil) async {
+    func savedTransferTargetID(validDeviceIDs: Set<String>) -> String {
+        let saved = defaults.string(forKey: PreferenceKey.lastTransferTargetDeviceID) ?? ""
+        return saved.isEmpty || validDeviceIDs.contains(saved) ? saved : ""
+    }
+
+    func rememberTransferTarget(_ deviceID: String?) {
+        defaults.set(deviceID ?? "", forKey: PreferenceKey.lastTransferTargetDeviceID)
+    }
+
+    func renameDevice(_ device: DeviceRecord, to name: String) async {
+        let normalizedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedName.isEmpty, normalizedName.count <= 100 else {
+            errorMessage = "기기 이름은 1~100자로 입력해 주세요."
+            return
+        }
+        guard !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        do {
+            if device.id == currentDeviceID {
+                deviceDisplayName = normalizedName
+                defaults.set(normalizedName, forKey: PreferenceKey.deviceDisplayName)
+                await registerCurrentDevice(reportErrors: true)
+            } else {
+                try await withAuthenticatedSession { client, session in
+                    try await client.renameDevice(
+                        userId: session.user.id,
+                        deviceId: device.id,
+                        deviceName: normalizedName,
+                        idToken: session.idToken
+                    )
+                }
+                if let index = devices.firstIndex(where: { $0.id == device.id }) {
+                    devices[index].deviceName = normalizedName
+                    devices[index].lastSeenAt = Date()
+                }
+            }
+        } catch {
+            handle(error)
+        }
+    }
+
+    func sendText(
+        _ text: String,
+        targetDeviceID: String? = nil,
+        retention: ClipboardRetention = .oneDay
+    ) async {
         await sendText(
             text,
             targetDeviceID: targetDeviceID,
+            retention: retention,
             retryID: UUID()
         )
     }
@@ -319,16 +383,17 @@ final class AppModel: ObservableObject {
     func retryFailedTransfer(_ id: UUID) async {
         guard !isLoading, let transfer = retryableTransfers[id] else { return }
         switch transfer {
-        case let .text(value, targetDeviceID):
-            await sendText(value, targetDeviceID: targetDeviceID, retryID: id)
-        case let .files(urls, targetDeviceID):
-            await sendFiles(urls, targetDeviceID: targetDeviceID, retryID: id)
+        case let .text(value, targetDeviceID, retention):
+            await sendText(value, targetDeviceID: targetDeviceID, retention: retention, retryID: id)
+        case let .files(urls, targetDeviceID, retention):
+            await sendFiles(urls, targetDeviceID: targetDeviceID, retention: retention, retryID: id)
         }
     }
 
     private func sendText(
         _ text: String,
         targetDeviceID: String?,
+        retention: ClipboardRetention,
         retryID: UUID
     ) async {
         guard !isLoading else { return }
@@ -354,7 +419,7 @@ final class AppModel: ObservableObject {
                 content: text,
                 sourceDeviceId: currentDeviceID,
                 targetDeviceId: targetDeviceID ?? "",
-                expiresAt: Date().addingTimeInterval(Self.clipboardTTL),
+                expiresAt: Date().addingTimeInterval(retention.duration),
                 readBy: []
             )
             let created: ClipboardRecord = try await withAuthenticatedSession { client, session in
@@ -372,17 +437,22 @@ final class AppModel: ObservableObject {
             transferState = .failed
             recordFailedTransfer(
                 id: retryID,
-                transfer: .text(value: text, targetDeviceID: targetDeviceID),
+                transfer: .text(value: text, targetDeviceID: targetDeviceID, retention: retention),
                 error: error
             )
             handle(error)
         }
     }
 
-    func sendFiles(_ urls: [URL], targetDeviceID: String? = nil) async {
+    func sendFiles(
+        _ urls: [URL],
+        targetDeviceID: String? = nil,
+        retention: ClipboardRetention = .oneDay
+    ) async {
         await sendFiles(
             urls,
             targetDeviceID: targetDeviceID,
+            retention: retention,
             retryID: UUID()
         )
     }
@@ -390,6 +460,7 @@ final class AppModel: ObservableObject {
     private func sendFiles(
         _ urls: [URL],
         targetDeviceID: String?,
+        retention: ClipboardRetention,
         retryID: UUID
     ) async {
         guard !isLoading else { return }
@@ -408,7 +479,7 @@ final class AppModel: ObservableObject {
         do {
             for url in urls {
                 activeURL = url
-                try await sendFile(url, targetDeviceID: targetDeviceID)
+                try await sendFile(url, targetDeviceID: targetDeviceID, retention: retention)
             }
             transferState = .succeeded
             syncStatus = .upToDate
@@ -418,7 +489,7 @@ final class AppModel: ObservableObject {
             let retryURLs = activeURL.map { [$0] } ?? urls
             recordFailedTransfer(
                 id: retryID,
-                transfer: .files(urls: retryURLs, targetDeviceID: targetDeviceID),
+                transfer: .files(urls: retryURLs, targetDeviceID: targetDeviceID, retention: retention),
                 error: error
             )
             handle(error)
@@ -570,6 +641,15 @@ final class AppModel: ObservableObject {
         Task { [weak self] in
             guard let self else { return }
             await self.openBinaryRecord(record)
+        }
+    }
+
+    func imagePreview(for record: ClipboardRecord) async -> NSImage? {
+        guard record.kind == .image, !record.storagePath.isEmpty else { return nil }
+        do {
+            return NSImage(data: try await download(record))
+        } catch {
+            return nil
         }
     }
 
@@ -807,7 +887,7 @@ final class AppModel: ObservableObject {
         let device = DeviceRecord(
             id: currentDeviceID,
             platform: DevicePlatform.macOS.rawValue,
-            deviceName: Self.currentDeviceName,
+            deviceName: resolvedCurrentDeviceName,
             isOnline: true
         )
         do {
@@ -884,7 +964,7 @@ final class AppModel: ObservableObject {
             let localHeadID = clipboardItems.first?.id
             if remoteHeadID != localHeadID {
                 await refreshContent(reportErrors: false)
-            } else if autoSync, unreadCount > 0 {
+            } else if autoSync, pendingIncomingCount > 0 {
                 await receiveUnreadItems()
             }
         } catch FirebaseRESTClientError.invalidSession {
@@ -1036,7 +1116,11 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func sendFile(_ url: URL, targetDeviceID: String?) async throws {
+    private func sendFile(
+        _ url: URL,
+        targetDeviceID: String?,
+        retention: ClipboardRetention
+    ) async throws {
         try ensureTransferNetworkAvailable()
         transferState = .preparing
         let prepared = try await prepareFile(url)
@@ -1045,7 +1129,8 @@ final class AppModel: ObservableObject {
             fileName: prepared.fileName,
             mimeType: prepared.mimeType,
             kind: prepared.kind,
-            targetDeviceID: targetDeviceID
+            targetDeviceID: targetDeviceID,
+            retention: retention
         )
     }
 
@@ -1105,12 +1190,16 @@ final class AppModel: ObservableObject {
         mimeType: String,
         kind: ClipboardKind,
         targetDeviceID: String?,
+        retention: ClipboardRetention = .oneDay,
         automaticContext: AutomaticSendContext? = nil
     ) async throws -> ClipboardRecord {
         try ensureTransferNetworkAvailable()
         guard !data.isEmpty else { throw AppModelError.emptyFile }
         guard Int64(data.count) <= Self.maximumTransferBytes else {
             throw AppModelError.fileTooLarge
+        }
+        guard automaticContext != nil || storageUsageBytes + Int64(data.count) <= Self.maximumStorageBytes else {
+            throw AppModelError.storageLimitReached
         }
 
         let itemID = automaticContext?.recordID ?? UUID().uuidString.lowercased()
@@ -1177,7 +1266,9 @@ final class AppModel: ObservableObject {
             mimeType: upload.mimeType,
             sourceDeviceId: currentDeviceID,
             targetDeviceId: targetDeviceID ?? "",
-            expiresAt: Date().addingTimeInterval(Self.clipboardTTL),
+            expiresAt: Date().addingTimeInterval(
+                automaticContext == nil ? retention.duration : Self.clipboardTTL,
+            ),
             readBy: []
         )
 
@@ -1426,7 +1517,7 @@ final class AppModel: ObservableObject {
 
     private func receiveUnreadItems() async {
         let incoming = clipboardItems
-            .filter(isUnreadIncomingRecord)
+            .filter(isPendingIncomingRecord)
             .sorted(by: Self.oldestFirst)
 
         for record in incoming {
@@ -1445,7 +1536,7 @@ final class AppModel: ObservableObject {
                         sourceDeviceName: sourceName
                     )
                 }
-                try await markRead(record)
+                try await markReceived(record)
                 transferState = .succeeded
             } catch FirebaseRESTClientError.invalidSession {
                 invalidateSession(message: "로그인 정보가 만료되었습니다. 다시 로그인해 주세요.")
@@ -1505,6 +1596,38 @@ final class AppModel: ObservableObject {
         guard let index = clipboardItems.firstIndex(where: { $0.id == itemID }) else { return }
         if !clipboardItems[index].readBy.contains(deviceID) {
             clipboardItems[index].readBy.append(deviceID)
+        }
+        if selectedItem?.id == itemID {
+            selectedItem = clipboardItems[index]
+        }
+    }
+
+    func markReadFromUser(_ record: ClipboardRecord) {
+        guard record.sourceDeviceId != currentDeviceID, !record.isRead(by: currentDeviceID) else { return }
+        Task { [weak self] in
+            do {
+                try await self?.markRead(record)
+            } catch {
+                self?.handle(error)
+            }
+        }
+    }
+
+    private func markReceived(_ record: ClipboardRecord) async throws {
+        let itemID = record.id
+        let deviceID = currentDeviceID
+        try await withAuthenticatedSession { client, session in
+            try await client.markClipboardReceived(
+                userId: session.user.id,
+                itemId: itemID,
+                deviceId: deviceID,
+                idToken: session.idToken
+            )
+        }
+
+        guard let index = clipboardItems.firstIndex(where: { $0.id == itemID }) else { return }
+        if !clipboardItems[index].receivedBy.contains(deviceID) {
+            clipboardItems[index].receivedBy.append(deviceID)
         }
         if selectedItem?.id == itemID {
             selectedItem = clipboardItems[index]
@@ -1762,6 +1885,13 @@ final class AppModel: ObservableObject {
             && !record.isRead(by: currentDeviceID)
     }
 
+    private func isPendingIncomingRecord(_ record: ClipboardRecord) -> Bool {
+        record.sourceDeviceId != currentDeviceID
+            && (record.targetDeviceId.isEmpty || record.targetDeviceId == currentDeviceID)
+            && !record.isExpired
+            && !record.isReceived(by: currentDeviceID)
+    }
+
     private static func newestFirst(_ lhs: ClipboardRecord, _ rhs: ClipboardRecord) -> Bool {
         (lhs.createdAt ?? .distantPast) > (rhs.createdAt ?? .distantPast)
     }
@@ -1836,7 +1966,12 @@ final class AppModel: ObservableObject {
         return generated
     }
 
-    private static var currentDeviceName: String {
+    private var resolvedCurrentDeviceName: String {
+        let saved = deviceDisplayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return saved.isEmpty ? Self.defaultCurrentDeviceName : saved
+    }
+
+    private static var defaultCurrentDeviceName: String {
         let hostName = ProcessInfo.processInfo.hostName
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return hostName.isEmpty ? "Mac" : hostName
@@ -1892,6 +2027,8 @@ private enum PreferenceKey {
     static let notificationsEnabled = "settings.notificationsEnabled"
     static let wifiOnlyTransfers = "settings.wifiOnlyTransfers"
     static let deviceID = "device.id"
+    static let deviceDisplayName = "device.displayName"
+    static let lastTransferTargetDeviceID = "send.lastTargetDeviceID"
 }
 
 private enum AppModelError: LocalizedError {
@@ -1899,6 +2036,7 @@ private enum AppModelError: LocalizedError {
     case invalidFile
     case emptyFile
     case fileTooLarge
+    case storageLimitReached
     case invalidImage
     case missingStoragePath
     case clipboardWriteFailed
@@ -1918,6 +2056,8 @@ private enum AppModelError: LocalizedError {
             return "빈 파일은 전송할 수 없습니다."
         case .fileTooLarge:
             return "파일은 50MB 이하여야 합니다."
+        case .storageLimitReached:
+            return "저장 공간 한도를 초과했습니다. 불필요한 파일을 삭제한 뒤 다시 시도해 주세요."
         case .invalidImage:
             return "이미지 데이터를 처리할 수 없습니다."
         case .missingStoragePath:

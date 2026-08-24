@@ -27,6 +27,7 @@ interface DeviceRepository {
     suspend fun getDevice(userId: String, deviceId: String): Device?
     suspend fun heartbeat(userId: String, deviceId: String)
     suspend fun updateFcmToken(userId: String, deviceId: String, fcmToken: String)
+    suspend fun renameDevice(userId: String, deviceId: String, deviceName: String)
     suspend fun markOffline(userId: String, deviceId: String)
     suspend fun removeDevice(userId: String, deviceId: String)
 }
@@ -125,6 +126,24 @@ class FirestoreDeviceRepository(
                     Fields.FCM_TOKEN to fcmToken.trim(),
                     Fields.LAST_SEEN_AT to FieldValue.serverTimestamp(),
                 ),
+            )
+            .awaitResult()
+    }
+
+    override suspend fun renameDevice(userId: String, deviceId: String, deviceName: String) {
+        requireValidDocumentId(userId, "사용자 ID")
+        requireValidDocumentId(deviceId, "기기 ID")
+        val normalizedName = deviceName.trim()
+        require(normalizedName.isNotEmpty() && normalizedName.length <= 100) {
+            "기기 이름은 1~100자로 입력해 주세요."
+        }
+        devicesCollection(userId).document(deviceId)
+            .set(
+                mapOf(
+                    Fields.DEVICE_NAME to normalizedName,
+                    Fields.LAST_SEEN_AT to FieldValue.serverTimestamp(),
+                ),
+                SetOptions.merge(),
             )
             .awaitResult()
     }

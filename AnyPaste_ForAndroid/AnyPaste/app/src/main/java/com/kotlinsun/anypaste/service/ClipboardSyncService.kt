@@ -643,7 +643,7 @@ class ClipboardSyncService : Service() {
         if (item.id.isBlank() ||
             item.sourceDeviceId == deviceId ||
             (item.targetDeviceId.isNotBlank() && item.targetDeviceId != deviceId) ||
-            item.isReadBy(deviceId)
+            item.isReceivedBy(deviceId)
         ) {
             clearRemoteItemState(item.id)
             return
@@ -883,7 +883,7 @@ class ClipboardSyncService : Service() {
         }
         var restoredConnection = false
         try {
-            clipboardRepository.markAsRead(userId, itemId, deviceId)
+            clipboardRepository.markAsReceived(userId, itemId, deviceId)
             synchronized(remoteLock) {
                 restoredConnection = pendingReadReceiptItemIds.remove(itemId) != null
             }

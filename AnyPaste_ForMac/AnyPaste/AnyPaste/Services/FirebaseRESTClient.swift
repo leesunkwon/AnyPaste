@@ -330,6 +330,28 @@ actor FirebaseRESTClient {
         _ = try await commit(writes: [write], idToken: idToken)
     }
 
+    func renameDevice(
+        userId: String,
+        deviceId: String,
+        deviceName: String,
+        idToken: String
+    ) async throws {
+        try requireToken(idToken)
+        try requireDocumentID(userId, label: "사용자 ID")
+        try requireDocumentID(deviceId, label: "기기 ID")
+        let normalizedName = deviceName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedName.isEmpty, normalizedName.count <= 100 else {
+            throw FirebaseRESTClientError.invalidInput("기기 이름은 1~100자로 입력해 주세요.")
+        }
+        let write = updateWrite(
+            name: documentName(["users", userId, "devices", deviceId]),
+            fields: ["deviceName": stringValue(normalizedName)],
+            updateMask: ["deviceName"],
+            transforms: [serverTimestampTransform("lastSeenAt")]
+        )
+        _ = try await commit(writes: [write], idToken: idToken)
+    }
+
     func markDeviceOffline(userId: String, deviceId: String, idToken: String) async throws {
         try requireToken(idToken)
         try requireDocumentID(userId, label: "사용자 ID")
@@ -396,15 +418,15 @@ actor FirebaseRESTClient {
             }
         }
 
-        guard record.readBy.isEmpty else {
-            throw FirebaseRESTClientError.invalidInput("새 클립보드 항목의 읽음 정보는 비어 있어야 합니다.")
+        guard record.receivedBy.isEmpty, record.readBy.isEmpty else {
+            throw FirebaseRESTClientError.invalidInput("새 클립보드 항목의 전달 상태는 비어 있어야 합니다.")
         }
 
         let now = Date()
         let expiry = record.expiresAt ?? now.addingTimeInterval(Self.defaultClipboardTTL)
         guard expiry > now,
-              expiry <= now.addingTimeInterval(25 * 60 * 60) else {
-            throw FirebaseRESTClientError.invalidInput("클립보드 만료 시간은 25시간 이내여야 합니다.")
+              expiry <= now.addingTimeInterval(30 * 24 * 60 * 60) else {
+            throw FirebaseRESTClientError.invalidInput("클립보드 만료 시간은 30일 이내여야 합니다.")
         }
 
         switch record.kind {
@@ -446,6 +468,7 @@ actor FirebaseRESTClient {
             "sourceDeviceId": stringValue(record.sourceDeviceId),
             "targetDeviceId": stringValue(record.targetDeviceId),
             "expiresAt": timestampValue(expiry),
+            "receivedBy": stringArrayValue(record.receivedBy),
             "readBy": stringArrayValue(record.readBy)
         ]
         let write = updateWrite(
@@ -469,6 +492,7 @@ actor FirebaseRESTClient {
             targetDeviceId: record.targetDeviceId,
             createdAt: commitTime,
             expiresAt: expiry,
+            receivedBy: record.receivedBy,
             readBy: record.readBy
         )
     }
@@ -538,6 +562,30 @@ actor FirebaseRESTClient {
 
         let transform: JSONObject = [
             "fieldPath": "readBy",
+            "appendMissingElements": [
+                "values": [stringValue(deviceId)]
+            ]
+        ]
+        let write = transformWrite(
+            name: documentName(["users", userId, "clipboard", itemId]),
+            transforms: [transform]
+        )
+        _ = try await commit(writes: [write], idToken: idToken)
+    }
+
+    func markClipboardReceived(
+        userId: String,
+        itemId: String,
+        deviceId: String,
+        idToken: String
+    ) async throws {
+        try requireToken(idToken)
+        try requireDocumentID(userId, label: "사용자 ID")
+        try requireDocumentID(itemId, label: "클립보드 항목 ID")
+        try requireDocumentID(deviceId, label: "기기 ID")
+
+        let transform: JSONObject = [
+            "fieldPath": "receivedBy",
             "appendMissingElements": [
                 "values": [stringValue(deviceId)]
             ]
@@ -854,6 +902,7 @@ actor FirebaseRESTClient {
             targetDeviceId: string(from: fields["targetDeviceId"]),
             createdAt: timestamp(from: fields["createdAt"]),
             expiresAt: timestamp(from: fields["expiresAt"]),
+            receivedBy: stringArray(from: fields["receivedBy"]),
             readBy: stringArray(from: fields["readBy"])
         )
     }

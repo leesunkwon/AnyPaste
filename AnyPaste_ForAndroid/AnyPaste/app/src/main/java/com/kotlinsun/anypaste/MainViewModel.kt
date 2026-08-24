@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.StorageException
@@ -16,6 +17,7 @@ import com.kotlinsun.anypaste.data.FirestoreClipboardRepository
 import com.kotlinsun.anypaste.data.FirestoreDeviceRepository
 import com.kotlinsun.anypaste.data.DeviceSessionRevokedException
 import com.kotlinsun.anypaste.data.awaitResult
+import com.kotlinsun.anypaste.core.AppPreferences
 import com.kotlinsun.anypaste.model.AuthUser
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
@@ -23,6 +25,7 @@ import com.kotlinsun.anypaste.model.Device
 import com.kotlinsun.anypaste.model.DevicePlatform
 import com.kotlinsun.anypaste.service.ClipboardSyncService
 import java.io.File
+import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +49,9 @@ data class MainUiState(
     val devices: List<Device> = emptyList(),
     val selectedItemId: String? = null,
     val selectedDeviceId: String? = null,
+    val sendTargetDeviceId: String = "",
+    val storageUsageBytes: Long = 0L,
+    val storageLimitBytes: Long = 1L * 1024L * 1024L * 1024L,
     val isBusy: Boolean = false,
     val transferProgress: Int? = null,
     val transferStatus: TransferStatus = TransferStatus.IDLE,
@@ -84,10 +90,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val deviceRepository = FirestoreDeviceRepository()
     private val storageRepository = FirebaseStorageRepository()
 
+    private val preferences = AppPreferences(application)
     private val deviceId = ClipboardSyncService.getOrCreateDeviceId(application)
-    private val deviceName = buildDeviceName()
 
-    private val mutableState = MutableStateFlow(MainUiState(user = authRepository.currentUser))
+    private val mutableState = MutableStateFlow(
+        MainUiState(
+            user = authRepository.currentUser,
+            sendTargetDeviceId = preferences.lastTransferTargetDeviceId,
+        ),
+    )
     val state: StateFlow<MainUiState> = mutableState.asStateFlow()
 
     private var sessionJob: Job? = null
@@ -148,7 +159,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         authRepository.signOut()
     }
 
-    fun sendText(content: String, targetDeviceId: String = "") {
+    fun sendText(
+        content: String,
+        targetDeviceId: String = "",
+        expiryDurationMillis: Long = DEFAULT_TRANSFER_TTL_MILLIS,
+    ) {
         val normalizedContent = content.trim()
         if (normalizedContent.isEmpty()) {
             postMessage("보낼 텍스트를 입력해 주세요.")
@@ -159,6 +174,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 id = UUID.randomUUID().toString(),
                 content = normalizedContent,
                 targetDeviceId = targetDeviceId,
+                expiryDurationMillis = expiryDurationMillis,
             ),
         )
     }
@@ -195,6 +211,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     content = transfer.content,
                     sourceDeviceId = deviceId,
                     targetDeviceId = transfer.targetDeviceId,
+                    expiresAt = transfer.expiresAt(),
                 )
                 completeTransfer(transfer.id)
             } catch (error: Throwable) {
@@ -212,6 +229,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         mimeType: String,
         fileSize: Long,
         targetDeviceId: String = "",
+        expiryDurationMillis: Long = DEFAULT_TRANSFER_TTL_MILLIS,
     ) {
         if (fileSize == 0L) {
             postMessage("빈 파일은 전송할 수 없습니다.")
@@ -219,6 +237,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (fileSize > MAX_FILE_BYTES) {
             postMessage("파일은 50MB 이하만 전송할 수 있습니다.")
+            return
+        }
+        if (fileSize > 0L && state.value.storageUsageBytes + fileSize > MAX_STORAGE_BYTES) {
+            postMessage("저장 공간 한도를 초과합니다. 불필요한 파일을 삭제한 뒤 다시 시도해 주세요.")
             return
         }
         val type = if (mimeType.startsWith("image/")) ClipboardType.IMAGE else ClipboardType.FILE
@@ -231,6 +253,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 fileSize = fileSize,
                 targetDeviceId = targetDeviceId,
                 type = type,
+                expiryDurationMillis = expiryDurationMillis,
             ),
         )
     }
@@ -259,6 +282,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     transfer.source
                 }
                 val resolvedSize = temporaryUpload?.length() ?: transfer.fileSize
+                require(
+                    resolvedSize <= 0L || state.value.storageUsageBytes + resolvedSize <= MAX_STORAGE_BYTES,
+                ) {
+                    "저장 공간 한도를 초과합니다. 불필요한 파일을 삭제한 뒤 다시 시도해 주세요."
+                }
                 mutableState.update {
                     it.copy(
                         transferMeta = "${if (transfer.type == ClipboardType.IMAGE) "이미지" else "파일"} · " +
@@ -285,6 +313,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     upload = upload,
                     sourceDeviceId = deviceId,
                     targetDeviceId = transfer.targetDeviceId,
+                    expiresAt = transfer.expiresAt(),
                 )
                 completeTransfer(transfer.id)
             } catch (error: Throwable) {
@@ -450,12 +479,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun renameDevice(device: Device, name: String) {
+        val userId = requireUserId() ?: return
+        val normalizedName = name.trim()
+        if (normalizedName.isEmpty() || normalizedName.length > MAX_DEVICE_NAME_LENGTH) {
+            postMessage("기기 이름은 1~100자로 입력해 주세요.")
+            return
+        }
+        if (device.id == deviceId) preferences.deviceDisplayName = normalizedName
+        launchBusy(successMessage = "기기 이름을 변경했습니다.") {
+            if (device.id == deviceId) {
+                registerCurrentDevice(userId)
+            } else {
+                deviceRepository.renameDevice(userId, device.id, normalizedName)
+            }
+        }
+    }
+
     fun selectItem(itemId: String?) {
         mutableState.update { it.copy(selectedItemId = itemId) }
     }
 
     fun selectDevice(deviceId: String?) {
         mutableState.update { it.copy(selectedDeviceId = deviceId) }
+    }
+
+    fun selectSendTarget(deviceId: String?) {
+        val targetDeviceId = deviceId.orEmpty()
+        preferences.lastTransferTargetDeviceId = targetDeviceId
+        mutableState.update { it.copy(sendTargetDeviceId = targetDeviceId) }
     }
 
     fun selectedItem(): ClipboardItem? = state.value.clipboardItems
@@ -494,9 +546,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                                     clipboardItems = items.filterNot { item ->
                                         item.isExpired() ||
                                             (item.targetDeviceId.isNotBlank() &&
-                                                item.targetDeviceId != deviceId &&
+                                        item.targetDeviceId != deviceId &&
                                                 item.sourceDeviceId != deviceId)
                                     },
+                                    storageUsageBytes = items.asSequence()
+                                        .filterNot(ClipboardItem::isExpired)
+                                        .map(ClipboardItem::fileSize)
+                                        .filter { it > 0L }
+                                        .sum(),
                                 )
                             }
                         }
@@ -539,7 +596,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             deviceRepository.registerDevice(
                 userId = userId,
                 deviceId = deviceId,
-                deviceName = deviceName,
+                deviceName = currentDeviceName(),
                 platform = DevicePlatform.ANDROID,
                 fcmToken = token,
             )
@@ -616,6 +673,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .joinToString(" ")
             .ifBlank { "Android 기기" }
     }
+
+    private fun currentDeviceName(): String = preferences.deviceDisplayName
+        .takeIf(String::isNotBlank)
+        ?: buildDeviceName()
 
     private fun Throwable.toKoreanMessage(): String {
         if (this is IllegalArgumentException) return message ?: "입력 내용을 확인해 주세요."
@@ -711,6 +772,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private companion object {
         const val MAX_FILE_BYTES = 50L * 1024L * 1024L
+        const val MAX_STORAGE_BYTES = 1L * 1024L * 1024L * 1024L
+        const val MAX_DEVICE_NAME_LENGTH = 100
+        const val DEFAULT_TRANSFER_TTL_MILLIS = 24L * 60L * 60L * 1_000L
         const val MAX_PREVIEW_BYTES = 8L * 1024L * 1024L
         const val HEARTBEAT_INTERVAL_MILLIS = 60_000L
         const val MAX_PENDING_EVENTS = 20
@@ -733,9 +797,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             override val id: String,
             val content: String,
             val targetDeviceId: String,
+            val expiryDurationMillis: Long,
         ) : PendingTransfer {
             override val title: String = content.lineSequence().firstOrNull().orEmpty().take(60)
             override val meta: String = "텍스트 · ${content.toByteArray().size} B"
+
+            fun expiresAt(): Timestamp = Timestamp(
+                Date(System.currentTimeMillis() + expiryDurationMillis),
+            )
         }
 
         data class File(
@@ -746,10 +815,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val fileSize: Long,
             val targetDeviceId: String,
             val type: ClipboardType,
+            val expiryDurationMillis: Long,
         ) : PendingTransfer {
             override val title: String = fileName
             override val meta: String =
                 "${if (type == ClipboardType.IMAGE) "이미지" else "파일"} · ${formatTransferSize(fileSize)}"
+
+            fun expiresAt(): Timestamp = Timestamp(
+                Date(System.currentTimeMillis() + expiryDurationMillis),
+            )
         }
     }
 }

@@ -25,6 +25,7 @@ data class ClipboardItem(
     val targetDeviceId: String = "",
     val createdAt: Timestamp? = null,
     val expiresAt: Timestamp? = null,
+    val receivedBy: List<String> = emptyList(),
     val readBy: List<String> = emptyList(),
 ) {
     fun resolvedType(): ClipboardType = ClipboardType.fromValue(type)
@@ -33,4 +34,7 @@ data class ClipboardItem(
         expiresAt?.let { it <= now } ?: false
 
     fun isReadBy(deviceId: String): Boolean = deviceId in readBy
+
+    /** The target app has accepted the item. Opening its detail view is tracked separately. */
+    fun isReceivedBy(deviceId: String): Boolean = deviceId in receivedBy
 }

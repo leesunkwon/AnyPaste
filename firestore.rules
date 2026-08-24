@@ -71,7 +71,7 @@ service cloud.firestore {
     }
 
     function hasClipboardFields() {
-      return hasExactFields([
+      return request.resource.data.keys().hasAll([
         'type',
         'content',
         'storagePath',
@@ -83,7 +83,21 @@ service cloud.firestore {
         'createdAt',
         'expiresAt',
         'readBy'
-      ]);
+      ])
+        && request.resource.data.keys().hasOnly([
+          'type',
+          'content',
+          'storagePath',
+          'fileName',
+          'fileSize',
+          'mimeType',
+          'sourceDeviceId',
+          'targetDeviceId',
+          'createdAt',
+          'expiresAt',
+          'receivedBy',
+          'readBy'
+        ]);
     }
 
     function hasValidClipboardStoredFields(itemId) {
@@ -103,14 +117,16 @@ service cloud.firestore {
         && request.resource.data.expiresAt is timestamp
         && request.resource.data.expiresAt > request.resource.data.createdAt
         && request.resource.data.expiresAt
-          <= request.resource.data.createdAt + duration.value(25, 'h');
+          <= request.resource.data.createdAt + duration.value(30, 'd');
     }
 
     function hasValidClipboardCreateFields(itemId) {
       return hasValidClipboardStoredFields(itemId)
         && request.resource.data.createdAt == request.time
         && request.resource.data.expiresAt > request.time
-        && request.resource.data.expiresAt <= request.time + duration.value(25, 'h')
+        && request.resource.data.expiresAt <= request.time + duration.value(30, 'd')
+        && request.resource.data.receivedBy is list
+        && request.resource.data.receivedBy.size() == 0
         && request.resource.data.readBy is list
         && request.resource.data.readBy.size() == 0;
     }
@@ -161,14 +177,26 @@ service cloud.firestore {
         );
     }
 
-    function isValidReadReceiptUpdate() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy'])
-        && request.resource.data.readBy is list
-        && resource.data.readBy is list
-        && request.resource.data.readBy.size() <= 100
-        && request.resource.data.readBy.size() >= resource.data.readBy.size()
-        && request.resource.data.readBy.size() <= resource.data.readBy.size() + 1
-        && request.resource.data.readBy.toSet().hasAll(resource.data.readBy.toSet());
+    function isValidReceiptAppend(fieldName) {
+      return request.resource.data[fieldName] is list
+        && resource.data.get(fieldName, []) is list
+        && request.resource.data[fieldName].size() <= 100
+        && request.resource.data[fieldName].size() >= resource.data.get(fieldName, []).size()
+        && request.resource.data[fieldName].size() <= resource.data.get(fieldName, []).size() + 1
+        && request.resource.data[fieldName].toSet().hasAll(resource.data.get(fieldName, []).toSet());
+    }
+
+    function isValidReceiptUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['receivedBy', 'readBy'])
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['receivedBy'])
+          || isValidReceiptAppend('receivedBy')
+        )
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['readBy'])
+          || isValidReceiptAppend('readBy')
+        );
     }
 
     match /users/{userId} {
@@ -214,7 +242,7 @@ service cloud.firestore {
           && hasClipboardFields()
           && hasValidClipboardStoredFields(itemId)
           && (isValidTextClipboard() || isValidBinaryClipboard(userId, itemId))
-          && isValidReadReceiptUpdate();
+          && isValidReceiptUpdate();
       }
     }
   }

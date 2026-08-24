@@ -21,6 +21,7 @@ import android.text.format.Formatter
 import android.util.Patterns
 import android.view.View
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -87,6 +88,7 @@ class MainActivity : AppCompatActivity() {
     private val selectedClipboardIds = linkedSetOf<String>()
 
     private var sendType = ClipboardType.TEXT
+    private var sendExpiry = SendExpiry.ONE_DAY
     private var selectedFile: SelectedFile? = null
     private var pendingPickerType = ClipboardType.FILE
     private var transferCompleted = false
@@ -94,6 +96,8 @@ class MainActivity : AppCompatActivity() {
     private var lastTransferTitle = ""
     private var lastTransferMeta = ""
     private var previewRequestedItemId: String? = null
+    private val imageThumbnails = LinkedHashMap<String, Bitmap>()
+    private val requestedImageThumbnailIds = linkedSetOf<String>()
     private var pendingStartSyncAfterPermission = false
     private var pendingSharedText: String? = null
     private var localPreviewBitmap: Bitmap? = null
@@ -460,9 +464,14 @@ class MainActivity : AppCompatActivity() {
         root.onClick(R.id.btn_select_file) { openDocument(sendType) }
         root.onClick(R.id.card_send_target_device) {
             val devices = remoteDevices(viewModel.state.value)
-            val currentIndex = devices.indexOfFirst { it.id == viewModel.selectedDevice()?.id }
-            val next = devices.getOrNull((currentIndex + 1).coerceAtLeast(0) % devices.size.coerceAtLeast(1))
-            viewModel.selectDevice(next?.id)
+            val selections = listOf<String?>(null) + devices.map(Device::id)
+            val currentIndex = selections.indexOf(viewModel.state.value.sendTargetDeviceId)
+            val next = selections[if (currentIndex < 0) 0 else (currentIndex + 1) % selections.size]
+            viewModel.selectSendTarget(next)
+            renderCurrent(viewModel.state.value)
+        }
+        root.onClick(R.id.card_send_expiry) {
+            sendExpiry = SendExpiry.entries[(sendExpiry.ordinal + 1) % SendExpiry.entries.size]
             renderCurrent(viewModel.state.value)
         }
         root.onClick(R.id.btn_transfer) { submitTransfer() }
@@ -475,6 +484,10 @@ class MainActivity : AppCompatActivity() {
             .setOnCheckedChangeListener { _, checked ->
                 setIncomingNotifications(checked)
             }
+        root.onClick(R.id.btn_rename_device) {
+            val device = viewModel.selectedDevice() ?: return@onClick
+            showRenameDeviceDialog(device)
+        }
         root.onClick(R.id.btn_disconnect_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
             AlertDialog.Builder(this)
@@ -511,6 +524,24 @@ class MainActivity : AppCompatActivity() {
             }
             viewModel.signOut()
         }
+    }
+
+    private fun showRenameDeviceDialog(device: Device) {
+        val input = EditText(this).apply {
+            setText(device.deviceName)
+            setSelectAllOnFocus(false)
+            setSingleLine(true)
+            setPadding(48, 0, 48, 0)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("기기 이름 변경")
+            .setMessage("이 이름은 같은 계정으로 연결된 모든 기기에 표시됩니다.")
+            .setView(input)
+            .setNegativeButton("취소", null)
+            .setPositiveButton("변경") { _, _ ->
+                viewModel.renameDevice(device, input.text?.toString().orEmpty())
+            }
+            .show()
     }
 
     private fun bindPermissionActions(root: View) {
@@ -670,11 +701,13 @@ class MainActivity : AppCompatActivity() {
             item.expiresAt?.toDate()?.let { "${dateTimeFormat().format(it)}에 자동 만료됩니다." }
                 ?: "자동 만료 정보가 없습니다.",
         )
-        root.setText(R.id.tv_detail_expiry_badge, "24시간")
+        root.setText(R.id.tv_detail_expiry_badge, expiryLabel(item))
+        root.setText(R.id.tv_detail_delivery_status, deliveryStatusText(item, state))
 
         val isText = item.resolvedType() == ClipboardType.TEXT
         root.findViewById<View>(R.id.btn_copy).isVisible = isText
         root.findViewById<View>(R.id.btn_download_file).isVisible = !isText
+        root.setText(R.id.btn_download_file, "다운로드 및 열기")
         root.findViewById<ImageView>(R.id.iv_detail_preview).isVisible =
             item.resolvedType() == ClipboardType.IMAGE
         if (item.resolvedType() == ClipboardType.IMAGE && previewRequestedItemId != item.id) {
@@ -712,12 +745,23 @@ class MainActivity : AppCompatActivity() {
         renderSendType(root, R.id.btn_type_file, sendType == ClipboardType.FILE)
 
         val remoteDevices = remoteDevices(state)
-        val remote = viewModel.selectedDevice()
-            ?.takeIf { selected -> remoteDevices.any { it.id == selected.id } }
-            ?: remoteDevices.firstOrNull()
-        root.findViewById<View>(R.id.card_send_target_device).isVisible = remote != null
-        root.findViewById<View>(R.id.tv_send_device_empty).isVisible = remote == null
-        remote?.let { device ->
+        val remote = remoteDevices.firstOrNull { it.id == state.sendTargetDeviceId }
+        val sendsToAllDevices = remote == null
+        root.findViewById<View>(R.id.card_send_target_device).isVisible = true
+        root.findViewById<View>(R.id.tv_send_device_empty).isVisible = remoteDevices.isEmpty()
+        if (sendsToAllDevices) {
+            root.setText(R.id.tv_send_target_mode, "전체 기기 전송")
+            root.setText(R.id.tv_send_target_name, "연결된 모든 기기")
+            root.setText(
+                R.id.tv_send_target_status,
+                if (remoteDevices.isEmpty()) "연결된 기기가 없어 기록으로만 저장됩니다"
+                else "오프라인 기기도 연결되면 자동으로 받습니다",
+            )
+            root.findViewById<ImageView>(R.id.iv_send_target_device)
+                .setImageResource(R.drawable.ic_devices)
+        } else {
+            val device = requireNotNull(remote)
+            root.setText(R.id.tv_send_target_mode, "특정 기기 전송")
             root.setText(R.id.tv_send_target_name, device.deviceName)
             root.setText(
                 R.id.tv_send_target_status,
@@ -726,11 +770,18 @@ class MainActivity : AppCompatActivity() {
             root.findViewById<ImageView>(R.id.iv_send_target_device)
                 .setImageResource(deviceIcon(device))
         }
+        root.setText(R.id.tv_send_expiry_title, "${sendExpiry.title} 보관")
+        root.setText(R.id.tv_send_expiry_description, "기간이 지나면 모든 기기에서 자동으로 삭제됩니다")
+        root.setText(
+            R.id.tv_send_storage_policy,
+            "파일 저장 공간 ${formatSize(state.storageUsageBytes)} / " +
+                "${formatSize(state.storageLimitBytes)} 사용 중",
+        )
         root.findViewById<ProgressBar>(R.id.progress_send).isVisible = state.isBusy
         root.findViewById<View>(R.id.btn_transfer).isEnabled = !state.isBusy
         root.setText(
             R.id.btn_transfer,
-            remote?.let { "${it.deviceName}에 보내기" } ?: "내 계정에 저장하기",
+            remote?.let { "${it.deviceName}에만 보내기" } ?: "전체 기기에 보내기",
         )
     }
 
@@ -1033,6 +1084,17 @@ class MainActivity : AppCompatActivity() {
                     },
                 )
                 contentDescription = typeLabel(type)
+                if (type == ClipboardType.IMAGE) {
+                    val thumbnail = imageThumbnails[item.id]
+                    if (thumbnail != null) {
+                        val bitmap = thumbnail
+                        setImageBitmap(bitmap)
+                        scaleType = ImageView.ScaleType.CENTER_CROP
+                        setPadding(0, 0, 0, 0)
+                    } else if (requestedImageThumbnailIds.add(item.id)) {
+                        viewModel.loadImagePreview(item)
+                    }
+                }
             }
             itemView.findViewById<TextView>(R.id.tv_clipboard_title).text = itemTitle(item)
             itemView.findViewById<TextView>(R.id.tv_clipboard_meta).text =
@@ -1147,9 +1209,9 @@ class MainActivity : AppCompatActivity() {
         }
         transferCompleted = false
         transferFailed = false
-        val targetDeviceId = viewModel.selectedDevice()?.id
-            ?.takeIf { selectedId -> remoteDevices(viewModel.state.value).any { it.id == selectedId } }
-            ?: remoteDevices(viewModel.state.value).firstOrNull()?.id.orEmpty()
+        val targetDeviceId = viewModel.state.value.sendTargetDeviceId
+            .takeIf { selectedId -> remoteDevices(viewModel.state.value).any { it.id == selectedId } }
+            .orEmpty()
         when (sendType) {
             ClipboardType.TEXT -> {
                 val input = currentRoot?.findViewById<TextInputEditText>(R.id.input_send_text)
@@ -1160,7 +1222,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 lastTransferTitle = input.lineSequence().firstOrNull().orEmpty().take(60)
                 lastTransferMeta = "텍스트 · ${input.toByteArray().size} B"
-                viewModel.sendText(input, targetDeviceId)
+                viewModel.sendText(input, targetDeviceId, sendExpiry.durationMillis)
             }
             ClipboardType.IMAGE, ClipboardType.FILE -> {
                 val file = selectedFile
@@ -1176,6 +1238,7 @@ class MainActivity : AppCompatActivity() {
                     file.mimeType,
                     file.size,
                     targetDeviceId,
+                    sendExpiry.durationMillis,
                 )
             }
         }
@@ -1211,10 +1274,23 @@ class MainActivity : AppCompatActivity() {
             }
             is MainUiEvent.DownloadReady -> openDownloadedFile(event.file, event.mimeType)
             is MainUiEvent.ImagePreviewReady -> {
-                if (viewModel.selectedItem()?.id == event.itemId && currentScreen == Screen.CLIPBOARD_DETAIL) {
-                    decodeSampledBitmap(event.bytes)?.let { bitmap ->
+                decodeSampledBitmap(event.bytes)?.let { bitmap ->
+                    imageThumbnails[event.itemId] = bitmap
+                    while (imageThumbnails.size > MAX_IMAGE_THUMBNAILS) {
+                        imageThumbnails.entries.iterator().apply {
+                            if (hasNext()) {
+                                next()
+                                remove()
+                            }
+                        }
+                    }
+                    if (viewModel.selectedItem()?.id == event.itemId && currentScreen == Screen.CLIPBOARD_DETAIL) {
                         currentRoot?.findViewById<ImageView>(R.id.iv_detail_preview)
                             ?.setImageBitmap(bitmap)
+                    } else if (currentScreen == Screen.CLIPBOARD_LIST) {
+                        currentRoot?.let { root ->
+                            renderClipboardList(root, viewModel.state.value)
+                        }
                     }
                 }
             }
@@ -1557,7 +1633,45 @@ class MainActivity : AppCompatActivity() {
             ?: if (item.sourceDeviceId == viewModel.currentDeviceId()) "이 기기" else "다른 기기"
         val parts = mutableListOf(sourceName, relativeTime(item.createdAt?.toDate()))
         if (item.fileSize > 0L) parts += formatSize(item.fileSize)
+        if (item.resolvedType() != ClipboardType.TEXT) {
+            item.fileName.substringAfterLast('.', "")
+                .takeIf(String::isNotBlank)
+                ?.uppercase()
+                ?.let(parts::add)
+        }
         return parts.joinToString(" · ")
+    }
+
+    private fun deliveryStatusText(item: ClipboardItem, state: MainUiState): String {
+        val currentDeviceId = viewModel.currentDeviceId()
+        val targets = if (item.sourceDeviceId == currentDeviceId) {
+            state.devices.filter { device ->
+                device.id != currentDeviceId &&
+                    (item.targetDeviceId.isBlank() || item.targetDeviceId == device.id)
+            }
+        } else {
+            state.devices.filter { it.id == currentDeviceId }
+        }
+        if (targets.isEmpty()) return "전송됨 · 대상 기기 정보를 기다리는 중입니다"
+        return targets.joinToString("\n") { device ->
+            val status = when {
+                item.isReadBy(device.id) -> "읽음"
+                item.isReceivedBy(device.id) -> "수신됨"
+                !isDeviceOnline(device) -> "오프라인 · 전송 대기"
+                else -> "전송됨"
+            }
+            "${device.deviceName} · $status"
+        }
+    }
+
+    private fun expiryLabel(item: ClipboardItem): String {
+        val millis = item.expiresAt?.toDate()?.time?.minus(System.currentTimeMillis()) ?: return "만료 예정"
+        return when {
+            millis <= 60L * 60L * 1_000L -> "1시간 이내"
+            millis <= 25L * 60L * 60L * 1_000L -> "24시간"
+            millis <= 8L * 24L * 60L * 60L * 1_000L -> "7일"
+            else -> "장기 보관"
+        }
     }
 
     private fun lastItemTime(items: List<ClipboardItem>): String =
@@ -1690,6 +1804,12 @@ class MainActivity : AppCompatActivity() {
 
     private enum class ClipboardFilter { ALL, TEXT, IMAGE, FILE }
 
+    private enum class SendExpiry(val title: String, val durationMillis: Long) {
+        ONE_HOUR("1시간", 60L * 60L * 1_000L),
+        ONE_DAY("24시간", 24L * 60L * 60L * 1_000L),
+        SEVEN_DAYS("7일", 7L * 24L * 60L * 60L * 1_000L),
+    }
+
     private enum class Screen(@param:LayoutRes val layoutRes: Int) {
         ONBOARDING(R.layout.screen_onboarding),
         LOGIN(R.layout.screen_login),
@@ -1717,6 +1837,7 @@ class MainActivity : AppCompatActivity() {
         const val STATE_SEND_TYPE = "send_type"
         const val ONLINE_WINDOW_MILLIS = 2L * 60L * 1000L
         const val MAX_PREVIEW_DIMENSION = 2_048
+        const val MAX_IMAGE_THUMBNAILS = 20
         const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
         const val MAX_DISPLAY_NAME_LENGTH = 50
 

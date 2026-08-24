@@ -264,10 +264,21 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/btn_disconnect_device"
+                android:id="@+id/btn_rename_device"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
                 android:layout_marginTop="@dimen/space_24"
+                android:background="@drawable/bg_card_stroke"
+                android:gravity="center"
+                android:text="기기 이름 변경"
+                android:textColor="@color/primary_contrast"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btn_disconnect_device"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/control_height_large"
+                android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_action_critical"
                 android:gravity="center"
                 android:text="이 기기 연결 해제"

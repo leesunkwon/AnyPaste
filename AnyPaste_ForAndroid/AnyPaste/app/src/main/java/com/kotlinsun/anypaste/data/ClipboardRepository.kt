@@ -52,6 +52,7 @@ interface ClipboardRepository {
     ): ClipboardItem
 
     suspend fun getItem(userId: String, itemId: String): ClipboardItem?
+    suspend fun markAsReceived(userId: String, itemId: String, deviceId: String)
     suspend fun markAsRead(userId: String, itemId: String, deviceId: String)
     suspend fun deleteItem(userId: String, itemId: String)
     suspend fun deleteExpiredItems(userId: String, batchLimit: Long = 100): Int
@@ -262,6 +263,15 @@ class FirestoreClipboardRepository(
             .awaitResult()
     }
 
+    override suspend fun markAsReceived(userId: String, itemId: String, deviceId: String) {
+        requireValidDocumentId(userId, "사용자 ID")
+        requireValidDocumentId(itemId, "클립보드 항목 ID")
+        requireValidDocumentId(deviceId, "기기 ID")
+        clipboardCollection(userId).document(itemId)
+            .update(Fields.RECEIVED_BY, FieldValue.arrayUnion(deviceId))
+            .awaitResult()
+    }
+
     override suspend fun deleteItem(userId: String, itemId: String) {
         requireValidDocumentId(userId, "사용자 ID")
         requireValidDocumentId(itemId, "클립보드 항목 ID")
@@ -301,6 +311,9 @@ class FirestoreClipboardRepository(
             targetDeviceId = getString(Fields.TARGET_DEVICE_ID).orEmpty(),
             createdAt = getTimestamp(Fields.CREATED_AT),
             expiresAt = getTimestamp(Fields.EXPIRES_AT),
+            receivedBy = (get(Fields.RECEIVED_BY) as? List<*>)
+                ?.filterIsInstance<String>()
+                .orEmpty(),
             readBy = (get(Fields.READ_BY) as? List<*>)
                 ?.filterIsInstance<String>()
                 .orEmpty(),
@@ -317,6 +330,7 @@ class FirestoreClipboardRepository(
         Fields.TARGET_DEVICE_ID to targetDeviceId,
         Fields.CREATED_AT to FieldValue.serverTimestamp(),
         Fields.EXPIRES_AT to expiresAt,
+        Fields.RECEIVED_BY to receivedBy,
         Fields.READ_BY to readBy,
     )
 
@@ -343,6 +357,7 @@ class FirestoreClipboardRepository(
         const val TARGET_DEVICE_ID = "targetDeviceId"
         const val CREATED_AT = "createdAt"
         const val EXPIRES_AT = "expiresAt"
+        const val RECEIVED_BY = "receivedBy"
         const val READ_BY = "readBy"
     }
 

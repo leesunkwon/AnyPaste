@@ -34,6 +34,30 @@ enum ClipboardKind: String, Codable, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
 }
 
+enum ClipboardRetention: String, CaseIterable, Identifiable, Sendable {
+    case oneHour
+    case oneDay
+    case sevenDays
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .oneHour: "1시간"
+        case .oneDay: "24시간"
+        case .sevenDays: "7일"
+        }
+    }
+
+    var duration: TimeInterval {
+        switch self {
+        case .oneHour: 60 * 60
+        case .oneDay: 24 * 60 * 60
+        case .sevenDays: 7 * 24 * 60 * 60
+        }
+    }
+}
+
 enum DevicePlatform: String, Codable, CaseIterable, Identifiable, Sendable {
     case android
     case macOS = "macos"
@@ -119,6 +143,7 @@ struct ClipboardRecord: Codable, Identifiable, Equatable, Sendable {
     var targetDeviceId: String
     var createdAt: Date?
     var expiresAt: Date?
+    var receivedBy: [String]
     var readBy: [String]
 
     init(
@@ -133,6 +158,7 @@ struct ClipboardRecord: Codable, Identifiable, Equatable, Sendable {
         targetDeviceId: String = "",
         createdAt: Date? = nil,
         expiresAt: Date? = nil,
+        receivedBy: [String] = [],
         readBy: [String] = []
     ) {
         self.id = id
@@ -146,6 +172,7 @@ struct ClipboardRecord: Codable, Identifiable, Equatable, Sendable {
         self.targetDeviceId = targetDeviceId
         self.createdAt = createdAt
         self.expiresAt = expiresAt
+        self.receivedBy = receivedBy
         self.readBy = readBy
     }
 
@@ -155,6 +182,10 @@ struct ClipboardRecord: Codable, Identifiable, Equatable, Sendable {
 
     func isRead(by deviceID: String) -> Bool {
         readBy.contains(deviceID)
+    }
+
+    func isReceived(by deviceID: String) -> Bool {
+        receivedBy.contains(deviceID)
     }
 
     var summary: String {
@@ -183,6 +214,7 @@ struct ClipboardRecord: Codable, Identifiable, Equatable, Sendable {
         case targetDeviceId
         case createdAt
         case expiresAt
+        case receivedBy
         case readBy
     }
 }

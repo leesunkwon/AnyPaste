@@ -365,6 +365,7 @@ struct ClipboardHistoryView: View {
                     Group {
                         if let selectedItem = resolvedSelection {
                             ClipboardDetailView(
+                                model: model,
                                 record: selectedItem,
                                 sourceDeviceName: sourceDeviceName(for: selectedItem),
                                 onCopy: { model.copy(selectedItem) },
@@ -544,11 +545,13 @@ struct ClipboardRecordRow: View {
 }
 
 struct ClipboardDetailView: View {
+    @ObservedObject var model: AppModel
     let record: ClipboardRecord
     let sourceDeviceName: String
     let onCopy: () -> Void
     let onOpen: () -> Void
     let onDelete: () -> Void
+    @State private var previewImage: NSImage?
 
     var body: some View {
         ScrollView {
@@ -587,9 +590,42 @@ struct ClipboardDetailView: View {
                         Divider()
                         metadataRow(label: "파일 크기", value: WorkspacePresentation.fileSize(record.fileSize))
                     }
+                    if record.kind != .text {
+                        Divider()
+                        metadataRow(label: "형식", value: fileFormat)
+                    }
                 }
                 .background(PasteColors.surfaceMuted)
                 .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
+
+                if !deliveryTargets.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("전달 상태")
+                            .font(PasteTypography.captionStrong)
+                            .foregroundStyle(PasteColors.textSecondary)
+                            .padding(.horizontal, PasteSpacing.lg)
+                            .padding(.vertical, PasteSpacing.md)
+                        ForEach(deliveryTargets) { device in
+                            Divider()
+                            HStack(spacing: PasteSpacing.md) {
+                                Circle()
+                                    .fill(device.isOnline ? PasteColors.success : PasteColors.textTertiary)
+                                    .frame(width: 8, height: 8)
+                                Text(device.deviceName)
+                                    .font(PasteTypography.body)
+                                    .foregroundStyle(PasteColors.text)
+                                Spacer()
+                                Text(deliveryStatus(for: device))
+                                    .font(PasteTypography.captionStrong)
+                                    .foregroundStyle(deliveryTone(for: device))
+                            }
+                            .padding(.horizontal, PasteSpacing.lg)
+                            .padding(.vertical, PasteSpacing.md)
+                        }
+                    }
+                    .background(PasteColors.surfaceMuted)
+                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
+                }
 
                 HStack(spacing: PasteSpacing.md) {
                     Button(action: onCopy) {
@@ -600,7 +636,7 @@ struct ClipboardDetailView: View {
 
                     if record.kind != .text {
                         Button(action: onOpen) {
-                            Label("열기", systemImage: "arrow.up.forward.app")
+                            Label("다운로드 후 열기", systemImage: "arrow.down.circle")
                         }
                         .buttonStyle(PasteSecondaryButtonStyle())
                         .accessibilityHint("파일을 기본 앱으로 엽니다")
@@ -617,6 +653,11 @@ struct ClipboardDetailView: View {
             }
             .padding(PasteSpacing.xxl)
         }
+        .onAppear {
+            model.markReadFromUser(record)
+            guard record.kind == .image, previewImage == nil else { return }
+            Task { previewImage = await model.imagePreview(for: record) }
+        }
     }
 
     @ViewBuilder
@@ -632,7 +673,18 @@ struct ClipboardDetailView: View {
                 .background(PasteColors.surfaceMuted)
                 .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
         case .image:
-            filePreview(symbol: "photo.fill", title: record.fileName.nonEmpty ?? "이미지")
+            if let previewImage {
+                Image(nsImage: previewImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 320)
+                    .padding(PasteSpacing.sm)
+                    .background(PasteColors.surfaceMuted)
+                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
+                    .accessibilityLabel("수신 이미지 미리보기")
+            } else {
+                filePreview(symbol: "photo.fill", title: record.fileName.nonEmpty ?? "이미지")
+            }
         case .file:
             filePreview(symbol: "doc.fill", title: record.fileName.nonEmpty ?? "파일")
         }
@@ -654,12 +706,47 @@ struct ClipboardDetailView: View {
                     .font(PasteTypography.caption)
                     .foregroundStyle(PasteColors.textSecondary)
             }
+            if record.kind != .text {
+                Text(fileFormat)
+                    .font(PasteTypography.caption)
+                    .foregroundStyle(PasteColors.textSecondary)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 180)
         .padding(PasteSpacing.lg)
         .background(PasteColors.surfaceMuted)
         .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+
+    private var fileFormat: String {
+        let fileExtension = URL(fileURLWithPath: record.fileName).pathExtension.uppercased()
+        let type = fileExtension.isEmpty ? "파일" : fileExtension
+        return record.mimeType.isEmpty ? type : "\(type) · \(record.mimeType)"
+    }
+
+    private var deliveryTargets: [DeviceRecord] {
+        if record.sourceDeviceId == model.currentDeviceID {
+            return model.devices.filter { device in
+                device.id != model.currentDeviceID
+                    && (record.targetDeviceId.isEmpty || device.id == record.targetDeviceId)
+            }
+        }
+        return model.devices.filter { $0.id == model.currentDeviceID }
+    }
+
+    private func deliveryStatus(for device: DeviceRecord) -> String {
+        if record.isRead(by: device.id) { return "읽음" }
+        if record.isReceived(by: device.id) { return "수신됨" }
+        if !device.isOnline { return "오프라인 · 대기" }
+        return "전송됨"
+    }
+
+    private func deliveryTone(for device: DeviceRecord) -> Color {
+        if record.isRead(by: device.id) || record.isReceived(by: device.id) {
+            return PasteColors.success
+        }
+        return device.isOnline ? PasteColors.brandForeground : PasteColors.textSecondary
     }
 
     private func metadataRow(label: String, value: String) -> some View {
@@ -686,6 +773,7 @@ struct SendClipboardView: View {
     @State private var text = ""
     @State private var selectedFiles: [URL] = []
     @State private var targetDeviceID = ""
+    @State private var retention: ClipboardRetention = .oneDay
     @State private var showsFileImporter = false
     @State private var isDropTargeted = false
 
@@ -720,6 +808,9 @@ struct SendClipboardView: View {
 
                         Divider()
                         targetPicker
+                        Divider()
+                        retentionPicker
+                        storagePolicy
                         sendAction
                     }
                 }
@@ -741,6 +832,14 @@ struct SendClipboardView: View {
         }
         .onChange(of: mode) {
             model.dismissError()
+        }
+        .onAppear {
+            targetDeviceID = model.savedTransferTargetID(
+                validDeviceIDs: Set(remoteDevices.map(\.id)),
+            )
+        }
+        .onChange(of: targetDeviceID) { _, value in
+            model.rememberTransferTarget(value.isEmpty ? nil : value)
         }
     }
 
@@ -861,11 +960,11 @@ struct SendClipboardView: View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
                 title: "대상 기기",
-                subtitle: "특정 기기를 선택하지 않으면 계정의 모든 다른 기기로 보냅니다."
+                subtitle: "전체 기기 전송과 특정 기기 전송 중 하나를 선택하세요."
             )
 
             Picker("대상 기기", selection: $targetDeviceID) {
-                Label("모든 기기", systemImage: "rectangle.stack.badge.person.crop")
+                Label("전체 기기 전송", systemImage: "rectangle.stack.badge.person.crop")
                     .tag("")
                 ForEach(remoteDevices) { device in
                     Text("\(device.deviceName)\(device.isOnline ? " · 온라인" : " · 오프라인")")
@@ -876,6 +975,16 @@ struct SendClipboardView: View {
             .frame(maxWidth: 380)
             .accessibilityLabel("대상 기기")
 
+            Label(
+                targetDeviceID.isEmpty
+                    ? "연결된 모든 다른 기기에 전송합니다. 오프라인 기기는 연결되면 받습니다."
+                    : "선택한 한 기기에만 전송합니다.",
+                systemImage: targetDeviceID.isEmpty ? "person.3.fill" : "scope"
+            )
+            .font(PasteTypography.caption)
+            .foregroundStyle(PasteColors.textSecondary)
+            .fixedSize(horizontal: false, vertical: true)
+
             if remoteDevices.isEmpty {
                 Label("연결된 다른 기기가 없습니다. 전송한 항목은 기록에 저장됩니다.", systemImage: "info.circle")
                     .font(PasteTypography.caption)
@@ -883,6 +992,34 @@ struct SendClipboardView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+
+    private var retentionPicker: some View {
+        VStack(alignment: .leading, spacing: PasteSpacing.md) {
+            PasteSectionHeader(
+                title: "보관 기간",
+                subtitle: "기간이 지나면 모든 기기에서 항목이 자동으로 삭제됩니다."
+            )
+            Picker("보관 기간", selection: $retention) {
+                ForEach(ClipboardRetention.allCases) { option in
+                    Text(option.title).tag(option)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(maxWidth: 360)
+        }
+    }
+
+    private var storagePolicy: some View {
+        let used = WorkspacePresentation.fileSize(model.storageUsageBytes)
+        let limit = WorkspacePresentation.fileSize(model.storageLimitBytes)
+        return Label(
+            "파일 저장 공간 \(used) / \(limit) 사용 중 · 최대 저장 용량을 넘는 파일은 전송할 수 없습니다.",
+            systemImage: "externaldrive.fill"
+        )
+        .font(PasteTypography.caption)
+        .foregroundStyle(PasteColors.textSecondary)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private var sendAction: some View {
@@ -999,13 +1136,13 @@ struct SendClipboardView: View {
             switch mode {
             case .text:
                 let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                await model.sendText(value, targetDeviceID: targetID)
+                await model.sendText(value, targetDeviceID: targetID, retention: retention)
                 if model.errorMessage == nil {
                     text = ""
                 }
             case .files:
                 let files = selectedFiles
-                await model.sendFiles(files, targetDeviceID: targetID)
+                await model.sendFiles(files, targetDeviceID: targetID, retention: retention)
                 if model.errorMessage == nil {
                     selectedFiles = []
                 }
@@ -1056,6 +1193,9 @@ struct DevicesView: View {
                             DeviceDetailView(
                                 device: selectedDevice,
                                 isCurrentDevice: selectedDevice.id == model.currentDeviceID,
+                                onRename: { name in
+                                    Task { await model.renameDevice(selectedDevice, to: name) }
+                                },
                                 onRemove: { devicePendingRemoval = selectedDevice }
                             )
                         } else {
@@ -1182,7 +1322,10 @@ struct DeviceRecordRow: View {
 struct DeviceDetailView: View {
     let device: DeviceRecord
     let isCurrentDevice: Bool
+    let onRename: (String) -> Void
     let onRemove: () -> Void
+    @State private var showsRenameDialog = false
+    @State private var proposedName = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.xxl) {
@@ -1219,6 +1362,14 @@ struct DeviceDetailView: View {
             .background(PasteColors.surfaceMuted)
             .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
 
+            Button {
+                proposedName = device.deviceName
+                showsRenameDialog = true
+            } label: {
+                Label("기기 이름 변경", systemImage: "pencil")
+            }
+            .buttonStyle(PasteSecondaryButtonStyle())
+
             if isCurrentDevice {
                 Label("현재 사용 중인 기기는 여기서 제거할 수 없습니다.", systemImage: "info.circle")
                     .font(PasteTypography.body)
@@ -1234,6 +1385,15 @@ struct DeviceDetailView: View {
             Spacer()
         }
         .padding(PasteSpacing.xxl)
+        .alert("기기 이름 변경", isPresented: $showsRenameDialog) {
+            TextField("예: 내 맥북, 업무용 폰", text: $proposedName)
+            Button("변경") {
+                onRename(proposedName)
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text("이 이름은 같은 계정으로 연결된 모든 기기에 표시됩니다.")
+        }
     }
 
     private func detailRow(label: String, value: String) -> some View {

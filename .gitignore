@@ -3,6 +3,10 @@
 .AppleDouble
 .LSOverride
 
+# Xcode user-specific state
+xcuserdata/
+*.xcuserstate
+
 # Android Studio and Gradle
 .gradle/
 .idea/

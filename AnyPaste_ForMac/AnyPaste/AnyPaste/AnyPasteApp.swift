@@ -20,8 +20,8 @@ struct AnyPasteApp: App {
                 }
                 .keyboardShortcut("1", modifiers: .command)
 
-                Button("전체 기록") {
-                    model.selectedRoute = .history
+                Button("현재 전송 항목") {
+                    model.selectedRoute = .currentItem
                 }
                 .keyboardShortcut("2", modifiers: .command)
 

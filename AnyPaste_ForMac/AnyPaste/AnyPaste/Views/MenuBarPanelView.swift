@@ -85,7 +85,7 @@ struct MenuBarPanelView: View {
     private var recentContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("최근 항목")
+                Text("현재 전송 항목")
                     .font(PasteTypography.captionStrong)
                     .foregroundStyle(PasteColors.textSecondary)
                     .accessibilityAddTraits(.isHeader)
@@ -104,7 +104,7 @@ struct MenuBarPanelView: View {
             } else if model.clipboardItems.isEmpty {
                 PasteEmptyState(
                     symbol: "clipboard",
-                    title: "최근 항목이 없습니다",
+                    title: "현재 전송 항목이 없습니다",
                     message: "다른 기기에서 내용을 보내면 여기에 표시됩니다.",
                     actionTitle: "보내기 열기"
                 ) {
@@ -113,11 +113,11 @@ struct MenuBarPanelView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 0) {
-                        ForEach(Array(model.clipboardItems.prefix(6)).indices, id: \.self) { index in
-                            let record = Array(model.clipboardItems.prefix(6))[index]
+                        ForEach(Array(model.clipboardItems.prefix(1)).indices, id: \.self) { index in
+                            let record = Array(model.clipboardItems.prefix(1))[index]
                             recentRow(record)
 
-                            if index < min(model.clipboardItems.count, 6) - 1 {
+                            if index < min(model.clipboardItems.count, 1) - 1 {
                                 Divider()
                                     .padding(.leading, 54)
                             }
@@ -185,9 +185,9 @@ struct MenuBarPanelView: View {
 
             HStack(spacing: PasteSpacing.sm) {
                 Button {
-                    showMainWindow(route: .history)
+                    showMainWindow(route: .currentItem)
                 } label: {
-                    Label("전체 기록", systemImage: "clock.arrow.circlepath")
+                    Label("현재 항목", systemImage: "doc.on.clipboard")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(PasteSecondaryButtonStyle())

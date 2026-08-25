@@ -478,7 +478,19 @@ actor FirebaseRESTClient {
             transforms: [serverTimestampTransform("createdAt")],
             currentDocument: createOnly ? ["exists": false] : nil
         )
-        let commitTime = try await commit(writes: [write], idToken: idToken)
+        let previousRecords = try await listClipboard(
+            userId: userId,
+            limit: 100,
+            idToken: idToken
+        )
+        let removalWrites = previousRecords
+            .filter { $0.id != documentID }
+            .map { record in
+                deleteWrite(
+                    name: documentName(["users", userId, "clipboard", record.id])
+                )
+            }
+        let commitTime = try await commit(writes: removalWrites + [write], idToken: idToken)
 
         return ClipboardRecord(
             id: documentID,
@@ -846,6 +858,10 @@ actor FirebaseRESTClient {
                 "fieldTransforms": transforms
             ]
         ]
+    }
+
+    private func deleteWrite(name: String) -> JSONObject {
+        ["delete": name]
     }
 
     private func serverTimestampTransform(_ fieldPath: String) -> JSONObject {

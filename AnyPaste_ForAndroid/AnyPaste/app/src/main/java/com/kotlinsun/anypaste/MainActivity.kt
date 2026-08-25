@@ -393,7 +393,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindHomeActions(root: View) {
         root.onClick(R.id.btn_notifications) { showScreen(Screen.NOTIFICATIONS) }
-        root.onClick(R.id.btn_all_recent) { showScreen(Screen.CLIPBOARD_LIST) }
         root.onClick(R.id.btn_send_all) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
@@ -640,7 +639,7 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
-        bindClipboardCards(root, state.clipboardItems.take(3), selectable = false)
+        bindClipboardCards(root, state.clipboardItems.take(1), selectable = false)
     }
 
     private fun renderClipboardList(root: View, state: MainUiState) {

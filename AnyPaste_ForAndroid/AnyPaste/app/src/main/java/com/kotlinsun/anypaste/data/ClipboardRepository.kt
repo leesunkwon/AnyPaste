@@ -58,7 +58,7 @@ interface ClipboardRepository {
     suspend fun deleteExpiredItems(userId: String, batchLimit: Long = 100): Int
 
     companion object {
-        const val DEFAULT_ITEM_LIMIT = 50L
+        const val DEFAULT_ITEM_LIMIT = 1L
     }
 }
 
@@ -115,8 +115,7 @@ class FirestoreClipboardRepository(
             createdAt = createdAt,
             expiresAt = expiresAt ?: defaultExpiry(),
         )
-        document.set(item.toFirestoreMap()).awaitResult()
-        return item
+        return replaceWithLatestItem(userId, document, item)
     }
 
     /**
@@ -159,7 +158,9 @@ class FirestoreClipboardRepository(
                 transaction.set(document, item.toFirestoreMap())
                 item
             }
-        }.awaitResult()
+        }.awaitResult().also {
+            deleteOlderItems(userId, preservingItemId = itemId)
+        }
     }
 
     override suspend fun createBinary(
@@ -192,10 +193,11 @@ class FirestoreClipboardRepository(
             createdAt = Timestamp.now(),
             expiresAt = expiresAt ?: defaultExpiry(),
         )
-        clipboardCollection(userId).document(itemId)
-            .set(item.toFirestoreMap())
-            .awaitResult()
-        return item
+        return replaceWithLatestItem(
+            userId = userId,
+            document = clipboardCollection(userId).document(itemId),
+            item = item,
+        )
     }
 
     /** Same retry semantics as [createAutomaticText], for an already-uploaded binary payload. */
@@ -243,7 +245,9 @@ class FirestoreClipboardRepository(
                 transaction.set(document, item.toFirestoreMap())
                 item
             }
-        }.awaitResult()
+        }.awaitResult().also {
+            deleteOlderItems(userId, preservingItemId = itemId)
+        }
     }
 
     override suspend fun getItem(userId: String, itemId: String): ClipboardItem? {
@@ -282,7 +286,7 @@ class FirestoreClipboardRepository(
         requireValidDocumentId(userId, "사용자 ID")
         val snapshot = clipboardCollection(userId)
             .whereLessThanOrEqualTo(Fields.EXPIRES_AT, Timestamp.now())
-            .limit(batchLimit.coerceIn(1L, MAX_DELETE_BATCH_SIZE))
+            .limit(batchLimit.coerceIn(1L, MAX_DELETE_BATCH_SIZE.toLong()))
             .get()
             .awaitResult()
         if (snapshot.isEmpty) return 0
@@ -291,6 +295,51 @@ class FirestoreClipboardRepository(
         snapshot.documents.forEach { batch.delete(it.reference) }
         batch.commit().awaitResult()
         return snapshot.size()
+    }
+
+    /**
+     * Stores a newly sent item and removes every previous clipboard document in the same commit.
+     * Keeping the document ID unique preserves the receiver-side de-duplication behavior while
+     * making the shared clipboard a single, latest-item slot.
+     */
+    private suspend fun replaceWithLatestItem(
+        userId: String,
+        document: com.google.firebase.firestore.DocumentReference,
+        item: ClipboardItem,
+    ): ClipboardItem {
+        val collection = clipboardCollection(userId)
+        val existingItems = collection.get().awaitResult().documents
+            .filter { it.id != document.id }
+
+        // Firestore permits at most 500 writes in one batch. The first commit creates the latest
+        // item atomically with as many removals as fit; the rare remaining legacy records are
+        // cleared immediately afterwards in bounded batches.
+        val firstBatch = firestore.batch().apply {
+            set(document, item.toFirestoreMap())
+            existingItems.take(MAX_REPLACED_ITEMS_IN_FIRST_BATCH).forEach { snapshot ->
+                delete(snapshot.reference)
+            }
+        }
+        firstBatch.commit().awaitResult()
+
+        existingItems.drop(MAX_REPLACED_ITEMS_IN_FIRST_BATCH)
+            .chunked(MAX_DELETE_BATCH_SIZE)
+            .forEach { references ->
+                firestore.batch().apply {
+                    references.forEach { snapshot -> delete(snapshot.reference) }
+                }.commit().awaitResult()
+            }
+        return item
+    }
+
+    private suspend fun deleteOlderItems(userId: String, preservingItemId: String) {
+        val olderItems = clipboardCollection(userId).get().awaitResult().documents
+            .filter { it.id != preservingItemId }
+        olderItems.chunked(MAX_DELETE_BATCH_SIZE).forEach { references ->
+            firestore.batch().apply {
+                references.forEach { snapshot -> delete(snapshot.reference) }
+            }.commit().awaitResult()
+        }
     }
 
     private fun clipboardCollection(userId: String) = firestore
@@ -363,7 +412,8 @@ class FirestoreClipboardRepository(
 
     private companion object {
         const val MAX_ITEM_LIMIT = 100L
-        const val MAX_DELETE_BATCH_SIZE = 500L
+        const val MAX_DELETE_BATCH_SIZE = 500
+        const val MAX_REPLACED_ITEMS_IN_FIRST_BATCH = MAX_DELETE_BATCH_SIZE - 1
         const val MAX_TEXT_CHARACTERS = 100_000
         const val DEFAULT_TTL_MILLIS = 24L * 60L * 60L * 1_000L
     }

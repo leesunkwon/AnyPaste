@@ -206,13 +206,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             mutableState.update { it.copy(isBusy = true) }
             try {
-                clipboardRepository.createText(
+                val previousItems = state.value.clipboardItems
+                val created = clipboardRepository.createText(
                     userId = userId,
                     content = transfer.content,
                     sourceDeviceId = deviceId,
                     targetDeviceId = transfer.targetDeviceId,
                     expiresAt = transfer.expiresAt(),
                 )
+                deleteReplacedStorage(previousItems, keepingStoragePath = created.storagePath)
                 completeTransfer(transfer.id)
             } catch (error: Throwable) {
                 if (error is CancellationException) throw error
@@ -239,10 +241,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             postMessage("파일은 50MB 이하만 전송할 수 있습니다.")
             return
         }
-        if (fileSize > 0L && state.value.storageUsageBytes + fileSize > MAX_STORAGE_BYTES) {
-            postMessage("저장 공간 한도를 초과합니다. 불필요한 파일을 삭제한 뒤 다시 시도해 주세요.")
-            return
-        }
         val type = if (mimeType.startsWith("image/")) ClipboardType.IMAGE else ClipboardType.FILE
         sendFileTransfer(
             PendingTransfer.File(
@@ -261,6 +259,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun sendFileTransfer(transfer: PendingTransfer.File) {
         val userId = requireUserId() ?: return
         viewModelScope.launch {
+            val previousItems = state.value.clipboardItems
             mutableState.update {
                 it.copy(
                     isBusy = true,
@@ -282,9 +281,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     transfer.source
                 }
                 val resolvedSize = temporaryUpload?.length() ?: transfer.fileSize
-                require(
-                    resolvedSize <= 0L || state.value.storageUsageBytes + resolvedSize <= MAX_STORAGE_BYTES,
-                ) {
+                require(resolvedSize <= MAX_STORAGE_BYTES) {
                     "저장 공간 한도를 초과합니다. 불필요한 파일을 삭제한 뒤 다시 시도해 주세요."
                 }
                 mutableState.update {
@@ -306,7 +303,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     },
                 )
                 uploadedPath = upload.storagePath
-                clipboardRepository.createBinary(
+                val created = clipboardRepository.createBinary(
                     userId = userId,
                     itemId = itemId,
                     type = transfer.type,
@@ -315,6 +312,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     targetDeviceId = transfer.targetDeviceId,
                     expiresAt = transfer.expiresAt(),
                 )
+                deleteReplacedStorage(previousItems, keepingStoragePath = created.storagePath)
                 completeTransfer(transfer.id)
             } catch (error: Throwable) {
                 if (error is CancellationException) throw error
@@ -444,6 +442,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    private suspend fun deleteReplacedStorage(
+        replacedItems: List<ClipboardItem>,
+        keepingStoragePath: String,
+    ) {
+        replacedItems.map(ClipboardItem::storagePath)
+            .filter { it.isNotBlank() && it != keepingStoragePath }
+            .distinct()
+            .forEach { path ->
+                try {
+                    storageRepository.delete(path)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Throwable) {
+                    // The replacement is already visible; best-effort Storage cleanup can retry later.
+                }
+            }
     }
 
     fun markAllRead() {

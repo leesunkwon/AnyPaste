@@ -68,12 +68,6 @@ struct MainWorkspaceView: View {
             List {
                 Section {
                     sidebarButton(route: .home, title: "홈", symbol: "house.fill")
-                    sidebarButton(
-                        route: .history,
-                        title: "전체 기록",
-                        symbol: "clock.arrow.circlepath",
-                        badge: model.unreadCount > 0 ? model.unreadCount : nil
-                    )
                     sidebarButton(route: .send, title: "보내기", symbol: "paperplane.fill")
                     sidebarButton(
                         route: .devices,
@@ -170,8 +164,8 @@ struct MainWorkspaceView: View {
         switch model.selectedRoute {
         case .home:
             HomeDashboardView(model: model)
-        case .history:
-            ClipboardHistoryView(model: model)
+        case .currentItem:
+            CurrentClipboardView(model: model)
         case .send:
             SendClipboardView(model: model)
         case .devices:
@@ -211,8 +205,8 @@ struct HomeDashboardView: View {
                 LazyVGrid(columns: metricColumns, spacing: PasteSpacing.lg) {
                     PasteMetricCard(
                         symbol: "doc.on.clipboard",
-                        value: "\(model.clipboardItems.count)",
-                        label: "저장된 기록",
+                        value: model.clipboardItems.isEmpty ? "없음" : "1개",
+                        label: "현재 전송 항목",
                         tone: .informative
                     )
                     PasteMetricCard(
@@ -252,28 +246,13 @@ struct HomeDashboardView: View {
                 }
                 .buttonStyle(PastePrimaryButtonStyle())
 
-                Button {
-                    model.selectedRoute = .history
-                } label: {
-                    Label("전체 기록 보기", systemImage: "clock.arrow.circlepath")
-                }
-                .buttonStyle(PasteSecondaryButtonStyle())
             }
         }
     }
 
     private var recentItems: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
-            HStack {
-                PasteSectionHeader(title: "최근 기록", subtitle: "가장 최근에 동기화된 항목입니다.")
-                Spacer()
-                if !model.clipboardItems.isEmpty {
-                    Button("전체 보기") {
-                        model.selectedRoute = .history
-                    }
-                    .buttonStyle(.link)
-                }
-            }
+            PasteSectionHeader(title: "현재 전송 항목", subtitle: "새 항목을 보내면 기존 항목은 자동으로 교체됩니다.")
 
             if model.isLoading && model.clipboardItems.isEmpty {
                 PasteLoadingState(message: "최근 기록을 불러오는 중입니다")
@@ -288,26 +267,18 @@ struct HomeDashboardView: View {
                 }
             } else {
                 PasteCard(padding: 0) {
-                    VStack(spacing: 0) {
-                        ForEach(Array(model.clipboardItems.prefix(5)).indices, id: \.self) { index in
-                            let item = Array(model.clipboardItems.prefix(5))[index]
-                            Button {
-                                model.selectedItem = item
-                                model.selectedRoute = .history
-                            } label: {
-                                ClipboardRecordRow(record: item, currentDeviceID: model.currentDeviceID)
-                                    .padding(.horizontal, PasteSpacing.lg)
-                                    .padding(.vertical, PasteSpacing.md)
-                                    .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityHint("전체 기록에서 상세 내용을 엽니다")
-
-                            if index < min(model.clipboardItems.count, 5) - 1 {
-                                Divider()
-                                    .padding(.leading, 52)
-                            }
+                    if let item = model.clipboardItems.first {
+                        Button {
+                            model.selectedItem = item
+                            model.selectedRoute = .currentItem
+                        } label: {
+                            ClipboardRecordRow(record: item, currentDeviceID: model.currentDeviceID)
+                                .padding(.horizontal, PasteSpacing.lg)
+                                .padding(.vertical, PasteSpacing.md)
+                                .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("현재 전송 항목의 상세 내용을 엽니다")
                     }
                 }
             }
@@ -315,84 +286,38 @@ struct HomeDashboardView: View {
     }
 }
 
-struct ClipboardHistoryView: View {
+struct CurrentClipboardView: View {
     @ObservedObject var model: AppModel
-    @State private var query = ""
-    @State private var filter: ClipboardFilter = .all
     @State private var itemPendingDeletion: ClipboardRecord?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: PasteSpacing.xl) {
-            HStack(alignment: .top, spacing: PasteSpacing.xl) {
-                PastePageHeader(
-                    title: "전체 기록",
-                    subtitle: "기기 사이에서 공유한 텍스트와 파일을 찾아보고 관리하세요.",
-                    symbol: "clock.arrow.circlepath"
-                )
-                Spacer()
-                PasteStatusBadge(
-                    label: "\(filteredItems.count)개",
-                    tone: .neutral,
-                    symbol: "line.3.horizontal.decrease.circle"
-                )
-            }
-
-            filterBar
-
+        Group {
             if model.isLoading && model.clipboardItems.isEmpty {
-                PasteLoadingState(message: "클립보드 기록을 불러오는 중입니다")
-            } else if filteredItems.isEmpty {
-                PasteEmptyState(
-                    symbol: query.isEmpty ? "clipboard" : "magnifyingglass",
-                    title: query.isEmpty ? "표시할 기록이 없습니다" : "검색 결과가 없습니다",
-                    message: query.isEmpty
-                        ? "새 항목을 보내면 이곳에서 다시 확인할 수 있습니다."
-                        : "다른 검색어나 필터를 사용해 보세요.",
-                    actionTitle: query.isEmpty ? "새 항목 보내기" : "검색 초기화"
-                ) {
-                    if query.isEmpty {
-                        model.selectedRoute = .send
-                    } else {
-                        query = ""
-                        filter = .all
-                    }
-                }
+                PasteLoadingState(message: "현재 전송 항목을 불러오는 중입니다")
+            } else if let record = model.clipboardItems.first {
+                ClipboardDetailView(
+                    model: model,
+                    record: record,
+                    sourceDeviceName: sourceDeviceName(for: record),
+                    onCopy: { model.copy(record) },
+                    onOpen: { model.open(record) },
+                    onRevealInDownloads: { model.revealInDownloads(record) },
+                    onDelete: { itemPendingDeletion = record }
+                )
             } else {
-                HSplitView {
-                    historyList
-                        .frame(minWidth: 300, idealWidth: 380, maxWidth: 480)
-
-                    Group {
-                        if let selectedItem = resolvedSelection {
-                            ClipboardDetailView(
-                                model: model,
-                                record: selectedItem,
-                                sourceDeviceName: sourceDeviceName(for: selectedItem),
-                                onCopy: { model.copy(selectedItem) },
-                                onOpen: { model.open(selectedItem) },
-                                onDelete: { itemPendingDeletion = selectedItem }
-                            )
-                        } else {
-                            PasteEmptyState(
-                                symbol: "cursorarrow.click",
-                                title: "항목을 선택하세요",
-                                message: "왼쪽 목록에서 기록을 선택하면 전체 내용과 세부 정보를 볼 수 있습니다."
-                            )
-                        }
-                    }
-                    .frame(minWidth: 360, maxWidth: .infinity, maxHeight: .infinity)
-                    .background(PasteColors.surfaceRaised)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: PasteRadius.large, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: PasteRadius.large, style: .continuous)
-                        .stroke(PasteColors.border, lineWidth: 1)
+                PasteEmptyState(
+                    symbol: "clipboard",
+                    title: "현재 전송 항목이 없습니다",
+                    message: "텍스트나 파일을 보내면 가장 최근 항목 한 개만 여기에 표시됩니다.",
+                    actionTitle: "새 항목 보내기"
+                ) {
+                    model.selectedRoute = .send
                 }
             }
         }
         .pastePagePadding()
         .alert(
-            "기록을 삭제할까요?",
+            "현재 항목을 삭제할까요?",
             isPresented: Binding(
                 get: { itemPendingDeletion != nil },
                 set: { if !$0 { itemPendingDeletion = nil } }
@@ -402,9 +327,6 @@ struct ClipboardHistoryView: View {
             Button("삭제", role: .destructive) {
                 Task {
                     await model.delete(record)
-                    if model.selectedItem?.id == record.id {
-                        model.selectedItem = nil
-                    }
                     itemPendingDeletion = nil
                 }
             }
@@ -414,82 +336,6 @@ struct ClipboardHistoryView: View {
         } message: { record in
             Text("‘\(record.summary)’ 항목은 삭제 후 복구할 수 없습니다.")
         }
-    }
-
-    private var filterBar: some View {
-        HStack(spacing: PasteSpacing.md) {
-            HStack(spacing: PasteSpacing.sm) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(PasteColors.textTertiary)
-                    .accessibilityHidden(true)
-                TextField("내용 또는 파일명 검색", text: $query)
-                    .textFieldStyle(.plain)
-                    .accessibilityLabel("기록 검색")
-                if !query.isEmpty {
-                    Button {
-                        query = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(PasteColors.textTertiary)
-                    .accessibilityLabel("검색어 지우기")
-                }
-            }
-            .padding(.horizontal, PasteSpacing.md)
-            .frame(minHeight: 40)
-            .background(PasteColors.surfaceRaised)
-            .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous)
-                    .stroke(PasteColors.border, lineWidth: 1)
-            }
-
-            Picker("종류", selection: $filter) {
-                ForEach(ClipboardFilter.allCases) { option in
-                    Text(option.title).tag(option)
-                }
-            }
-            .pickerStyle(.segmented)
-            .frame(maxWidth: 360)
-        }
-    }
-
-    private var historyList: some View {
-        List(filteredItems) { record in
-            Button {
-                model.selectedItem = record
-            } label: {
-                ClipboardRecordRow(record: record, currentDeviceID: model.currentDeviceID)
-                    .padding(.vertical, PasteSpacing.xs)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .listRowBackground(
-                model.selectedItem?.id == record.id
-                    ? PasteColors.surfacePressed
-                    : Color.clear
-            )
-            .accessibilityAddTraits(model.selectedItem?.id == record.id ? .isSelected : [])
-        }
-        .listStyle(.inset)
-    }
-
-    private var filteredItems: [ClipboardRecord] {
-        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        return model.clipboardItems.filter { record in
-            let matchesFilter = filter.matches(record.kind)
-            let matchesQuery = normalizedQuery.isEmpty
-                || record.content.localizedCaseInsensitiveContains(normalizedQuery)
-                || record.fileName.localizedCaseInsensitiveContains(normalizedQuery)
-                || record.summary.localizedCaseInsensitiveContains(normalizedQuery)
-            return matchesFilter && matchesQuery
-        }
-    }
-
-    private var resolvedSelection: ClipboardRecord? {
-        guard let selectedID = model.selectedItem?.id else { return nil }
-        return filteredItems.first { $0.id == selectedID }
     }
 
     private func sourceDeviceName(for record: ClipboardRecord) -> String {
@@ -550,6 +396,7 @@ struct ClipboardDetailView: View {
     let sourceDeviceName: String
     let onCopy: () -> Void
     let onOpen: () -> Void
+    let onRevealInDownloads: () -> Void
     let onDelete: () -> Void
     @State private var previewImage: NSImage?
 
@@ -640,6 +487,12 @@ struct ClipboardDetailView: View {
                         }
                         .buttonStyle(PasteSecondaryButtonStyle())
                         .accessibilityHint("파일을 기본 앱으로 엽니다")
+
+                        Button(action: onRevealInDownloads) {
+                            Label("다운로드 폴더 열기", systemImage: "folder")
+                        }
+                        .buttonStyle(PasteSecondaryButtonStyle())
+                        .accessibilityHint("파일을 다운로드 폴더에 저장하고 Finder에서 표시합니다")
                     }
 
                     Spacer()
@@ -1658,33 +1511,6 @@ enum WorkspacePresentation {
 
     static func fileSize(_ value: Int64) -> String {
         ByteCountFormatter.string(fromByteCount: value, countStyle: .file)
-    }
-}
-
-private enum ClipboardFilter: String, CaseIterable, Identifiable {
-    case all
-    case text
-    case image
-    case file
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .all: "전체"
-        case .text: "텍스트"
-        case .image: "이미지"
-        case .file: "파일"
-        }
-    }
-
-    func matches(_ kind: ClipboardKind) -> Bool {
-        switch self {
-        case .all: true
-        case .text: kind == .text
-        case .image: kind == .image
-        case .file: kind == .file
-        }
     }
 }
 

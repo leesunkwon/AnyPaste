@@ -8,7 +8,7 @@ enum AppPhase: Equatable, Sendable {
 
 enum AppRoute: String, Codable, CaseIterable, Identifiable, Sendable {
     case home
-    case history
+    case currentItem
     case send
     case devices
     case settings

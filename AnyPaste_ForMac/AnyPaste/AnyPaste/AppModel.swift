@@ -413,6 +413,7 @@ final class AppModel: ObservableObject {
         defer { isLoading = false }
 
         do {
+            let previousRecords = clipboardItems
             let record = ClipboardRecord(
                 id: UUID().uuidString.lowercased(),
                 kind: .text,
@@ -429,6 +430,7 @@ final class AppModel: ObservableObject {
                     idToken: session.idToken
                 )
             }
+            await removeReplacedStorageObjects(previousRecords, keeping: created.storagePath)
             insertOrReplace(created)
             transferState = .succeeded
             syncStatus = .upToDate
@@ -644,6 +646,15 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func revealInDownloads(_ record: ClipboardRecord) {
+        guard record.kind != .text else { return }
+        errorMessage = nil
+        Task { [weak self] in
+            guard let self else { return }
+            await self.revealBinaryRecordInDownloads(record)
+        }
+    }
+
     func imagePreview(for record: ClipboardRecord) async -> NSImage? {
         guard record.kind == .image, !record.storagePath.isEmpty else { return nil }
         do {
@@ -856,9 +867,12 @@ final class AppModel: ObservableObject {
                 return try await (clipboard, devices)
             }
 
-            clipboardItems = result.0
-                .filter { !$0.isExpired }
-                .sorted(by: Self.newestFirst)
+            clipboardItems = Array(
+                result.0
+                    .filter { !$0.isExpired }
+                    .sorted(by: Self.newestFirst)
+                    .prefix(1)
+            )
             updateDevices(result.1)
             if let selectedID = selectedItem?.id {
                 selectedItem = clipboardItems.first { $0.id == selectedID }
@@ -1198,10 +1212,11 @@ final class AppModel: ObservableObject {
         guard Int64(data.count) <= Self.maximumTransferBytes else {
             throw AppModelError.fileTooLarge
         }
-        guard automaticContext != nil || storageUsageBytes + Int64(data.count) <= Self.maximumStorageBytes else {
+        guard automaticContext != nil || Int64(data.count) <= Self.maximumStorageBytes else {
             throw AppModelError.storageLimitReached
         }
 
+        let previousRecords = clipboardItems
         let itemID = automaticContext?.recordID ?? UUID().uuidString.lowercased()
         if let automaticContext,
            let existing = try await fetchClipboardRecord(
@@ -1284,6 +1299,7 @@ final class AppModel: ObservableObject {
                 )
             }
             if automaticContext == nil || authSession?.user.id == automaticContext?.userID {
+                await removeReplacedStorageObjects(previousRecords, keeping: created.storagePath)
                 insertOrReplace(created)
             }
             return created
@@ -1680,6 +1696,46 @@ final class AppModel: ObservableObject {
         }
     }
 
+    private func revealBinaryRecordInDownloads(_ record: ClipboardRecord) async {
+        transferState = .downloading
+        do {
+            let data = try await download(record)
+            let fileURL = try saveToDownloads(data: data, record: record)
+            NSWorkspace.shared.activateFileViewerSelecting([fileURL])
+            if isUnreadIncomingRecord(record) {
+                try await markRead(record)
+            }
+            transferState = .succeeded
+        } catch {
+            transferState = .failed
+            handle(error)
+        }
+    }
+
+    private func saveToDownloads(data: Data, record: ClipboardRecord) throws -> URL {
+        let fileManager = FileManager.default
+        guard let downloadsDirectory = fileManager.urls(
+            for: .downloadsDirectory,
+            in: .userDomainMask
+        ).first else {
+            throw AppModelError.cacheUnavailable
+        }
+
+        let directory = downloadsDirectory.appendingPathComponent("AnyPaste", isDirectory: true)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+
+        let rawName = record.fileName.isEmpty ? "\(record.id).bin" : record.fileName
+        let safeName = rawName
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "\\", with: "_")
+        let destination = directory.appendingPathComponent(
+            "\(record.id.prefix(8))-\(safeName)",
+            isDirectory: false
+        )
+        try data.write(to: destination, options: .atomic)
+        return destination
+    }
+
     private func cache(data: Data, record: ClipboardRecord) throws -> URL {
         let fileManager = FileManager.default
         guard let applicationSupport = fileManager.urls(
@@ -1702,6 +1758,24 @@ final class AppModel: ObservableObject {
         let destination = directory.appendingPathComponent(fileName, isDirectory: false)
         try data.write(to: destination, options: .atomic)
         return destination
+    }
+
+    private func removeReplacedStorageObjects(
+        _ records: [ClipboardRecord],
+        keeping storagePath: String
+    ) async {
+        let obsoletePaths = Set(
+            records.map(\.storagePath).filter { !$0.isEmpty && $0 != storagePath }
+        )
+        for path in obsoletePaths {
+            do {
+                try await withAuthenticatedSession { client, session in
+                    try await client.deleteStorageObject(path: path, idToken: session.idToken)
+                }
+            } catch {
+                // The new record is already available. A failed cleanup must not roll it back.
+            }
+        }
     }
 
     // MARK: - Session helpers
@@ -1854,10 +1928,8 @@ final class AppModel: ObservableObject {
     }
 
     private func insertOrReplace(_ record: ClipboardRecord) {
-        clipboardItems.removeAll { $0.id == record.id }
-        clipboardItems.append(record)
-        clipboardItems.sort(by: Self.newestFirst)
-        if selectedItem?.id == record.id {
+        clipboardItems = [record]
+        if selectedItem != nil {
             selectedItem = record
         }
     }

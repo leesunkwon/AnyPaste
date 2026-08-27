@@ -684,100 +684,11 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<TextView>(R.id.tv_home_device_summary).setTextColor(
             ContextCompat.getColor(this, if (hasOnlineDevice) R.color.success_foreground else R.color.ink),
         )
-        renderHomeDeviceChips(root, remote, state.clipboardItems.firstOrNull())
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
         bindClipboardCards(root, state.clipboardItems.take(1), selectable = false)
         state.clipboardItems.firstOrNull()?.let { renderHomeCurrentItem(root, it) }
-    }
-
-    private fun renderHomeDeviceChips(
-        root: View,
-        devices: List<Device>,
-        currentItem: ClipboardItem?,
-    ) {
-        root.findViewById<View>(R.id.section_home_device_chips).isVisible = devices.isNotEmpty()
-        val container = root.findViewById<LinearLayout>(R.id.layout_home_device_chips)
-        container.removeAllViews()
-        val chipSpacing = resources.getDimensionPixelSize(R.dimen.space_8)
-        val horizontalPadding = resources.getDimensionPixelSize(R.dimen.space_12)
-        val verticalPadding = resources.getDimensionPixelSize(R.dimen.space_8)
-        val iconSize = resources.getDimensionPixelSize(R.dimen.space_20)
-
-        devices.take(4).forEachIndexed { index, device ->
-            val online = isDeviceOnline(device)
-            val status = homeDeviceChipStatus(device, currentItem, online)
-            val chip = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    if (index > 0) marginStart = chipSpacing
-                }
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_choice_chip)
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-                isClickable = true
-                isFocusable = true
-                contentDescription = "${device.deviceName}, $status"
-                setOnClickListener {
-                    viewModel.selectDevice(device.id)
-                    showScreen(Screen.DEVICE_DETAIL)
-                }
-            }
-            val icon = ImageView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
-                setImageResource(deviceIcon(device))
-                contentDescription = null
-            }
-            val textContainer = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                ).apply { marginStart = chipSpacing }
-                orientation = LinearLayout.VERTICAL
-            }
-            val name = TextView(this).apply {
-                text = device.deviceName
-                maxLines = 1
-                setTextColor(ContextCompat.getColor(this@MainActivity, R.color.ink))
-                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-            }
-            val statusLabel = TextView(this).apply {
-                text = status
-                maxLines = 1
-                setTextColor(
-                    ContextCompat.getColor(
-                        this@MainActivity,
-                        if (online) R.color.success_foreground else R.color.ink_secondary,
-                    ),
-                )
-                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
-            }
-            textContainer.addView(name)
-            textContainer.addView(statusLabel)
-            chip.addView(icon)
-            chip.addView(textContainer)
-            container.addView(chip)
-        }
-    }
-
-    private fun homeDeviceChipStatus(
-        device: Device,
-        currentItem: ClipboardItem?,
-        online: Boolean,
-    ): String {
-        if (!online) return "오프라인"
-        val delivery = when {
-            currentItem?.isReadBy(device.id) == true -> "읽음"
-            currentItem?.isReceivedBy(device.id) == true -> "수신됨"
-            currentItem != null -> "전송됨"
-            else -> null
-        }
-        return if (delivery == null) "온라인" else "온라인 · $delivery"
     }
 
     private fun renderClipboardList(root: View, state: MainUiState) {

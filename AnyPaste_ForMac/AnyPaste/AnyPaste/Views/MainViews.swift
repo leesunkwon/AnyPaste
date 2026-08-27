@@ -203,7 +203,6 @@ struct HomeDashboardView: View {
                     )
                 }
 
-                connectedDeviceChips
                 recentItems
 
                 quickActions
@@ -249,57 +248,6 @@ struct HomeDashboardView: View {
                 }
                 .buttonStyle(PastePrimaryButtonStyle())
 
-            }
-        }
-    }
-
-    private var connectedDeviceChips: some View {
-        VStack(alignment: .leading, spacing: PasteSpacing.md) {
-            PasteSectionHeader(
-                title: "연결된 기기",
-                subtitle: "온라인 상태와 현재 항목의 수신·읽음 상태를 확인하세요."
-            )
-
-            if remoteDevices.isEmpty {
-                Label("연결된 다른 기기가 없습니다.", systemImage: "laptopcomputer.and.iphone")
-                    .font(PasteTypography.caption)
-                    .foregroundStyle(PasteColors.textSecondary)
-                    .padding(PasteSpacing.md)
-                    .background(PasteColors.surfaceMuted)
-                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: PasteSpacing.sm) {
-                        ForEach(remoteDevices) { device in
-                            let status = deviceChipStatus(for: device)
-                            HStack(spacing: PasteSpacing.sm) {
-                                Image(systemName: WorkspacePresentation.deviceSymbol(device.platform))
-                                    .foregroundStyle(PasteColors.brandForeground)
-                                    .accessibilityHidden(true)
-                                VStack(alignment: .leading, spacing: PasteSpacing.xxs) {
-                                    Text(device.deviceName)
-                                        .font(PasteTypography.captionStrong)
-                                        .foregroundStyle(PasteColors.text)
-                                        .lineLimit(1)
-                                    Label(status.label, systemImage: status.symbol)
-                                        .font(PasteTypography.caption)
-                                        .foregroundStyle(status.tone.foreground)
-                                        .lineLimit(1)
-                                }
-                            }
-                            .padding(.horizontal, PasteSpacing.md)
-                            .padding(.vertical, PasteSpacing.sm)
-                            .background(status.tone.background)
-                            .clipShape(Capsule())
-                            .overlay {
-                                Capsule()
-                                    .stroke(PasteColors.border, lineWidth: 1)
-                            }
-                            .accessibilityElement(children: .combine)
-                            .accessibilityLabel("\(device.deviceName), \(status.label)")
-                        }
-                    }
-                }
             }
         }
     }
@@ -383,31 +331,6 @@ struct HomeDashboardView: View {
         }
     }
 
-    private var remoteDevices: [DeviceRecord] {
-        model.devices.filter { $0.id != model.currentDeviceID }
-    }
-
-    private func deviceChipStatus(for device: DeviceRecord) -> DeviceChipStatus {
-        guard device.isOnline else {
-            return DeviceChipStatus(label: "오프라인", symbol: "circle", tone: .neutral)
-        }
-        guard let item = model.clipboardItems.first else {
-            return DeviceChipStatus(label: "온라인", symbol: "circle.fill", tone: .success)
-        }
-        if item.isRead(by: device.id) {
-            return DeviceChipStatus(label: "온라인 · 읽음", symbol: "checkmark.circle.fill", tone: .success)
-        }
-        if item.isReceived(by: device.id) {
-            return DeviceChipStatus(label: "온라인 · 수신됨", symbol: "tray.and.arrow.down.fill", tone: .success)
-        }
-        return DeviceChipStatus(label: "온라인 · 전송됨", symbol: "paperplane.fill", tone: .informative)
-    }
-}
-
-private struct DeviceChipStatus {
-    let label: String
-    let symbol: String
-    let tone: PasteStatusTone
 }
 
 struct CurrentClipboardView: View {

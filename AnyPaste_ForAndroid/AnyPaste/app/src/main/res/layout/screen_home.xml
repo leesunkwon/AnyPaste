@@ -93,34 +93,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/section_home_device_chips"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_16"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/TextAppearance.AnyPaste.Overline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="연결된 기기" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_8"
-                    android:clipToPadding="false"
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:id="@+id/layout_home_device_chips"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal" />
-                </HorizontalScrollView>
-            </LinearLayout>
-
-            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"

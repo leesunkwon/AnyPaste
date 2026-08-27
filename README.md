@@ -148,11 +148,64 @@ Android는 운영체제 정책상 일반 앱이 백그라운드에서 다른 앱
 
 Firebase 클라이언트 API 키는 앱 동작에 포함될 수 있는 식별자이므로, Google Cloud Console에서 사용 API와 앱 제한을 설정해 사용 범위를 제한하세요.
 
-## 개발 도구
+## 기술 스택 및 라이브러리
 
-- Android: Kotlin, Android Views(XML), Firebase Android SDK
-- macOS: Swift, SwiftUI, Firebase REST API
-- Backend: Firebase Cloud Functions, Node.js 22
+### Android
+
+Kotlin과 XML 기반 Android Views로 구현했습니다. `MainViewModel`이 `StateFlow`로 화면 상태를 관리하고, 화면은 `Fragment` 단위로 전환해 하단 네비게이션을 유지합니다.
+
+| 분류 | 라이브러리 / 버전 | 사용 목적 |
+| --- | --- | --- |
+| 언어·빌드 | Kotlin, Android Gradle Plugin 9.2.1 | Android 앱 구현과 빌드 구성 |
+| UI | Android Views(XML), Material Components 1.14.0 | 입력 필드, 스위치, 버튼 등 일관된 네이티브 UI 구성 |
+| 화면 구성 | AndroidX AppCompat 1.8.0, Activity KTX 1.13.0, Fragment | Fragment 기반 화면 전환과 Lifecycle 연동 |
+| 레이아웃 | ConstraintLayout 2.2.2 | 복합 화면의 반응형 제약 레이아웃 구성 |
+| 비동기 처리 | Kotlin Coroutines 1.10.2 | 네트워크·파일 I/O와 UI 상태 갱신을 안전하게 분리 |
+| 상태 관리 | ViewModel, StateFlow | 인증·기기·전송·재시도 상태를 단일 UI 상태로 관리 |
+| 로그인 | Credential Manager 1.6.0, Google ID 1.1.1 | Google 계정 선택과 Firebase 인증 연동 |
+| Firebase | Firebase BoM 34.17.0 | Firebase SDK 버전을 일관되게 관리 |
+| Firebase Auth | `firebase-auth` | 이메일/비밀번호 및 Google 로그인 |
+| Firestore | `firebase-firestore` | 기기 정보, 전송 항목, 전달·읽음 상태 실시간 동기화 |
+| Cloud Storage | `firebase-storage` | 이미지·파일 업로드와 다운로드 진행 상태 처리 |
+| Cloud Functions | `firebase-functions` | 기기 연결 해제에 따른 세션 무효화 호출 |
+| FCM | `firebase-messaging` | 새 전송 항목 알림과 수신 동기화 트리거 |
+
+### macOS
+
+SwiftUI를 중심으로 구현했으며, 외부 Firebase SDK 대신 `URLSession` 기반 `FirebaseRESTClient`를 직접 작성해 Authentication, Firestore, Storage, Cloud Functions API를 호출합니다. 의존성을 가볍게 유지하면서도 `actor`로 네트워크 요청의 동시성 안전성을 확보했습니다.
+
+| 분류 | 프레임워크 | 사용 목적 |
+| --- | --- | --- |
+| UI | SwiftUI | 앱 화면, 사이드바, 전송·기기·설정 인터페이스 구성 |
+| 상태 관리 | Combine, `ObservableObject`, `@Published` | `AppModel` 중심의 화면 상태 갱신 |
+| 네트워크 | Foundation, `URLSession` | Firebase REST API 호출과 파일 업로드·다운로드 |
+| 동시성 | Swift Concurrency, `actor` | 인증 토큰 갱신과 REST 요청의 경쟁 상태 방지 |
+| 클립보드 | AppKit, `NSPasteboard` | macOS 클립보드 감시와 수신 데이터 반영 |
+| 중복 방지 | CryptoKit, SHA-256 | 동일 클립보드 데이터 재전송 및 수신-재전송 루프 방지 |
+| 보안 저장소 | Security, Keychain | Firebase 로그인 세션을 기기 전용 Keychain에 저장 |
+| 알림 | UserNotifications | 수신 항목에 대한 로컬 알림 표시 |
+| 파일 형식 | UniformTypeIdentifiers | 파일 확장자·MIME 타입 판별과 이미지 분류 |
+
+### Backend 및 Firebase
+
+| 분류 | 라이브러리 / 서비스 | 사용 목적 |
+| --- | --- | --- |
+| 런타임 | Node.js 22 | Cloud Functions 실행 환경 |
+| 서버 SDK | `firebase-admin` 14.3.0 | Admin 권한의 Firestore 조회, FCM 발송, Storage 정리 |
+| Functions | `firebase-functions` 7.3.2 | Callable Function, Firestore 트리거, 예약 정리 작업 |
+| 인증 | Firebase Authentication | 사용자별 인증과 토큰 갱신 |
+| 데이터베이스 | Cloud Firestore | 기기·클립보드·수신 및 읽음 상태 저장 |
+| 파일 저장소 | Cloud Storage | 최대 50MB 이미지·파일 저장 및 수명 주기 관리 |
+| 알림 | Firebase Cloud Messaging | 수신 대상 기기에 data 메시지 전달 |
+| 보안 | Firestore Rules, Storage Rules | 사용자 경로·기기 상태·파일 경로·크기·만료 시각 검증 |
+
+### 구현 포인트
+
+- **단일 최신 항목 정책**: 새 항목 생성 시 이전 Firestore 문서와 연결된 Storage 객체를 함께 정리해 계정별 최신 항목 1개만 유지합니다.
+- **5분 보관 정책**: Android, macOS, Cloud Functions, Firestore Rules에 동일한 만료 기준을 적용했습니다.
+- **전송 안정성**: 파일 전송은 업로드·문서 생성·기존 파일 삭제 순으로 처리하고, 실패 시 원인별 재시도 상태를 제공합니다.
+- **기기 세션 보호**: 연결 해제한 기기는 `revokedDevices` 기록으로 재등록·heartbeat·전송을 차단하고, FCM으로 세션 종료를 알립니다.
+- **보안 설정 분리**: macOS 값은 `Secrets.xcconfig` → `Info.plist` 빌드 주입 방식으로, Android Firebase 설정은 로컬 `google-services.json`으로 분리합니다.
 
 ## 참고
 

@@ -178,6 +178,7 @@ struct MainWorkspaceView: View {
 
 struct HomeDashboardView: View {
     @ObservedObject var model: AppModel
+    @State private var currentItemPreview: NSImage?
 
     private let metricColumns = [
         GridItem(.flexible(minimum: 160), spacing: PasteSpacing.lg),
@@ -268,17 +269,60 @@ struct HomeDashboardView: View {
             } else {
                 PasteCard(padding: 0) {
                     if let item = model.clipboardItems.first {
-                        Button {
-                            model.selectedItem = item
-                            model.selectedRoute = .currentItem
-                        } label: {
-                            ClipboardRecordRow(record: item, currentDeviceID: model.currentDeviceID)
+                        VStack(spacing: 0) {
+                            Button {
+                                model.selectedItem = item
+                                model.selectedRoute = .currentItem
+                            } label: {
+                                ClipboardRecordRow(
+                                    record: item,
+                                    currentDeviceID: model.currentDeviceID,
+                                    previewImage: currentItemPreview
+                                )
                                 .padding(.horizontal, PasteSpacing.lg)
                                 .padding(.vertical, PasteSpacing.md)
                                 .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityHint("현재 전송 항목의 상세 내용을 엽니다")
+
+                            Divider()
+
+                            HStack(spacing: PasteSpacing.sm) {
+                                Button {
+                                    if item.kind == .text {
+                                        model.copy(item)
+                                    } else {
+                                        model.revealInDownloads(item)
+                                    }
+                                } label: {
+                                    Label(
+                                        item.kind == .text ? "복사" : "다운로드",
+                                        systemImage: item.kind == .text ? "doc.on.doc" : "arrow.down.circle"
+                                    )
+                                }
+                                .buttonStyle(PasteSecondaryButtonStyle())
+
+                                Button {
+                                    model.selectedItem = item
+                                    model.selectedRoute = .currentItem
+                                } label: {
+                                    Label("상세 보기", systemImage: "arrow.right")
+                                }
+                                .buttonStyle(PasteSecondaryButtonStyle())
+
+                                Spacer()
+                            }
+                            .padding(.horizontal, PasteSpacing.lg)
+                            .padding(.vertical, PasteSpacing.sm)
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityHint("현재 전송 항목의 상세 내용을 엽니다")
+                        .task(id: item.id) {
+                            guard item.kind == .image else {
+                                currentItemPreview = nil
+                                return
+                            }
+                            currentItemPreview = await model.imagePreview(for: item)
+                        }
                     }
                 }
             }
@@ -349,16 +393,26 @@ struct CurrentClipboardView: View {
 struct ClipboardRecordRow: View {
     let record: ClipboardRecord
     let currentDeviceID: String
+    var previewImage: NSImage?
 
     var body: some View {
         HStack(spacing: PasteSpacing.md) {
-            Image(systemName: WorkspacePresentation.recordSymbol(record.kind))
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(WorkspacePresentation.recordTone(record.kind).foreground)
-                .frame(width: 36, height: 36)
-                .background(WorkspacePresentation.recordTone(record.kind).background)
-                .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
-                .accessibilityHidden(true)
+            Group {
+                if let previewImage, record.kind == .image {
+                    Image(nsImage: previewImage)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    Image(systemName: WorkspacePresentation.recordSymbol(record.kind))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(WorkspacePresentation.recordTone(record.kind).foreground)
+                        .frame(width: 36, height: 36)
+                        .background(WorkspacePresentation.recordTone(record.kind).background)
+                }
+            }
+            .frame(width: 36, height: 36)
+            .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
+            .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: PasteSpacing.xxs) {
                 Text(record.summary)
@@ -626,6 +680,9 @@ struct SendClipboardView: View {
     @State private var text = ""
     @State private var selectedFiles: [URL] = []
     @State private var targetDeviceID = ""
+    @State private var targetMode: SendTargetMode = .allDevices
+    @State private var lastSpecificTargetID = ""
+    @State private var transferCompletion: TransferCompletion?
     @State private var showsFileImporter = false
     @State private var isDropTargeted = false
 
@@ -667,6 +724,10 @@ struct SendClipboardView: View {
                     }
                 }
 
+                if let transferCompletion {
+                    completionCard(transferCompletion)
+                }
+
                 if !model.failedTransfers.isEmpty {
                     failedTransferQueue
                 }
@@ -686,12 +747,31 @@ struct SendClipboardView: View {
             model.dismissError()
         }
         .onAppear {
-            targetDeviceID = model.savedTransferTargetID(
+            let savedTargetID = model.savedTransferTargetID(
                 validDeviceIDs: Set(remoteDevices.map(\.id)),
             )
+            targetDeviceID = savedTargetID
+            lastSpecificTargetID = savedTargetID
+            targetMode = savedTargetID.isEmpty ? .allDevices : .specificDevice
         }
         .onChange(of: targetDeviceID) { _, value in
+            if !value.isEmpty {
+                lastSpecificTargetID = value
+            }
             model.rememberTransferTarget(value.isEmpty ? nil : value)
+        }
+        .onChange(of: targetMode) { _, value in
+            guard value == .specificDevice else {
+                targetDeviceID = ""
+                return
+            }
+
+            let deviceIDs = Set(remoteDevices.map(\.id))
+            if deviceIDs.contains(lastSpecificTargetID) {
+                targetDeviceID = lastSpecificTargetID
+            } else if let device = remoteDevices.first(where: \.isOnline) ?? remoteDevices.first {
+                targetDeviceID = device.id
+            }
         }
     }
 
@@ -815,23 +895,56 @@ struct SendClipboardView: View {
                 subtitle: "전체 기기 전송과 특정 기기 전송 중 하나를 선택하세요."
             )
 
-            Picker("대상 기기", selection: $targetDeviceID) {
-                Label("전체 기기 전송", systemImage: "rectangle.stack.badge.person.crop")
-                    .tag("")
-                ForEach(remoteDevices) { device in
-                    Text("\(device.deviceName)\(device.isOnline ? " · 온라인" : " · 오프라인")")
-                        .tag(device.id)
+            Picker("전송 방식", selection: $targetMode) {
+                Label("전체 기기", systemImage: "rectangle.stack.badge.person.crop")
+                    .tag(SendTargetMode.allDevices)
+                Label("특정 기기", systemImage: "scope")
+                    .tag(SendTargetMode.specificDevice)
+            }
+            .pickerStyle(.segmented)
+            .frame(maxWidth: 360)
+            .accessibilityLabel("전송 대상 방식")
+
+            if targetMode == .specificDevice, !remoteDevices.isEmpty {
+                Picker("받는 기기", selection: $targetDeviceID) {
+                    ForEach(remoteDevices) { device in
+                        Text("\(device.deviceName)\(device.isOnline ? " · 온라인" : " · 오프라인")")
+                            .tag(device.id)
+                    }
+                }
+                .labelsHidden()
+                .frame(maxWidth: 380)
+                .accessibilityLabel("받는 기기")
+
+                if let device = selectedTargetDevice {
+                    HStack(spacing: PasteSpacing.sm) {
+                        Image(systemName: WorkspacePresentation.deviceSymbol(device.platform))
+                            .foregroundStyle(PasteColors.brandForeground)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: PasteSpacing.xxs) {
+                            Text(device.deviceName)
+                                .font(PasteTypography.bodyStrong)
+                                .foregroundStyle(PasteColors.text)
+                            Label(
+                                device.isOnline ? "온라인" : "오프라인",
+                                systemImage: device.isOnline ? "circle.fill" : "circle"
+                            )
+                            .font(PasteTypography.caption)
+                            .foregroundStyle(device.isOnline ? PasteColors.success : PasteColors.textSecondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(PasteSpacing.md)
+                    .background(PasteColors.surfaceMuted)
+                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
                 }
             }
-            .labelsHidden()
-            .frame(maxWidth: 380)
-            .accessibilityLabel("대상 기기")
 
             Label(
-                targetDeviceID.isEmpty
+                targetMode == .allDevices
                     ? "연결된 모든 다른 기기에 전송합니다. 오프라인 기기는 연결되면 받습니다."
                     : "선택한 한 기기에만 전송합니다.",
-                systemImage: targetDeviceID.isEmpty ? "person.3.fill" : "scope"
+                systemImage: targetMode == .allDevices ? "person.3.fill" : "scope"
             )
             .font(PasteTypography.caption)
             .foregroundStyle(PasteColors.textSecondary)
@@ -886,7 +999,7 @@ struct SendClipboardView: View {
             .buttonStyle(PastePrimaryButtonStyle())
             .disabled(!canSend || isTransferring)
             .keyboardShortcut(.defaultAction)
-            .accessibilityHint(targetDeviceID.isEmpty ? "모든 다른 기기로 전송합니다" : "선택한 기기로 전송합니다")
+            .accessibilityHint(targetMode == .allDevices ? "모든 다른 기기로 전송합니다" : "선택한 기기로 전송합니다")
 
             if isTransferring {
                 Text("창을 닫지 말고 전송이 끝날 때까지 기다려 주세요.")
@@ -948,7 +1061,12 @@ struct SendClipboardView: View {
         model.devices.filter { $0.id != model.currentDeviceID }
     }
 
+    private var selectedTargetDevice: DeviceRecord? {
+        remoteDevices.first { $0.id == targetDeviceID }
+    }
+
     private var canSend: Bool {
+        guard targetMode == .allDevices || selectedTargetDevice != nil else { return false }
         switch mode {
         case .text:
             return !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -975,7 +1093,17 @@ struct SendClipboardView: View {
 
     private func send() {
         guard canSend, !isTransferring else { return }
-        let targetID: String? = targetDeviceID.isEmpty ? nil : targetDeviceID
+        model.dismissError()
+        let targetID: String? = targetMode == .allDevices ? nil : targetDeviceID
+        let completion = TransferCompletion(
+            itemDescription: mode == .text
+                ? "텍스트 \(text.trimmingCharacters(in: .whitespacesAndNewlines).count)자"
+                : "파일 \(selectedFiles.count)개",
+            targetDescription: targetMode == .allDevices
+                ? "전체 기기 · \(remoteDevices.count)대"
+                : "\(selectedTargetDevice?.deviceName ?? "선택한 기기") · \(selectedTargetDevice?.isOnline == true ? "온라인" : "오프라인")",
+            expiresAt: Date().addingTimeInterval(ClipboardRetention.fiveMinutes.duration)
+        )
 
         Task {
             switch mode {
@@ -984,13 +1112,48 @@ struct SendClipboardView: View {
                 await model.sendText(value, targetDeviceID: targetID, retention: .fiveMinutes)
                 if model.errorMessage == nil {
                     text = ""
+                    transferCompletion = completion
                 }
             case .files:
                 let files = selectedFiles
                 await model.sendFiles(files, targetDeviceID: targetID, retention: .fiveMinutes)
                 if model.errorMessage == nil {
                     selectedFiles = []
+                    transferCompletion = completion
                 }
+            }
+        }
+    }
+
+    private func completionCard(_ completion: TransferCompletion) -> some View {
+        PasteCard {
+            HStack(alignment: .top, spacing: PasteSpacing.md) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(PasteColors.success)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: PasteSpacing.xs) {
+                    Text("전송을 완료했어요")
+                        .font(PasteTypography.sectionTitle)
+                        .foregroundStyle(PasteColors.text)
+                    Text("\(completion.targetDescription)에 \(completion.itemDescription)을 보냈습니다.")
+                        .font(PasteTypography.body)
+                        .foregroundStyle(PasteColors.textSecondary)
+                    Label(
+                        "\(WorkspacePresentation.fullDate(completion.expiresAt))에 만료 · 5분 보관",
+                        systemImage: "clock"
+                    )
+                    .font(PasteTypography.caption)
+                    .foregroundStyle(PasteColors.textSecondary)
+                }
+
+                Spacer(minLength: PasteSpacing.sm)
+
+                Button("닫기") {
+                    transferCompletion = nil
+                }
+                .buttonStyle(PasteSecondaryButtonStyle())
             }
         }
     }
@@ -1525,6 +1688,19 @@ private enum SendMode: String, CaseIterable, Identifiable {
         case .files: "doc.on.doc"
         }
     }
+}
+
+private enum SendTargetMode: String, CaseIterable, Identifiable {
+    case allDevices
+    case specificDevice
+
+    var id: String { rawValue }
+}
+
+private struct TransferCompletion {
+    let itemDescription: String
+    let targetDescription: String
+    let expiresAt: Date
 }
 
 private extension String {

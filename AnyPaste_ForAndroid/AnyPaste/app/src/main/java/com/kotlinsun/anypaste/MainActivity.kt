@@ -93,6 +93,8 @@ class MainActivity : AppCompatActivity() {
     private var transferFailed = false
     private var lastTransferTitle = ""
     private var lastTransferMeta = ""
+    private var lastTransferTargetSummary = ""
+    private var lastTransferExpiresAtMillis: Long? = null
     private var previewRequestedItemId: String? = null
     private val imageThumbnails = LinkedHashMap<String, Bitmap>()
     private val requestedImageThumbnailIds = linkedSetOf<String>()
@@ -439,6 +441,17 @@ class MainActivity : AppCompatActivity() {
         root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
         root.onClick(R.id.btn_send_file) { openSend(ClipboardType.FILE, openPicker = true) }
+        root.onClick(R.id.btn_home_clipboard_primary) {
+            viewModel.state.value.clipboardItems.firstOrNull()?.let { item ->
+                if (item.resolvedType() == ClipboardType.TEXT) copyTextItem(item) else downloadItem(item)
+            }
+        }
+        root.onClick(R.id.btn_home_clipboard_detail) {
+            viewModel.state.value.clipboardItems.firstOrNull()?.let { item ->
+                viewModel.selectItem(item.id)
+                showScreen(Screen.CLIPBOARD_DETAIL)
+            }
+        }
     }
 
     private fun bindClipboardListActions(root: View) {
@@ -503,14 +516,12 @@ class MainActivity : AppCompatActivity() {
         }
         root.onClick(R.id.card_select_file) { openDocument(sendType) }
         root.onClick(R.id.btn_select_file) { openDocument(sendType) }
-        root.onClick(R.id.card_send_target_device) {
-            val devices = remoteDevices(viewModel.state.value)
-            val selections = listOf<String?>(null) + devices.map(Device::id)
-            val currentIndex = selections.indexOf(viewModel.state.value.sendTargetDeviceId)
-            val next = selections[if (currentIndex < 0) 0 else (currentIndex + 1) % selections.size]
-            viewModel.selectSendTarget(next)
+        root.onClick(R.id.btn_send_target_all) {
+            viewModel.selectSendTarget(null)
             renderCurrent(viewModel.state.value)
         }
+        root.onClick(R.id.btn_send_target_specific) { showSendTargetPicker() }
+        root.onClick(R.id.card_send_target_device) { showSendTargetPicker() }
         root.onClick(R.id.btn_transfer) { submitTransfer() }
     }
 
@@ -677,6 +688,7 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
         bindClipboardCards(root, state.clipboardItems.take(1), selectable = false)
+        state.clipboardItems.firstOrNull()?.let { renderHomeCurrentItem(root, it) }
     }
 
     private fun renderClipboardList(root: View, state: MainUiState) {
@@ -783,6 +795,9 @@ class MainActivity : AppCompatActivity() {
         val remoteDevices = remoteDevices(state)
         val remote = remoteDevices.firstOrNull { it.id == state.sendTargetDeviceId }
         val sendsToAllDevices = remote == null
+        renderSendType(root, R.id.btn_send_target_all, sendsToAllDevices)
+        renderSendType(root, R.id.btn_send_target_specific, !sendsToAllDevices)
+        root.findViewById<View>(R.id.btn_send_target_specific).isEnabled = remoteDevices.isNotEmpty()
         root.findViewById<View>(R.id.card_send_target_device).isVisible = true
         root.findViewById<View>(R.id.tv_send_device_empty).isVisible = remoteDevices.isEmpty()
         if (sendsToAllDevices) {
@@ -806,6 +821,10 @@ class MainActivity : AppCompatActivity() {
             root.findViewById<ImageView>(R.id.iv_send_target_device)
                 .setImageResource(deviceIcon(device))
         }
+        root.setText(
+            R.id.tv_send_target_change,
+            if (sendsToAllDevices) "특정 기기 선택" else "기기 변경",
+        )
         root.setText(R.id.tv_send_expiry_title, "5분 보관")
         root.setText(
             R.id.tv_send_expiry_description,
@@ -839,6 +858,16 @@ class MainActivity : AppCompatActivity() {
             state.transferTitle.ifBlank { lastTransferTitle.ifBlank { "전송 항목" } },
         )
         root.setText(R.id.tv_transfer_item_meta, state.transferMeta.ifBlank { lastTransferMeta })
+        root.setText(
+            R.id.tv_transfer_target_name,
+            lastTransferTargetSummary.ifBlank { "전송 대상 확인 중" },
+        )
+        root.setText(
+            R.id.tv_transfer_expiry,
+            lastTransferExpiresAtMillis?.let { expiresAt ->
+                "${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(expiresAt))}에 만료 · 5분 보관"
+            } ?: "전송 완료 후 5분 보관",
+        )
         root.findViewById<ImageView>(R.id.iv_transfer_type).setImageResource(
             when (state.transferType) {
                 ClipboardType.TEXT -> R.drawable.ic_text
@@ -1260,6 +1289,11 @@ class MainActivity : AppCompatActivity() {
         val targetDeviceId = viewModel.state.value.sendTargetDeviceId
             .takeIf { selectedId -> remoteDevices(viewModel.state.value).any { it.id == selectedId } }
             .orEmpty()
+        val targetDevice = remoteDevices(viewModel.state.value).firstOrNull { it.id == targetDeviceId }
+        lastTransferTargetSummary = targetDevice?.let { device ->
+            "${device.deviceName} · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
+        } ?: "전체 기기 · ${remoteDevices(viewModel.state.value).size}대"
+        lastTransferExpiresAtMillis = null
         when (sendType) {
             ClipboardType.TEXT -> {
                 val input = currentRoot?.findViewById<TextInputEditText>(R.id.input_send_text)
@@ -1334,9 +1368,13 @@ class MainActivity : AppCompatActivity() {
                     if (viewModel.selectedItem()?.id == event.itemId && currentScreen == Screen.CLIPBOARD_DETAIL) {
                         currentRoot?.findViewById<ImageView>(R.id.iv_detail_preview)
                             ?.setImageBitmap(bitmap)
-                    } else if (currentScreen == Screen.CLIPBOARD_LIST) {
+                    } else if (currentScreen == Screen.CLIPBOARD_LIST || currentScreen == Screen.HOME) {
                         currentRoot?.let { root ->
-                            renderClipboardList(root, viewModel.state.value)
+                            if (currentScreen == Screen.HOME) {
+                                renderHome(root, viewModel.state.value)
+                            } else {
+                                renderClipboardList(root, viewModel.state.value)
+                            }
                         }
                     }
                 }
@@ -1344,6 +1382,7 @@ class MainActivity : AppCompatActivity() {
             MainUiEvent.TransferCompleted -> {
                 transferCompleted = true
                 transferFailed = false
+                lastTransferExpiresAtMillis = System.currentTimeMillis() + CLIPBOARD_TTL_MILLIS
                 showScreen(Screen.TRANSFER_STATUS, force = currentScreen != Screen.TRANSFER_STATUS)
             }
         }
@@ -1582,6 +1621,64 @@ class MainActivity : AppCompatActivity() {
         root.findViewById<View>(cardId).apply {
             isSelected = selected
             ViewCompat.setStateDescription(this, if (isSelected) "선택됨" else null)
+        }
+    }
+
+    private fun showSendTargetPicker() {
+        val devices = remoteDevices(viewModel.state.value)
+        if (devices.isEmpty()) {
+            toast("연결된 다른 기기가 없어요. 전체 기기 전송으로 저장됩니다.")
+            return
+        }
+        val currentId = viewModel.state.value.sendTargetDeviceId
+        val checkedIndex = devices.indexOfFirst { it.id == currentId }
+        val labels = devices.map { device ->
+            val platform = if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android"
+            "${device.deviceName} · $platform · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
+        }.toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("특정 기기 선택")
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                viewModel.selectSendTarget(devices[which].id)
+                dialog.dismiss()
+                renderCurrent(viewModel.state.value)
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    private fun renderHomeCurrentItem(root: View, item: ClipboardItem) {
+        val type = item.resolvedType()
+        root.findViewById<TextView>(R.id.tv_home_clipboard_preview).apply {
+            isVisible = type == ClipboardType.TEXT
+            text = item.content.trim().replace(Regex("\\s+"), " ").take(140)
+        }
+        root.findViewById<TextView>(R.id.btn_home_clipboard_primary).text =
+            if (type == ClipboardType.TEXT) "복사" else "다운로드"
+        val icon = root.findViewById<ImageView>(R.id.iv_clipboard_first_type)
+        val iconPadding = resources.getDimensionPixelSize(R.dimen.space_12)
+        icon.apply {
+            setImageResource(typeIcon(item))
+            setBackgroundResource(
+                when (type) {
+                    ClipboardType.TEXT -> R.drawable.bg_icon_primary
+                    ClipboardType.IMAGE -> R.drawable.bg_icon_teal
+                    ClipboardType.FILE -> R.drawable.bg_icon_purple
+                },
+            )
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+        }
+        if (type == ClipboardType.IMAGE) {
+            val thumbnail = imageThumbnails[item.id]
+            if (thumbnail != null) {
+                val bitmap = thumbnail
+                icon.setImageBitmap(bitmap)
+                icon.scaleType = ImageView.ScaleType.CENTER_CROP
+                icon.setPadding(0, 0, 0, 0)
+            } else if (requestedImageThumbnailIds.add(item.id)) {
+                viewModel.loadImagePreview(item)
+            }
         }
     }
 
@@ -1878,6 +1975,7 @@ class MainActivity : AppCompatActivity() {
         const val STATE_FILE_SIZE = "file_size"
         const val STATE_SEND_TYPE = "send_type"
         const val ONLINE_WINDOW_MILLIS = 2L * 60L * 1000L
+        const val CLIPBOARD_TTL_MILLIS = 5L * 60L * 1_000L
         const val MAX_PREVIEW_DIMENSION = 2_048
         const val MAX_IMAGE_THUMBNAILS = 20
         const val MIN_SIGN_UP_PASSWORD_LENGTH = 8

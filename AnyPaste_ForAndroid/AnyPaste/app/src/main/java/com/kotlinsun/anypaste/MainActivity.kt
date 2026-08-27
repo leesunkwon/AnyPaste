@@ -1,7 +1,6 @@
 package com.kotlinsun.anypaste
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -24,7 +23,6 @@ import android.util.Patterns
 import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -79,7 +77,6 @@ class MainActivity : AppCompatActivity() {
     private val preferences by lazy { AppPreferences(this) }
     private val credentialManager by lazy { CredentialManager.create(this) }
 
-    private lateinit var screenContainer: FrameLayout
     private var currentScreen = Screen.LOGIN
     private var currentRoot: View? = null
     private var authTransitionHandled = false
@@ -144,8 +141,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         val root = findViewById<View>(R.id.main)
-        screenContainer = findViewById(R.id.screen_container)
-
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val safeInsets = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime(),
@@ -258,48 +253,50 @@ class MainActivity : AppCompatActivity() {
 
     private fun showScreen(screen: Screen, force: Boolean = false) {
         if (!force && screen == currentScreen && currentRoot != null) return
-        val previousView = currentRoot
+        val previousScreen = currentScreen
         currentScreen = screen
         previewRequestedItemId = null
-        val view = layoutInflater.inflate(screen.layoutRes, screenContainer, false)
-        currentRoot = view
-        val shouldAnimate = previousView != null && !force && ValueAnimator.areAnimatorsEnabled()
-
-        if (shouldAnimate) {
-            for (index in screenContainer.childCount - 1 downTo 0) {
-                val child = screenContainer.getChildAt(index)
-                if (child !== previousView) screenContainer.removeViewAt(index)
-            }
-
-            val distance = SCREEN_TRANSITION_DISTANCE_DP * resources.displayMetrics.density
-            view.alpha = 0f
-            view.translationY = distance
-            screenContainer.addView(view)
-
-            previousView.animate().cancel()
-            previousView.animate()
-                .alpha(0f)
-                .translationY(-distance / 3)
-                .setDuration(SCREEN_EXIT_DURATION_MILLIS)
-                .withEndAction {
-                    if (previousView.parent === screenContainer) {
-                        screenContainer.removeView(previousView)
-                    }
-                }
-                .start()
-            view.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setStartDelay(SCREEN_ENTER_DELAY_MILLIS)
-                .setDuration(SCREEN_ENTER_DURATION_MILLIS)
-                .start()
-        } else {
-            screenContainer.removeAllViews()
-            screenContainer.addView(view)
+        val fragment = ScreenFragment.newInstance(screen.layoutRes)
+        val transaction = supportFragmentManager.beginTransaction()
+            .setReorderingAllowed(true)
+        if (currentRoot != null && !force) {
+            val backward = isBackwardNavigation(previousScreen, screen)
+            transaction.setCustomAnimations(
+                if (backward) {
+                    R.anim.screen_slide_in_left
+                } else {
+                    R.anim.screen_slide_in_right
+                },
+                if (backward) {
+                    R.anim.screen_slide_out_right
+                } else {
+                    R.anim.screen_slide_out_left
+                },
+            )
         }
+        transaction
+            .replace(R.id.screen_container, fragment, SCREEN_FRAGMENT_TAG)
+            .commitNow()
+
+        val view = fragment.view ?: return
+        currentRoot = view
         bindCommonNavigation(view)
         bindScreenActions(view, screen)
         renderCurrent(viewModel.state.value)
+    }
+
+    private fun isBackwardNavigation(from: Screen, to: Screen): Boolean {
+        val fromPosition = bottomNavigationPosition(from)
+        val toPosition = bottomNavigationPosition(to)
+        return fromPosition != null && toPosition != null && toPosition < fromPosition
+    }
+
+    private fun bottomNavigationPosition(screen: Screen): Int? = when (screen) {
+        Screen.HOME -> 0
+        Screen.SEND -> 1
+        Screen.DEVICES -> 2
+        Screen.SETTINGS -> 3
+        else -> null
     }
 
     private fun bindCommonNavigation(root: View) = with(root) {
@@ -1897,10 +1894,7 @@ class MainActivity : AppCompatActivity() {
         const val MAX_IMAGE_THUMBNAILS = 20
         const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
         const val MAX_DISPLAY_NAME_LENGTH = 50
-        const val SCREEN_TRANSITION_DISTANCE_DP = 12f
-        const val SCREEN_EXIT_DURATION_MILLIS = 160L
-        const val SCREEN_ENTER_DELAY_MILLIS = 30L
-        const val SCREEN_ENTER_DURATION_MILLIS = 220L
+        const val SCREEN_FRAGMENT_TAG = "screen_fragment"
 
         val AUTH_SCREENS = setOf(
             Screen.LOGIN,
@@ -1937,4 +1931,5 @@ class MainActivity : AppCompatActivity() {
         )
 
     }
+
 }

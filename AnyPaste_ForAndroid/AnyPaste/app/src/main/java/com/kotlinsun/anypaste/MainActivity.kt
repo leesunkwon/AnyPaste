@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.util.Patterns
@@ -513,6 +514,11 @@ class MainActivity : AppCompatActivity() {
             .setOnCheckedChangeListener { _, checked ->
                 setIncomingNotifications(checked)
             }
+        root.onClick(R.id.tv_background_sync_guidance) {
+            if (ClipboardSyncService.shouldSuggestBatteryOptimization(this)) {
+                openAppBatterySettings()
+            }
+        }
         root.onClick(R.id.btn_permissions) { showScreen(Screen.PERMISSIONS) }
         root.onClick(R.id.btn_account) { toast("계정 정보는 아래 로그아웃 버튼에서 관리할 수 있습니다.") }
         root.onClick(R.id.btn_logout) {
@@ -1015,8 +1021,17 @@ class MainActivity : AppCompatActivity() {
         ) { checked -> setIncomingNotifications(checked) }
         val guidance = ClipboardSyncService.backgroundSyncGuidance(this)
             ?: preferences.backgroundSyncNotice.takeIf(String::isNotBlank)
-        root.findViewById<View>(R.id.tv_background_sync_guidance).isVisible = guidance != null
-        root.setText(R.id.tv_background_sync_guidance, guidance.orEmpty())
+        val guidanceView = root.findViewById<TextView>(R.id.tv_background_sync_guidance)
+        val canOpenBatterySettings = ClipboardSyncService.shouldSuggestBatteryOptimization(this)
+        guidanceView.isVisible = guidance != null
+        guidanceView.isClickable = canOpenBatterySettings
+        guidanceView.isFocusable = canOpenBatterySettings
+        guidanceView.contentDescription = if (canOpenBatterySettings) {
+            "앱 배터리 설정 열기"
+        } else {
+            null
+        }
+        guidanceView.text = guidance.orEmpty()
     }
 
     private fun renderPermissions(root: View) {
@@ -1420,6 +1435,14 @@ class MainActivity : AppCompatActivity() {
         }
         runCatching { startActivity(Intent.createChooser(intent, "파일 열기")) }
             .onFailure { toast("이 파일을 열 수 있는 앱이 없습니다.") }
+    }
+
+    private fun openAppBatterySettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        runCatching { startActivity(intent) }
+            .onFailure { toast("앱 배터리 설정을 열 수 없습니다.") }
     }
 
     private fun copyTextItem(item: ClipboardItem) {

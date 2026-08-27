@@ -1297,14 +1297,17 @@ class ClipboardSyncService : Service() {
             if (notificationBlocked) {
                 return "알림 권한이 꺼져 있어 동기화 상태 알림을 볼 수 없습니다."
             }
-            val powerManager = appContext.getSystemService(PowerManager::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                powerManager != null &&
-                !powerManager.isIgnoringBatteryOptimizations(appContext.packageName)
-            ) {
-                return "절전 모드에서는 동기화가 늦어질 수 있습니다. 앱 배터리를 ‘제한 없음’으로 설정해 주세요."
+            if (shouldSuggestBatteryOptimization(appContext)) {
+                return "절전 모드에서는 동기화가 늦어질 수 있습니다. 탭하여 앱 배터리 사용량을 ‘제한 없음’으로 설정해 주세요."
             }
             return null
+        }
+
+        fun shouldSuggestBatteryOptimization(context: Context): Boolean {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
+            val appContext = context.applicationContext
+            val powerManager = appContext.getSystemService(PowerManager::class.java) ?: return false
+            return !powerManager.isIgnoringBatteryOptimizations(appContext.packageName)
         }
 
         private fun setState(state: ClipboardSyncState) {

@@ -121,7 +121,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:text="복사한 텍스트와 이미지를 자동으로 동기화"
+                            android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화"
                             android:textSize="12sp" />
                     </LinearLayout>
 
@@ -130,8 +130,20 @@
                         android:id="@+id/switch_auto_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true" />
+                    android:checked="true" />
                 </LinearLayout>
+
+                <TextView
+                    style="@style/TextAppearance.AnyPaste.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:background="@drawable/bg_card_informative"
+                    android:lineSpacingExtra="2dp"
+                    android:padding="@dimen/space_12"
+                    android:text="안내: Android 보안 정책에 따라 자동 동기화는 AnyPaste 화면이 열려 있을 때만 작동합니다. 앱을 다시 열면 마지막으로 복사한 항목을 확인해 동기화합니다."
+                    android:textColor="@color/informative_foreground"
+                    android:textSize="12sp" />
 
                 <View
                     android:layout_width="match_parent"

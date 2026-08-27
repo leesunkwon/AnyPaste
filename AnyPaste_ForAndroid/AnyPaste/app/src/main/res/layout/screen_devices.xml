@@ -150,5 +150,4 @@
         </LinearLayout>
     </ScrollView>
 
-    <include layout="@layout/view_bottom_navigation" />
 </LinearLayout>

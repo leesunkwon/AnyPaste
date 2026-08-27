@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
 
     private var currentScreen = Screen.LOGIN
     private var currentRoot: View? = null
+    private lateinit var bottomNavigation: View
     private var authTransitionHandled = false
     private var lastUserId: String? = null
 
@@ -141,6 +142,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         val root = findViewById<View>(R.id.main)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+        bindBottomNavigation()
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val safeInsets = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime(),
@@ -280,6 +283,7 @@ class MainActivity : AppCompatActivity() {
 
         val view = fragment.view ?: return
         currentRoot = view
+        updateBottomNavigation()
         bindCommonNavigation(view)
         bindScreenActions(view, screen)
         renderCurrent(viewModel.state.value)
@@ -299,16 +303,23 @@ class MainActivity : AppCompatActivity() {
         else -> null
     }
 
-    private fun bindCommonNavigation(root: View) = with(root) {
+    private fun bindBottomNavigation() = with(bottomNavigation) {
         onClick(R.id.nav_home) { showScreen(Screen.HOME) }
         onClick(R.id.nav_devices) { showScreen(Screen.DEVICES) }
         onClick(R.id.nav_settings) { showScreen(Screen.SETTINGS) }
         onClick(R.id.btn_send) { openSend(ClipboardType.TEXT) }
-        onClick(R.id.btn_back) { navigateBack() }
-        updateBottomNavigationSelection(this)
     }
 
-    private fun updateBottomNavigationSelection(root: View) {
+    private fun bindCommonNavigation(root: View) = with(root) {
+        onClick(R.id.btn_back) { navigateBack() }
+    }
+
+    private fun updateBottomNavigation() {
+        bottomNavigation.isVisible = bottomNavigationPosition(currentScreen) != null
+        updateBottomNavigationSelection()
+    }
+
+    private fun updateBottomNavigationSelection() {
         val selectedId = when (currentScreen) {
             Screen.HOME -> R.id.nav_home
             Screen.SEND -> R.id.btn_send
@@ -317,7 +328,7 @@ class MainActivity : AppCompatActivity() {
             else -> View.NO_ID
         }
         listOf(R.id.nav_home, R.id.btn_send, R.id.nav_devices, R.id.nav_settings).forEach { itemId ->
-            root.findViewById<View>(itemId)?.let { item ->
+            bottomNavigation.findViewById<View>(itemId)?.let { item ->
                 item.isSelected = itemId == selectedId
                 ViewCompat.setStateDescription(item, if (item.isSelected) "선택됨" else null)
             }

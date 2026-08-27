@@ -436,5 +436,4 @@
         android:indeterminateTint="@color/primary_contrast"
         android:visibility="gone" />
 
-    <include layout="@layout/view_bottom_navigation" />
 </LinearLayout>

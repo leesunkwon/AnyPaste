@@ -62,7 +62,6 @@ import com.kotlinsun.anypaste.model.ClipboardType
 import com.kotlinsun.anypaste.model.Device
 import com.kotlinsun.anypaste.model.DevicePlatform
 import com.kotlinsun.anypaste.service.AnyPasteNotificationManager
-import com.kotlinsun.anypaste.service.ClipboardSyncPhase
 import com.kotlinsun.anypaste.service.ClipboardSyncService
 import java.io.File
 import java.text.DateFormat
@@ -654,11 +653,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderHome(root: View, state: MainUiState) {
-        val name = displayName(state)
-        root.setText(R.id.tv_home_avatar, name.firstOrNull()?.uppercase() ?: "A")
-        root.setText(R.id.tv_home_account_name, name)
-        root.setText(R.id.tv_home_greeting, "안녕하세요, ${name}님")
-
         val remote = remoteDevices(state)
         val onlineCount = remote.count(::isDeviceOnline)
         root.setText(
@@ -670,7 +664,6 @@ class MainActivity : AppCompatActivity() {
             if (remote.isEmpty()) "기기 연결 화면에서 연결 방법을 확인하세요"
             else "현재 ${onlineCount}대 온라인 · ${lastItemTime(state.clipboardItems)}",
         )
-        root.setText(R.id.tv_home_sync_status, syncStatusText())
         val hasOnlineDevice = onlineCount > 0
         root.findViewById<View>(R.id.card_home_device_status).setBackgroundResource(
             if (hasOnlineDevice) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
@@ -1748,14 +1741,6 @@ class MainActivity : AppCompatActivity() {
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS,
         ).toString()
-    }
-
-    private fun syncStatusText(): String = when (ClipboardSyncService.state.value.phase) {
-        ClipboardSyncPhase.STOPPED -> preferences.backgroundSyncNotice
-            .takeIf(String::isNotBlank) ?: "자동 동기화 꺼짐"
-        ClipboardSyncPhase.WAITING_FOR_AUTH -> "로그인 대기 중"
-        ClipboardSyncPhase.SYNCING -> ClipboardSyncService.state.value.message ?: "동기화 중"
-        ClipboardSyncPhase.ERROR -> ClipboardSyncService.state.value.message ?: "동기화 확인 필요"
     }
 
     private fun dateTimeFormat(): DateFormat = DateFormat.getDateTimeInstance(

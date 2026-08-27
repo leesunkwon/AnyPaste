@@ -203,6 +203,11 @@ struct HomeDashboardView: View {
                     )
                 }
 
+                connectedDeviceChips
+                recentItems
+
+                quickActions
+
                 LazyVGrid(columns: metricColumns, spacing: PasteSpacing.lg) {
                     PasteMetricCard(
                         symbol: "doc.on.clipboard",
@@ -223,9 +228,6 @@ struct HomeDashboardView: View {
                         tone: model.unreadCount > 0 ? .warning : .neutral
                     )
                 }
-
-                quickActions
-                recentItems
             }
             .pastePagePadding()
         }
@@ -247,6 +249,57 @@ struct HomeDashboardView: View {
                 }
                 .buttonStyle(PastePrimaryButtonStyle())
 
+            }
+        }
+    }
+
+    private var connectedDeviceChips: some View {
+        VStack(alignment: .leading, spacing: PasteSpacing.md) {
+            PasteSectionHeader(
+                title: "연결된 기기",
+                subtitle: "온라인 상태와 현재 항목의 수신·읽음 상태를 확인하세요."
+            )
+
+            if remoteDevices.isEmpty {
+                Label("연결된 다른 기기가 없습니다.", systemImage: "laptopcomputer.and.iphone")
+                    .font(PasteTypography.caption)
+                    .foregroundStyle(PasteColors.textSecondary)
+                    .padding(PasteSpacing.md)
+                    .background(PasteColors.surfaceMuted)
+                    .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: PasteSpacing.sm) {
+                        ForEach(remoteDevices) { device in
+                            let status = deviceChipStatus(for: device)
+                            HStack(spacing: PasteSpacing.sm) {
+                                Image(systemName: WorkspacePresentation.deviceSymbol(device.platform))
+                                    .foregroundStyle(PasteColors.brandForeground)
+                                    .accessibilityHidden(true)
+                                VStack(alignment: .leading, spacing: PasteSpacing.xxs) {
+                                    Text(device.deviceName)
+                                        .font(PasteTypography.captionStrong)
+                                        .foregroundStyle(PasteColors.text)
+                                        .lineLimit(1)
+                                    Label(status.label, systemImage: status.symbol)
+                                        .font(PasteTypography.caption)
+                                        .foregroundStyle(status.tone.foreground)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .padding(.horizontal, PasteSpacing.md)
+                            .padding(.vertical, PasteSpacing.sm)
+                            .background(status.tone.background)
+                            .clipShape(Capsule())
+                            .overlay {
+                                Capsule()
+                                    .stroke(PasteColors.border, lineWidth: 1)
+                            }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("\(device.deviceName), \(status.label)")
+                        }
+                    }
+                }
             }
         }
     }
@@ -277,7 +330,8 @@ struct HomeDashboardView: View {
                                 ClipboardRecordRow(
                                     record: item,
                                     currentDeviceID: model.currentDeviceID,
-                                    previewImage: currentItemPreview
+                                    previewImage: currentItemPreview,
+                                    prominent: true
                                 )
                                 .padding(.horizontal, PasteSpacing.lg)
                                 .padding(.vertical, PasteSpacing.md)
@@ -328,6 +382,32 @@ struct HomeDashboardView: View {
             }
         }
     }
+
+    private var remoteDevices: [DeviceRecord] {
+        model.devices.filter { $0.id != model.currentDeviceID }
+    }
+
+    private func deviceChipStatus(for device: DeviceRecord) -> DeviceChipStatus {
+        guard device.isOnline else {
+            return DeviceChipStatus(label: "오프라인", symbol: "circle", tone: .neutral)
+        }
+        guard let item = model.clipboardItems.first else {
+            return DeviceChipStatus(label: "온라인", symbol: "circle.fill", tone: .success)
+        }
+        if item.isRead(by: device.id) {
+            return DeviceChipStatus(label: "온라인 · 읽음", symbol: "checkmark.circle.fill", tone: .success)
+        }
+        if item.isReceived(by: device.id) {
+            return DeviceChipStatus(label: "온라인 · 수신됨", symbol: "tray.and.arrow.down.fill", tone: .success)
+        }
+        return DeviceChipStatus(label: "온라인 · 전송됨", symbol: "paperplane.fill", tone: .informative)
+    }
+}
+
+private struct DeviceChipStatus {
+    let label: String
+    let symbol: String
+    let tone: PasteStatusTone
 }
 
 struct CurrentClipboardView: View {
@@ -394,6 +474,7 @@ struct ClipboardRecordRow: View {
     let record: ClipboardRecord
     let currentDeviceID: String
     var previewImage: NSImage?
+    var prominent = false
 
     var body: some View {
         HStack(spacing: PasteSpacing.md) {
@@ -406,19 +487,25 @@ struct ClipboardRecordRow: View {
                     Image(systemName: WorkspacePresentation.recordSymbol(record.kind))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(WorkspacePresentation.recordTone(record.kind).foreground)
-                        .frame(width: 36, height: 36)
+                        .frame(width: previewSize, height: previewSize)
                         .background(WorkspacePresentation.recordTone(record.kind).background)
                 }
             }
-            .frame(width: 36, height: 36)
+            .frame(width: previewSize, height: previewSize)
             .clipShape(RoundedRectangle(cornerRadius: PasteRadius.medium, style: .continuous))
             .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: PasteSpacing.xxs) {
                 Text(record.summary)
-                    .font(PasteTypography.bodyStrong)
+                    .font(prominent ? PasteTypography.sectionTitle : PasteTypography.bodyStrong)
                     .foregroundStyle(PasteColors.text)
-                    .lineLimit(2)
+                    .lineLimit(prominent ? 2 : 1)
+                if prominent {
+                    Text(recordPreview)
+                        .font(PasteTypography.caption)
+                        .foregroundStyle(PasteColors.textSecondary)
+                        .lineLimit(2)
+                }
                 HStack(spacing: PasteSpacing.sm) {
                     Text(WorkspacePresentation.relativeDate(record.createdAt))
                     if !record.isRead(by: currentDeviceID) {
@@ -441,6 +528,23 @@ struct ClipboardRecordRow: View {
         .accessibilityLabel(
             "\(WorkspacePresentation.recordKindLabel(record.kind)), \(record.summary), \(WorkspacePresentation.relativeDate(record.createdAt))"
         )
+    }
+
+    private var previewSize: CGFloat {
+        prominent ? 76 : 36
+    }
+
+    private var recordPreview: String {
+        switch record.kind {
+        case .text:
+            return record.content
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "\n", with: " ")
+        case .image:
+            return "이미지 · \(WorkspacePresentation.fileSize(record.fileSize))"
+        case .file:
+            return "파일 · \(record.mimeType.nonEmpty ?? "알 수 없는 형식") · \(WorkspacePresentation.fileSize(record.fileSize))"
+        }
     }
 }
 
@@ -699,13 +803,19 @@ struct SendClipboardView: View {
                     transferBadge
                 }
 
-                Picker("보낼 내용", selection: $mode) {
-                    ForEach(SendMode.allCases) { option in
-                        Label(option.title, systemImage: option.symbol).tag(option)
+                VStack(alignment: .leading, spacing: PasteSpacing.md) {
+                    PasteSectionHeader(
+                        title: "1 · 보낼 내용",
+                        subtitle: "텍스트 또는 파일을 선택한 뒤 내용을 입력하세요."
+                    )
+                    Picker("보낼 내용", selection: $mode) {
+                        ForEach(SendMode.allCases) { option in
+                            Label(option.title, systemImage: option.symbol).tag(option)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .frame(maxWidth: 360)
                 }
-                .pickerStyle(.segmented)
-                .frame(maxWidth: 360)
 
                 PasteCard {
                     VStack(alignment: .leading, spacing: PasteSpacing.xl) {
@@ -778,7 +888,7 @@ struct SendClipboardView: View {
     private var textComposer: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
-                title: "텍스트",
+                title: "내용 입력",
                 subtitle: "받는 기기의 클립보드에 복사할 내용을 입력하세요."
             )
             TextEditor(text: $text)
@@ -812,7 +922,7 @@ struct SendClipboardView: View {
     private var fileComposer: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
-                title: "파일",
+                title: "파일 선택",
                 subtitle: "파일을 선택하거나 아래 영역에 끌어다 놓으세요."
             )
 
@@ -891,7 +1001,7 @@ struct SendClipboardView: View {
     private var targetPicker: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
-                title: "대상 기기",
+                title: "2 · 대상 기기",
                 subtitle: "전체 기기 전송과 특정 기기 전송 중 하나를 선택하세요."
             )
 
@@ -962,7 +1072,7 @@ struct SendClipboardView: View {
     private var retentionPolicy: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
-                title: "보관 정책",
+                title: "3 · 5분 보관 안내",
                 subtitle: "항목은 5분 동안만 보관되며, 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
             )
         }

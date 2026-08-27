@@ -34,7 +34,7 @@
                 style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="보낼 항목" />
+                android:text="1 · 보낼 내용" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -143,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="내용" />
+                android:text="내용 입력" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.AnyPaste.TextInputLayout"
@@ -276,67 +276,12 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/card_send_expiry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card_stroke"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="@dimen/space_16">
-
-                <ImageView
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:background="@drawable/bg_icon_teal"
-                    android:contentDescription="보관 정책"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_settings" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_12"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_send_expiry_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5분 보관"
-                        android:textColor="@color/ink"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_send_expiry_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_4"
-                        android:text="새 항목이 들어오면 기존 항목은 즉시 삭제됩니다"
-                        android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_send_storage_policy"
-                style="@style/TextAppearance.AnyPaste.Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card_stroke"
-                android:padding="@dimen/space_12"
-                android:text="파일 저장 공간 0 B / 1 GB 사용 중"
-                android:textSize="12sp" />
-
             <TextView
                 style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
-                android:text="받는 기기" />
+                android:text="2 · 받는 기기" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -487,6 +432,68 @@
                 android:text="전송할 수 있는 다른 기기가 없어요."
                 android:textSize="13sp"
                 android:visibility="gone" />
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Overline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_28"
+                android:text="3 · 5분 보관 안내" />
+
+            <LinearLayout
+                android:id="@+id/card_send_expiry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_card_stroke"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/space_16">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_icon_teal"
+                    android:contentDescription="보관 정책"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_settings" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_12"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_send_expiry_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5분 보관"
+                        android:textColor="@color/ink"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_send_expiry_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:text="새 항목이 들어오면 기존 항목은 즉시 삭제됩니다"
+                        android:textColor="@color/ink_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_send_storage_policy"
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_card_stroke"
+                android:padding="@dimen/space_12"
+                android:text="파일 저장 공간 0 B / 1 GB 사용 중"
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 

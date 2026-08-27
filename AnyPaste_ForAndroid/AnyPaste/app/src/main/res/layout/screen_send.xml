@@ -282,8 +282,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card_stroke"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
@@ -292,7 +290,7 @@
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:background="@drawable/bg_icon_teal"
-                    android:contentDescription="보관 기간"
+                    android:contentDescription="보관 정책"
                     android:padding="9dp"
                     android:src="@drawable/ic_settings" />
 
@@ -307,7 +305,7 @@
                         android:id="@+id/tv_send_expiry_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="24시간 보관"
+                        android:text="5분 보관"
                         android:textColor="@color/ink"
                         android:textStyle="bold" />
 
@@ -316,7 +314,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
-                        android:text="기간이 지나면 자동으로 삭제됩니다"
+                        android:text="새 항목이 들어오면 기존 항목은 즉시 삭제됩니다"
                         android:textColor="@color/ink_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>

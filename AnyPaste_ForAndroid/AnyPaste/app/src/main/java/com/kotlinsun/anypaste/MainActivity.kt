@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity() {
     private val selectedClipboardIds = linkedSetOf<String>()
 
     private var sendType = ClipboardType.TEXT
-    private var sendExpiry = SendExpiry.ONE_DAY
     private var selectedFile: SelectedFile? = null
     private var pendingPickerType = ClipboardType.FILE
     private var transferCompleted = false
@@ -513,10 +512,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.selectSendTarget(next)
             renderCurrent(viewModel.state.value)
         }
-        root.onClick(R.id.card_send_expiry) {
-            sendExpiry = SendExpiry.entries[(sendExpiry.ordinal + 1) % SendExpiry.entries.size]
-            renderCurrent(viewModel.state.value)
-        }
         root.onClick(R.id.btn_transfer) { submitTransfer() }
     }
 
@@ -818,8 +813,11 @@ class MainActivity : AppCompatActivity() {
             root.findViewById<ImageView>(R.id.iv_send_target_device)
                 .setImageResource(deviceIcon(device))
         }
-        root.setText(R.id.tv_send_expiry_title, "${sendExpiry.title} 보관")
-        root.setText(R.id.tv_send_expiry_description, "기간이 지나면 모든 기기에서 자동으로 삭제됩니다")
+        root.setText(R.id.tv_send_expiry_title, "5분 보관")
+        root.setText(
+            R.id.tv_send_expiry_description,
+            "새 항목이 들어오면 기존 항목은 즉시 삭제됩니다",
+        )
         root.setText(
             R.id.tv_send_storage_policy,
             "파일 저장 공간 ${formatSize(state.storageUsageBytes)} / " +
@@ -1279,7 +1277,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 lastTransferTitle = input.lineSequence().firstOrNull().orEmpty().take(60)
                 lastTransferMeta = "텍스트 · ${input.toByteArray().size} B"
-                viewModel.sendText(input, targetDeviceId, sendExpiry.durationMillis)
+                viewModel.sendText(input, targetDeviceId)
             }
             ClipboardType.IMAGE, ClipboardType.FILE -> {
                 val file = selectedFile
@@ -1295,7 +1293,6 @@ class MainActivity : AppCompatActivity() {
                     file.mimeType,
                     file.size,
                     targetDeviceId,
-                    sendExpiry.durationMillis,
                 )
             }
         }
@@ -1732,6 +1729,7 @@ class MainActivity : AppCompatActivity() {
     private fun expiryLabel(item: ClipboardItem): String {
         val millis = item.expiresAt?.toDate()?.time?.minus(System.currentTimeMillis()) ?: return "만료 예정"
         return when {
+            millis <= 5L * 60L * 1_000L -> "5분"
             millis <= 60L * 60L * 1_000L -> "1시간 이내"
             millis <= 25L * 60L * 60L * 1_000L -> "24시간"
             millis <= 8L * 24L * 60L * 60L * 1_000L -> "7일"
@@ -1868,12 +1866,6 @@ class MainActivity : AppCompatActivity() {
     )
 
     private enum class ClipboardFilter { ALL, TEXT, IMAGE, FILE }
-
-    private enum class SendExpiry(val title: String, val durationMillis: Long) {
-        ONE_HOUR("1시간", 60L * 60L * 1_000L),
-        ONE_DAY("24시간", 24L * 60L * 60L * 1_000L),
-        SEVEN_DAYS("7일", 7L * 24L * 60L * 60L * 1_000L),
-    }
 
     private enum class Screen(@param:LayoutRes val layoutRes: Int) {
         ONBOARDING(R.layout.screen_onboarding),

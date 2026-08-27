@@ -35,25 +35,19 @@ enum ClipboardKind: String, Codable, CaseIterable, Identifiable, Sendable {
 }
 
 enum ClipboardRetention: String, CaseIterable, Identifiable, Sendable {
-    case oneHour
-    case oneDay
-    case sevenDays
+    case fiveMinutes
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .oneHour: "1시간"
-        case .oneDay: "24시간"
-        case .sevenDays: "7일"
+        case .fiveMinutes: "5분"
         }
     }
 
     var duration: TimeInterval {
         switch self {
-        case .oneHour: 60 * 60
-        case .oneDay: 24 * 60 * 60
-        case .sevenDays: 7 * 24 * 60 * 60
+        case .fiveMinutes: 5 * 60
         }
     }
 }

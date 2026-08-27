@@ -162,7 +162,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun sendText(
         content: String,
         targetDeviceId: String = "",
-        expiryDurationMillis: Long = DEFAULT_TRANSFER_TTL_MILLIS,
     ) {
         val normalizedContent = content.trim()
         if (normalizedContent.isEmpty()) {
@@ -174,7 +173,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 id = UUID.randomUUID().toString(),
                 content = normalizedContent,
                 targetDeviceId = targetDeviceId,
-                expiryDurationMillis = expiryDurationMillis,
             ),
         )
     }
@@ -231,7 +229,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         mimeType: String,
         fileSize: Long,
         targetDeviceId: String = "",
-        expiryDurationMillis: Long = DEFAULT_TRANSFER_TTL_MILLIS,
     ) {
         if (fileSize == 0L) {
             postMessage("빈 파일은 전송할 수 없습니다.")
@@ -251,7 +248,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 fileSize = fileSize,
                 targetDeviceId = targetDeviceId,
                 type = type,
-                expiryDurationMillis = expiryDurationMillis,
             ),
         )
     }
@@ -790,7 +786,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         const val MAX_FILE_BYTES = 50L * 1024L * 1024L
         const val MAX_STORAGE_BYTES = 1L * 1024L * 1024L * 1024L
         const val MAX_DEVICE_NAME_LENGTH = 100
-        const val DEFAULT_TRANSFER_TTL_MILLIS = 24L * 60L * 60L * 1_000L
+        const val CLIPBOARD_TTL_MILLIS = 5L * 60L * 1_000L
         const val MAX_PREVIEW_BYTES = 8L * 1024L * 1024L
         const val HEARTBEAT_INTERVAL_MILLIS = 60_000L
         const val MAX_PENDING_EVENTS = 20
@@ -813,13 +809,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             override val id: String,
             val content: String,
             val targetDeviceId: String,
-            val expiryDurationMillis: Long,
         ) : PendingTransfer {
             override val title: String = content.lineSequence().firstOrNull().orEmpty().take(60)
             override val meta: String = "텍스트 · ${content.toByteArray().size} B"
 
             fun expiresAt(): Timestamp = Timestamp(
-                Date(System.currentTimeMillis() + expiryDurationMillis),
+                Date(System.currentTimeMillis() + CLIPBOARD_TTL_MILLIS),
             )
         }
 
@@ -831,14 +826,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val fileSize: Long,
             val targetDeviceId: String,
             val type: ClipboardType,
-            val expiryDurationMillis: Long,
         ) : PendingTransfer {
             override val title: String = fileName
             override val meta: String =
                 "${if (type == ClipboardType.IMAGE) "이미지" else "파일"} · ${formatTransferSize(fileSize)}"
 
             fun expiresAt(): Timestamp = Timestamp(
-                Date(System.currentTimeMillis() + expiryDurationMillis),
+                Date(System.currentTimeMillis() + CLIPBOARD_TTL_MILLIS),
             )
         }
     }

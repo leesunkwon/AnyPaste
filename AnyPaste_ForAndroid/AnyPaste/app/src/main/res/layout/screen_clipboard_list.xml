@@ -209,7 +209,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="최근 항목은 기본 24시간 후 자동으로 삭제됩니다."
+                    android:text="최근 항목은 5분 뒤 삭제되며, 새 항목이 들어오면 즉시 사라집니다."
                     android:textColor="@color/warning_foreground"
                     android:textSize="12sp" />
 

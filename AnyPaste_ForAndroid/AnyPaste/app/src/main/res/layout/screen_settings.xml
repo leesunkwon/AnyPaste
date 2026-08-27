@@ -146,6 +146,18 @@
                     android:textColor="@color/informative_foreground"
                     android:textSize="12sp" />
 
+                <TextView
+                    style="@style/TextAppearance.AnyPaste.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:background="@drawable/bg_card_informative"
+                    android:lineSpacingExtra="2dp"
+                    android:padding="@dimen/space_12"
+                    android:text="보관 안내: 모든 항목은 5분 동안만 보관됩니다. 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
+                    android:textColor="@color/informative_foreground"
+                    android:textSize="12sp" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -303,7 +315,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:text="클립보드 동기화, 자동 만료 설정"
+                            android:text="클립보드 동기화와 5분 보관 정책"
                             android:textSize="12sp" />
                     </LinearLayout>
 

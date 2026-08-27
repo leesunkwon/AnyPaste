@@ -188,7 +188,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="이 항목은 내일 오전 10:24에 자동 만료됩니다."
+                    android:text="이 항목은 5분 후 자동 만료됩니다."
                     android:textColor="@color/warning_foreground"
                     android:textSize="12sp" />
 
@@ -196,7 +196,7 @@
                     android:id="@+id/tv_detail_expiry_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="24시간"
+                    android:text="5분"
                     android:textColor="@color/warning_foreground"
                     android:textStyle="bold" />
             </LinearLayout>

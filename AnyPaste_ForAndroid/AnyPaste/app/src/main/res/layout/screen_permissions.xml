@@ -208,7 +208,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
-                        android:text="수신한 항목은 기본 24시간 후 자동으로 삭제돼요."
+                        android:text="수신한 항목은 5분 후 삭제되며, 새 항목이 오면 즉시 대체돼요."
                         android:textSize="12sp" />
                 </LinearLayout>
 

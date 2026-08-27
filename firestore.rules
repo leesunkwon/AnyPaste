@@ -117,14 +117,14 @@ service cloud.firestore {
         && request.resource.data.expiresAt is timestamp
         && request.resource.data.expiresAt > request.resource.data.createdAt
         && request.resource.data.expiresAt
-          <= request.resource.data.createdAt + duration.value(30, 'd');
+          <= request.resource.data.createdAt + duration.value(5, 'm');
     }
 
     function hasValidClipboardCreateFields(itemId) {
       return hasValidClipboardStoredFields(itemId)
         && request.resource.data.createdAt == request.time
         && request.resource.data.expiresAt > request.time
-        && request.resource.data.expiresAt <= request.time + duration.value(30, 'd')
+        && request.resource.data.expiresAt <= request.time + duration.value(5, 'm')
         && request.resource.data.receivedBy is list
         && request.resource.data.receivedBy.size() == 0
         && request.resource.data.readBy is list

@@ -4,7 +4,7 @@ actor FirebaseRESTClient {
     private let configuration: AppConfiguration
     private let session: URLSession
 
-    private static let defaultClipboardTTL: TimeInterval = 24 * 60 * 60
+    private static let defaultClipboardTTL: TimeInterval = 5 * 60
     private static let maximumTextLength = 100_000
     private static let maximumTransferBytes: Int64 = 50 * 1024 * 1024
     private static let maximumAllowedDownloadBytes: Int64 = 100 * 1024 * 1024
@@ -425,8 +425,8 @@ actor FirebaseRESTClient {
         let now = Date()
         let expiry = record.expiresAt ?? now.addingTimeInterval(Self.defaultClipboardTTL)
         guard expiry > now,
-              expiry <= now.addingTimeInterval(30 * 24 * 60 * 60) else {
-            throw FirebaseRESTClientError.invalidInput("클립보드 만료 시간은 30일 이내여야 합니다.")
+              expiry <= now.addingTimeInterval(Self.defaultClipboardTTL) else {
+            throw FirebaseRESTClientError.invalidInput("클립보드 만료 시간은 5분 이내여야 합니다.")
         }
 
         switch record.kind {

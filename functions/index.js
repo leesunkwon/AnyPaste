@@ -13,7 +13,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 initializeApp();
 
 const REGION = "asia-northeast3";
-const DEFAULT_CLIPBOARD_TTL_MILLIS = 24 * 60 * 60 * 1000;
+const DEFAULT_CLIPBOARD_TTL_MILLIS = 5 * 60 * 1000;
 const MAX_RECENT_DEVICE_DOCUMENTS = 100;
 const MAX_FCM_TOKEN_LENGTH = 4096;
 const MAX_FCM_ITEM_ID_LENGTH = 128;

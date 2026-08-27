@@ -153,7 +153,7 @@ final class AppModel: ObservableObject {
     private static let maximumTextLength = 100_000
     private static let maximumTransferBytes: Int64 = 50 * 1024 * 1024
     private static let maximumStorageBytes: Int64 = 1024 * 1024 * 1024
-    private static let clipboardTTL: TimeInterval = 24 * 60 * 60
+    private static let clipboardTTL: TimeInterval = 5 * 60
     private static let pollingNanoseconds: UInt64 = 2_000_000_000
     private static let heartbeatNanoseconds: UInt64 = 60_000_000_000
     private static let maximumFailedTransfers = 20
@@ -370,7 +370,7 @@ final class AppModel: ObservableObject {
     func sendText(
         _ text: String,
         targetDeviceID: String? = nil,
-        retention: ClipboardRetention = .oneDay
+        retention: ClipboardRetention = .fiveMinutes
     ) async {
         await sendText(
             text,
@@ -449,7 +449,7 @@ final class AppModel: ObservableObject {
     func sendFiles(
         _ urls: [URL],
         targetDeviceID: String? = nil,
-        retention: ClipboardRetention = .oneDay
+        retention: ClipboardRetention = .fiveMinutes
     ) async {
         await sendFiles(
             urls,
@@ -1204,7 +1204,7 @@ final class AppModel: ObservableObject {
         mimeType: String,
         kind: ClipboardKind,
         targetDeviceID: String?,
-        retention: ClipboardRetention = .oneDay,
+        retention: ClipboardRetention = .fiveMinutes,
         automaticContext: AutomaticSendContext? = nil
     ) async throws -> ClipboardRecord {
         try ensureTransferNetworkAvailable()

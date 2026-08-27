@@ -626,7 +626,6 @@ struct SendClipboardView: View {
     @State private var text = ""
     @State private var selectedFiles: [URL] = []
     @State private var targetDeviceID = ""
-    @State private var retention: ClipboardRetention = .oneDay
     @State private var showsFileImporter = false
     @State private var isDropTargeted = false
 
@@ -662,7 +661,7 @@ struct SendClipboardView: View {
                         Divider()
                         targetPicker
                         Divider()
-                        retentionPicker
+                        retentionPolicy
                         storagePolicy
                         sendAction
                     }
@@ -847,19 +846,12 @@ struct SendClipboardView: View {
         }
     }
 
-    private var retentionPicker: some View {
+    private var retentionPolicy: some View {
         VStack(alignment: .leading, spacing: PasteSpacing.md) {
             PasteSectionHeader(
-                title: "보관 기간",
-                subtitle: "기간이 지나면 모든 기기에서 항목이 자동으로 삭제됩니다."
+                title: "보관 정책",
+                subtitle: "항목은 5분 동안만 보관되며, 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
             )
-            Picker("보관 기간", selection: $retention) {
-                ForEach(ClipboardRetention.allCases) { option in
-                    Text(option.title).tag(option)
-                }
-            }
-            .pickerStyle(.segmented)
-            .frame(maxWidth: 360)
         }
     }
 
@@ -989,13 +981,13 @@ struct SendClipboardView: View {
             switch mode {
             case .text:
                 let value = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                await model.sendText(value, targetDeviceID: targetID, retention: retention)
+                await model.sendText(value, targetDeviceID: targetID, retention: .fiveMinutes)
                 if model.errorMessage == nil {
                     text = ""
                 }
             case .files:
                 let files = selectedFiles
-                await model.sendFiles(files, targetDeviceID: targetID, retention: retention)
+                await model.sendFiles(files, targetDeviceID: targetID, retention: .fiveMinutes)
                 if model.errorMessage == nil {
                     selectedFiles = []
                 }

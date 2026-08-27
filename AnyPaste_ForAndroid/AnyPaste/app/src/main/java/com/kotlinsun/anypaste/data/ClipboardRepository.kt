@@ -415,6 +415,6 @@ class FirestoreClipboardRepository(
         const val MAX_DELETE_BATCH_SIZE = 500
         const val MAX_REPLACED_ITEMS_IN_FIRST_BATCH = MAX_DELETE_BATCH_SIZE - 1
         const val MAX_TEXT_CHARACTERS = 100_000
-        const val DEFAULT_TTL_MILLIS = 24L * 60L * 60L * 1_000L
+        const val DEFAULT_TTL_MILLIS = 5L * 60L * 1_000L
     }
 }

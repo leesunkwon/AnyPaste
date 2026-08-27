@@ -1,6 +1,7 @@
 package com.kotlinsun.anypaste
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -257,12 +258,45 @@ class MainActivity : AppCompatActivity() {
 
     private fun showScreen(screen: Screen, force: Boolean = false) {
         if (!force && screen == currentScreen && currentRoot != null) return
+        val previousView = currentRoot
         currentScreen = screen
         previewRequestedItemId = null
-        screenContainer.removeAllViews()
         val view = layoutInflater.inflate(screen.layoutRes, screenContainer, false)
         currentRoot = view
-        screenContainer.addView(view)
+        val shouldAnimate = previousView != null && !force && ValueAnimator.areAnimatorsEnabled()
+
+        if (shouldAnimate) {
+            for (index in screenContainer.childCount - 1 downTo 0) {
+                val child = screenContainer.getChildAt(index)
+                if (child !== previousView) screenContainer.removeViewAt(index)
+            }
+
+            val distance = SCREEN_TRANSITION_DISTANCE_DP * resources.displayMetrics.density
+            view.alpha = 0f
+            view.translationY = distance
+            screenContainer.addView(view)
+
+            previousView.animate().cancel()
+            previousView.animate()
+                .alpha(0f)
+                .translationY(-distance / 3)
+                .setDuration(SCREEN_EXIT_DURATION_MILLIS)
+                .withEndAction {
+                    if (previousView.parent === screenContainer) {
+                        screenContainer.removeView(previousView)
+                    }
+                }
+                .start()
+            view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(SCREEN_ENTER_DELAY_MILLIS)
+                .setDuration(SCREEN_ENTER_DURATION_MILLIS)
+                .start()
+        } else {
+            screenContainer.removeAllViews()
+            screenContainer.addView(view)
+        }
         bindCommonNavigation(view)
         bindScreenActions(view, screen)
         renderCurrent(viewModel.state.value)
@@ -280,11 +314,12 @@ class MainActivity : AppCompatActivity() {
     private fun updateBottomNavigationSelection(root: View) {
         val selectedId = when (currentScreen) {
             Screen.HOME -> R.id.nav_home
+            Screen.SEND -> R.id.btn_send
             Screen.DEVICES -> R.id.nav_devices
             Screen.SETTINGS -> R.id.nav_settings
             else -> View.NO_ID
         }
-        listOf(R.id.nav_home, R.id.nav_devices, R.id.nav_settings).forEach { itemId ->
+        listOf(R.id.nav_home, R.id.btn_send, R.id.nav_devices, R.id.nav_settings).forEach { itemId ->
             root.findViewById<View>(itemId)?.let { item ->
                 item.isSelected = itemId == selectedId
                 ViewCompat.setStateDescription(item, if (item.isSelected) "선택됨" else null)
@@ -1862,6 +1897,10 @@ class MainActivity : AppCompatActivity() {
         const val MAX_IMAGE_THUMBNAILS = 20
         const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
         const val MAX_DISPLAY_NAME_LENGTH = 50
+        const val SCREEN_TRANSITION_DISTANCE_DP = 12f
+        const val SCREEN_EXIT_DURATION_MILLIS = 160L
+        const val SCREEN_ENTER_DELAY_MILLIS = 30L
+        const val SCREEN_ENTER_DURATION_MILLIS = 220L
 
         val AUTH_SCREENS = setOf(
             Screen.LOGIN,

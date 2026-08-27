@@ -6,31 +6,15 @@
     android:background="@color/background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/screen_gutter"
-    android:paddingTop="@dimen/space_12">
+    android:paddingTop="@dimen/space_16">
 
-    <LinearLayout
+    <TextView
+        style="@style/TextAppearance.AnyPaste.Title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/btn_back"
-            android:layout_width="@dimen/touch_target"
-            android:layout_height="@dimen/touch_target"
-            android:background="@drawable/bg_icon_action"
-            android:contentDescription="뒤로가기"
-            android:padding="@dimen/space_12"
-            android:src="@drawable/ic_back" />
-
-        <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_12"
-            android:layout_weight="1"
-            android:text="새로 보내기" />
-    </LinearLayout>
+        android:text="보내기"
+        android:textSize="24sp" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -451,4 +435,6 @@
         android:layout_gravity="center_horizontal"
         android:indeterminateTint="@color/primary_contrast"
         android:visibility="gone" />
+
+    <include layout="@layout/view_bottom_navigation" />
 </LinearLayout>

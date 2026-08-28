@@ -71,6 +71,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var transferState: TransferState = .idle
     @Published private(set) var failedTransfers: [FailedTransferRecord] = []
     @Published private(set) var deviceDisplayName = ""
+    @Published private(set) var pendingSendFiles: [URL] = []
 
     @Published var autoSync: Bool {
         didSet {
@@ -332,6 +333,33 @@ final class AppModel: ObservableObject {
         defaults.set(deviceID ?? "", forKey: PreferenceKey.lastTransferTargetDeviceID)
     }
 
+    func prepareDroppedFilesForSend(_ urls: [URL]) {
+        guard authPhase == .authenticated else {
+            errorMessage = "파일을 보내려면 먼저 로그인해 주세요."
+            return
+        }
+
+        var seenURLs = Set<URL>()
+        let files = urls.compactMap { url -> URL? in
+            guard url.isFileURL else { return nil }
+            let normalizedURL = url.standardizedFileURL
+            return seenURLs.insert(normalizedURL).inserted ? normalizedURL : nil
+        }
+        guard !files.isEmpty else {
+            errorMessage = "전송할 파일을 확인할 수 없습니다."
+            return
+        }
+
+        errorMessage = nil
+        pendingSendFiles = files
+        selectedRoute = .send
+    }
+
+    func consumePendingSendFiles() -> [URL] {
+        defer { pendingSendFiles = [] }
+        return pendingSendFiles
+    }
+
     func renameDevice(_ device: DeviceRecord, to name: String) async {
         let normalizedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalizedName.isEmpty, normalizedName.count <= 100 else {
@@ -584,6 +612,7 @@ final class AppModel: ObservableObject {
         selectedItem = nil
         failedTransfers = []
         retryableTransfers = [:]
+        pendingSendFiles = []
         selectedRoute = .home
         transferState = .idle
         syncStatus = .stopped

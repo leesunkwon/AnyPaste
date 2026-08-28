@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     private val requestedImageThumbnailIds = linkedSetOf<String>()
     private var pendingStartSyncAfterPermission = false
     private var pendingSharedText: String? = null
+    private var pendingShareTargetSelection = false
     private var localPreviewBitmap: Bitmap? = null
     private var localPreviewBitmapUri: Uri? = null
     private var localPreviewLoadingUri: Uri? = null
@@ -1433,13 +1434,20 @@ class MainActivity : AppCompatActivity() {
 
         if (intent.action != Intent.ACTION_SEND && intent.action != Intent.ACTION_SEND_MULTIPLE) return
         val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)?.takeIf { it.isNotBlank() }
-        val stream = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
-            ?: IntentCompat.getParcelableArrayListExtra(
+        val sharedStreams = buildList {
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)?.let(::add)
+            IntentCompat.getParcelableArrayListExtra(
                 intent,
                 Intent.EXTRA_STREAM,
                 Uri::class.java,
-            )?.firstOrNull()
-            ?: intent.clipData?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.uri
+            )?.let(::addAll)
+            intent.clipData?.let { clipData ->
+                repeat(clipData.itemCount) { index ->
+                    clipData.getItemAt(index).uri?.let(::add)
+                }
+            }
+        }.distinct()
+        val stream = sharedStreams.firstOrNull()
 
         when {
             stream != null -> {
@@ -1459,8 +1467,13 @@ class MainActivity : AppCompatActivity() {
             sharedText?.let {
                 currentRoot?.findViewById<TextInputEditText>(R.id.input_send_text)?.setText(it)
             }
+            showSharedSendTargetPicker()
+            if (sharedStreams.size > 1) {
+                toast("여러 파일 중 첫 번째 파일을 준비했어요. 현재는 한 번에 하나씩 전송할 수 있습니다.")
+            }
         } else {
             pendingSharedText = sharedText
+            pendingShareTargetSelection = true
             toast("로그인 후 공유 항목을 전송할 수 있습니다.")
             showScreen(Screen.LOGIN)
         }
@@ -1477,7 +1490,19 @@ class MainActivity : AppCompatActivity() {
             currentRoot?.findViewById<TextInputEditText>(R.id.input_send_text)?.setText(text)
             pendingSharedText = null
         }
+        if (pendingShareTargetSelection) {
+            pendingShareTargetSelection = false
+            showSharedSendTargetPicker()
+        }
         if (openPicker) openDocument(type)
+    }
+
+    private fun showSharedSendTargetPicker() {
+        currentRoot?.post {
+            if (currentScreen == Screen.SEND && remoteDevices(viewModel.state.value).isNotEmpty()) {
+                showSendTargetPicker()
+            }
+        }
     }
 
     private fun openDocument(type: ClipboardType) {
@@ -1631,15 +1656,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val currentId = viewModel.state.value.sendTargetDeviceId
-        val checkedIndex = devices.indexOfFirst { it.id == currentId }
-        val labels = devices.map { device ->
+        val selections = listOf<String?>(null) + devices.map(Device::id)
+        val checkedIndex = selections.indexOf(currentId).coerceAtLeast(0)
+        val labels = (listOf("전체 기기 · ${devices.size}대") + devices.map { device ->
             val platform = if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android"
             "${device.deviceName} · $platform · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
-        }.toTypedArray()
+        }).toTypedArray()
         AlertDialog.Builder(this)
-            .setTitle("특정 기기 선택")
+            .setTitle("전송 대상 선택")
             .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
-                viewModel.selectSendTarget(devices[which].id)
+                viewModel.selectSendTarget(selections[which])
                 dialog.dismiss()
                 renderCurrent(viewModel.state.value)
             }

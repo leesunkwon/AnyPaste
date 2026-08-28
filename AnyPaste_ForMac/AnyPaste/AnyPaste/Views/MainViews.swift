@@ -786,6 +786,11 @@ struct SendClipboardView: View {
             targetDeviceID = savedTargetID
             lastSpecificTargetID = savedTargetID
             targetMode = savedTargetID.isEmpty ? .allDevices : .specificDevice
+            consumePendingDroppedFiles()
+        }
+        .onChange(of: model.pendingSendFiles) { _, files in
+            guard !files.isEmpty else { return }
+            consumePendingDroppedFiles()
         }
         .onChange(of: targetDeviceID) { _, value in
             if !value.isEmpty {
@@ -1122,6 +1127,13 @@ struct SendClipboardView: View {
             !selectedFiles.contains(url)
         }
         selectedFiles.append(contentsOf: additions)
+    }
+
+    private func consumePendingDroppedFiles() {
+        let files = model.consumePendingSendFiles()
+        guard !files.isEmpty else { return }
+        mode = .files
+        appendFiles(files)
     }
 
     private func send() {

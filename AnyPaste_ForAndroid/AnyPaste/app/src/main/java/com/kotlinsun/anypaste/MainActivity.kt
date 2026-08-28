@@ -51,6 +51,8 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -71,7 +73,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     private val viewModel: MainViewModel by viewModels()
     private val preferences by lazy { AppPreferences(this) }
     private val credentialManager by lazy { CredentialManager.create(this) }
@@ -79,6 +81,9 @@ class MainActivity : AppCompatActivity() {
     private var currentScreen = Screen.LOGIN
     private var currentRoot: View? = null
     private lateinit var bottomNavigation: View
+    private lateinit var screenContainer: View
+    private lateinit var bottomTabPager: ViewPager2
+    private val bottomTabRoots = mutableMapOf<Screen, View>()
     private var authTransitionHandled = false
     private var lastUserId: String? = null
 
@@ -144,6 +149,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val root = findViewById<View>(R.id.main)
         bottomNavigation = findViewById(R.id.bottom_navigation)
+        screenContainer = findViewById(R.id.screen_container)
+        bottomTabPager = findViewById(R.id.bottom_tab_pager)
+        bottomTabPager.isVisible = false
+        configureBottomTabPager()
         bindBottomNavigation()
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val safeInsets = insets.getInsets(
@@ -256,14 +265,81 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showScreen(screen: Screen, force: Boolean = false) {
-        if (!force && screen == currentScreen && currentRoot != null) return
-        val previousScreen = currentScreen
+        if (screen.isBottomTab) {
+            showBottomTab(screen, force)
+            return
+        }
+        showStandaloneScreen(screen, force)
+    }
+
+    private fun configureBottomTabPager() {
+        bottomTabPager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount(): Int = BOTTOM_TAB_SCREENS.size
+
+            override fun createFragment(position: Int) =
+                BottomTabScreenFragment.newInstance(BOTTOM_TAB_SCREENS[position].layoutRes)
+        }
+        bottomTabPager.offscreenPageLimit = BOTTOM_TAB_SCREENS.lastIndex
+        bottomTabPager.isUserInputEnabled = true
+        bottomTabPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                if (!bottomTabPager.isVisible) return
+                activateBottomTab(BOTTOM_TAB_SCREENS[position])
+            }
+        })
+    }
+
+    private fun showBottomTab(screen: Screen, force: Boolean) {
+        if (!force &&
+            currentScreen == screen &&
+            bottomTabPager.isVisible &&
+            currentRoot != null
+        ) {
+            return
+        }
+
         currentScreen = screen
+        currentRoot = bottomTabRoots[screen]
         previewRequestedItemId = null
+        screenContainer.isVisible = false
+        bottomTabPager.isVisible = true
+        updateBottomNavigation()
+
+        val position = requireNotNull(bottomNavigationPosition(screen))
+        if (bottomTabPager.currentItem == position) {
+            activateBottomTab(screen)
+        } else {
+            bottomTabPager.setCurrentItem(position, !force)
+        }
+    }
+
+    private fun activateBottomTab(screen: Screen) {
+        currentScreen = screen
+        currentRoot = bottomTabRoots[screen]
+        previewRequestedItemId = null
+        updateBottomNavigation()
+        renderCurrent(viewModel.state.value)
+    }
+
+    private fun showStandaloneScreen(screen: Screen, force: Boolean) {
+        if (!force &&
+            screen == currentScreen &&
+            screenContainer.isVisible &&
+            currentRoot != null
+        ) {
+            return
+        }
+        val previousScreen = currentScreen
+        val hadVisibleScreen = currentRoot != null || bottomTabPager.isVisible
+        currentScreen = screen
+        currentRoot = null
+        previewRequestedItemId = null
+        bottomTabPager.isVisible = false
+        screenContainer.isVisible = true
         val fragment = ScreenFragment.newInstance(screen.layoutRes)
         val transaction = supportFragmentManager.beginTransaction()
             .setReorderingAllowed(true)
-        if (currentRoot != null && !force) {
+        if (hadVisibleScreen && !force) {
             val backward = isBackwardNavigation(previousScreen, screen)
             transaction.setCustomAnimations(
                 if (backward) {
@@ -288,6 +364,23 @@ class MainActivity : AppCompatActivity() {
         bindCommonNavigation(view)
         bindScreenActions(view, screen)
         renderCurrent(viewModel.state.value)
+    }
+
+    override fun onBottomTabScreenViewCreated(@LayoutRes layoutRes: Int, root: View) {
+        val screen = BOTTOM_TAB_SCREENS.firstOrNull { it.layoutRes == layoutRes } ?: return
+        bottomTabRoots[screen] = root
+        bindCommonNavigation(root)
+        bindScreenActions(root, screen)
+        if (bottomTabPager.isVisible && currentScreen == screen) {
+            currentRoot = root
+            renderCurrent(viewModel.state.value)
+        }
+    }
+
+    override fun onBottomTabScreenViewDestroyed(@LayoutRes layoutRes: Int, root: View) {
+        val screen = BOTTOM_TAB_SCREENS.firstOrNull { it.layoutRes == layoutRes } ?: return
+        if (bottomTabRoots[screen] === root) bottomTabRoots.remove(screen)
+        if (currentRoot === root) currentRoot = null
     }
 
     private fun isBackwardNavigation(from: Screen, to: Screen): Boolean {
@@ -1991,6 +2084,11 @@ class MainActivity : AppCompatActivity() {
         NOTIFICATIONS(R.layout.screen_notifications),
         SETTINGS(R.layout.screen_settings),
         PERMISSIONS(R.layout.screen_permissions),
+
+        ;
+
+        val isBottomTab: Boolean
+            get() = this == HOME || this == SEND || this == DEVICES || this == SETTINGS
     }
 
     private companion object {
@@ -2007,6 +2105,13 @@ class MainActivity : AppCompatActivity() {
         const val MIN_SIGN_UP_PASSWORD_LENGTH = 8
         const val MAX_DISPLAY_NAME_LENGTH = 50
         const val SCREEN_FRAGMENT_TAG = "screen_fragment"
+
+        val BOTTOM_TAB_SCREENS = listOf(
+            Screen.HOME,
+            Screen.SEND,
+            Screen.DEVICES,
+            Screen.SETTINGS,
+        )
 
         val AUTH_SCREENS = setOf(
             Screen.LOGIN,

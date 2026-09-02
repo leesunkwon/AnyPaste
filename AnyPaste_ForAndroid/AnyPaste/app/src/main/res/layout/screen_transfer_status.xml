@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.TopNavigation"
+            style="@style/TextAppearance.Via.Title4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -56,7 +56,7 @@
 
             <TextView
                 android:id="@+id/tv_transfer_title"
-                style="@style/TextAppearance.ViaOs.Title"
+                style="@style/TextAppearance.Via.Title3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/tv_transfer_message"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -199,7 +199,7 @@
 
                 <TextView
                     android:id="@+id/tv_transfer_network_status"
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
@@ -226,7 +226,7 @@
 
                 <TextView
                     android:id="@+id/tv_transfer_notice"
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
@@ -238,7 +238,7 @@
 
             <TextView
                 android:id="@+id/tv_transfer_failure_reason"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
@@ -250,7 +250,7 @@
 
             <TextView
                 android:id="@+id/tv_transfer_retry_queue"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"

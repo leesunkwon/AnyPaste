@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.TopNavigation"
+            style="@style/TextAppearance.Via.Title4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -55,7 +55,7 @@
                 android:textSize="40sp" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Title"
+                style="@style/TextAppearance.Via.Title3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
@@ -64,7 +64,7 @@
                 android:textSize="24sp" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -81,7 +81,7 @@
                 android:padding="@dimen/space_20">
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Overline"
+                    style="@style/TextAppearance.Via.Label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="연결 방법" />
@@ -178,7 +178,7 @@
                     android:src="@drawable/ic_shield" />
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
@@ -198,7 +198,7 @@
 
             <TextView
                 android:id="@+id/tv_device_discovery_status"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"

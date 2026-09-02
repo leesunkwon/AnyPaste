@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.TopNavigation"
+            style="@style/TextAppearance.Via.Title4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -63,7 +63,7 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_name"
-                style="@style/TextAppearance.ViaOs.Title"
+                style="@style/TextAppearance.Via.Title3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
@@ -106,7 +106,7 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Overline"
+                    style="@style/TextAppearance.Via.Label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="기기 정보" />
@@ -179,7 +179,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -208,7 +208,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -247,7 +247,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -287,7 +287,7 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_error"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"

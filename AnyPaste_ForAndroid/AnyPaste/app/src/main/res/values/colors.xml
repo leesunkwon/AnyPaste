@@ -1,24 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- VIA OS semantic tokens: keep all color values in this source file. -->
+    <color name="sk_gray_50">#F7F7F8</color>
+    <color name="sk_gray_100">#EDEDF0</color>
+    <color name="sk_gray_200">#E1E1E4</color>
+    <color name="sk_gray_300">#D0D0D5</color>
+    <color name="sk_gray_400">#B4B4BB</color>
+    <color name="sk_gray_500">#8E8E96</color>
+    <color name="sk_gray_600">#6C6C74</color>
+    <color name="sk_gray_700">#484850</color>
+    <color name="sk_gray_800">#2C2C32</color>
+    <color name="sk_gray_900">#141416</color>
+    <color name="sk_gray_950">#0A0A0C</color>
+    <color name="sk_y_50">#FFFEE8</color>
+    <color name="sk_y_100">#FFF7A3</color>
+    <color name="sk_y_200">#FBF36A</color>
+    <color name="sk_y_300">#F6EE3C</color>
+    <color name="sk_y_400">#F4EC28</color>
+    <color name="sk_y_500">#E5DC10</color>
+    <color name="sk_y_600">#C4BC00</color>
+    <color name="sk_y_700">#8A8500</color>
+    <color name="sk_y_800">#5C5900</color>
+    <color name="sk_y_900">#3A3800</color>
+    <color name="sk_sig_50">#FFEBE6</color>
+    <color name="sk_sig_100">#FFC7BA</color>
+    <color name="sk_sig_400">#FF6A45</color>
+    <color name="sk_sig_500">#FF4D2E</color>
+    <color name="sk_sig_600">#E03618</color>
+    <color name="sk_sig_700">#B52810</color>
+
     <color name="sk_bg">#E8E8EC</color>
     <color name="sk_bg_elevated">#FFFFFF</color>
     <color name="sk_bg_muted">#D8D8DC</color>
+    <color name="sk_bg_inverse">#0A0A0C</color>
+    <color name="sk_bg_overlay">#660A0A0C</color>
+    <color name="sk_bg_accent">#F4EC28</color>
     <color name="sk_accent">#F4EC28</color>
     <color name="sk_accent_pressed">#E5DC10</color>
+    <color name="sk_accent_hover">#F6EE3C</color>
     <color name="sk_solid">#0A0A0C</color>
     <color name="sk_solid_pressed">#141416</color>
+    <color name="sk_solid_hover">#1C1C22</color>
+    <color name="sk_solid_fg">#FFFFFF</color>
     <color name="sk_fg">#0A0A0C</color>
     <color name="sk_fg_muted">#5C5C66</color>
-    <color name="sk_fg_subtle">#6C6C74</color>
+    <color name="sk_fg_subtle">#6E6E76</color>
     <color name="sk_fg_placeholder">#8E8E96</color>
     <color name="sk_fg_disabled">#B4B4BB</color>
     <color name="sk_fg_on_solid">#FFFFFF</color>
     <color name="sk_fg_on_accent">#0A0A0C</color>
+    <color name="sk_fg_inverse">#FFFFFF</color>
     <color name="sk_line">#D0D0D5</color>
+    <color name="sk_success">#0A0A0C</color>
+    <color name="sk_success_soft">#D8D8DC</color>
     <color name="sk_warning">#FF4D2E</color>
     <color name="sk_warning_pressed">#E03618</color>
     <color name="sk_warning_soft">#FFEBE6</color>
+    <color name="sk_warning_fg">#B52810</color>
+    <color name="sk_danger">#FF4D2E</color>
+    <color name="sk_danger_soft">#FFEBE6</color>
+    <color name="sk_danger_fg">#B52810</color>
+    <color name="sk_focus">#0A0A0C</color>
+    <color name="sk_cluster">#070708</color>
+    <color name="sk_hud">#050506</color>
 
     <!-- Compatibility aliases used by the existing XML layouts and Kotlin. -->
     <color name="black">#0A0A0C</color>

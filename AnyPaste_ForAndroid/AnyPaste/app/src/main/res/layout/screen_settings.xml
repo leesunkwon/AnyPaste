@@ -20,7 +20,7 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Title"
+                style="@style/TextAppearance.Via.Title3"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
@@ -84,7 +84,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -118,7 +118,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.ViaOs.Body"
+                            style="@style/TextAppearance.Via.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
@@ -135,7 +135,7 @@
                 </LinearLayout>
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
@@ -147,7 +147,7 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
@@ -184,7 +184,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.ViaOs.Body"
+                            style="@style/TextAppearance.Via.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
@@ -203,7 +203,7 @@
 
             <TextView
                 android:id="@+id/tv_background_sync_guidance"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -214,7 +214,7 @@
                 android:visibility="gone" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -257,7 +257,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.ViaOs.Body"
+                            style="@style/TextAppearance.Via.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
@@ -311,7 +311,7 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.ViaOs.Body"
+                            style="@style/TextAppearance.Via.Body1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
@@ -328,7 +328,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"

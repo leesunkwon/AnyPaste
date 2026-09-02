@@ -10,6 +10,17 @@
     <dimen name="sk_space_12">48dp</dimen>
     <dimen name="sk_space_16">64dp</dimen>
 
+    <dimen name="sk_s_1">4dp</dimen>
+    <dimen name="sk_s_2">8dp</dimen>
+    <dimen name="sk_s_3">12dp</dimen>
+    <dimen name="sk_s_4">16dp</dimen>
+    <dimen name="sk_s_5">20dp</dimen>
+    <dimen name="sk_s_6">24dp</dimen>
+    <dimen name="sk_s_8">32dp</dimen>
+    <dimen name="sk_s_10">40dp</dimen>
+    <dimen name="sk_s_12">48dp</dimen>
+    <dimen name="sk_s_16">64dp</dimen>
+
     <dimen name="sk_touch">44dp</dimen>
     <dimen name="sk_control_md">44dp</dimen>
     <dimen name="sk_control_lg">52dp</dimen>
@@ -23,6 +34,24 @@
     <dimen name="sk_safe_top">54dp</dimen>
     <dimen name="sk_safe_bottom">34dp</dimen>
     <dimen name="sk_tabbar">56dp</dimen>
+
+    <dimen name="sk_control_sm">36dp</dimen>
+    <dimen name="sk_icon">24dp</dimen>
+    <dimen name="sk_icon_sm">16dp</dimen>
+    <dimen name="sk_grid_gap">10dp</dimen>
+    <dimen name="sk_phone">390dp</dimen>
+
+    <!-- Typography follows Android-scaled sp units. -->
+    <dimen name="sk_fs_display">56sp</dimen>
+    <dimen name="sk_fs_title_1">36sp</dimen>
+    <dimen name="sk_fs_title_2">28sp</dimen>
+    <dimen name="sk_fs_title_3">22sp</dimen>
+    <dimen name="sk_fs_title_4">16sp</dimen>
+    <dimen name="sk_fs_body_1">16sp</dimen>
+    <dimen name="sk_fs_body_2">14sp</dimen>
+    <dimen name="sk_fs_caption">12sp</dimen>
+    <dimen name="sk_fs_label">12sp</dimen>
+    <dimen name="sk_fs_num">11sp</dimen>
 
     <!-- Compatibility dimensions used by existing XML. -->
     <dimen name="space_2">2dp</dimen>

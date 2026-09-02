@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.TopNavigation"
+            style="@style/TextAppearance.Via.Title4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -45,14 +45,14 @@
             android:paddingBottom="@dimen/space_20">
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Title"
+                style="@style/TextAppearance.Via.Title3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="더 매끄러운 동기화를\n위해 권한이 필요해요"
                 android:textSize="24sp" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -94,7 +94,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -150,7 +150,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -204,7 +204,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -240,7 +240,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"

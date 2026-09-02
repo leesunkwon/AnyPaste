@@ -24,14 +24,14 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.ScreenTitle"
+            style="@style/TextAppearance.Via.Title2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_title_gap"
             android:text="이메일 로그인" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
@@ -39,7 +39,7 @@
             android:textSize="16sp" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Overline"
+            style="@style/TextAppearance.Via.Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
@@ -64,7 +64,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Overline"
+            style="@style/TextAppearance.Via.Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
@@ -102,7 +102,7 @@
 
         <TextView
             android:id="@+id/tv_auth_error"
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -127,7 +127,7 @@
                 android:src="@drawable/ic_shield" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_8"

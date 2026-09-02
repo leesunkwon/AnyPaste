@@ -36,7 +36,7 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.ScreenTitle"
+            style="@style/TextAppearance.Via.Title2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -44,7 +44,7 @@
             android:text="복사한 모든 것을\n어디서나 붙여넣으세요" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
@@ -123,7 +123,7 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_check"
@@ -134,7 +134,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"

@@ -2,6 +2,7 @@
     <style name="Base.Theme.ViaOs" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/sk_solid</item>
         <item name="colorPrimaryVariant">@color/sk_solid_pressed</item>
+        <item name="colorPrimaryDark">@color/sk_gray_950</item>
         <item name="colorOnPrimary">@color/sk_fg_on_solid</item>
         <item name="colorSecondary">@color/sk_solid</item>
         <item name="colorOnSecondary">@color/sk_fg_on_solid</item>
@@ -15,9 +16,13 @@
         <item name="textInputStyle">@style/Widget.ViaOs.TextInputLayout</item>
         <item name="switchStyle">@style/Widget.ViaOs.Switch</item>
         <item name="android:colorAccent">@color/sk_solid</item>
+        <item name="android:colorBackground">@color/sk_bg</item>
+        <item name="android:colorControlHighlight">@color/sk_bg_muted</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowBackground">@color/sk_bg</item>
+        <item name="android:textColorPrimary">@color/sk_fg</item>
+        <item name="android:textColorSecondary">@color/sk_fg_muted</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:statusBarColor">@color/sk_bg</item>

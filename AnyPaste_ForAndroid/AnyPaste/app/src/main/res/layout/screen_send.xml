@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/space_16">
 
     <TextView
-        style="@style/TextAppearance.ViaOs.Title"
+        style="@style/TextAppearance.Via.Title3"
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
@@ -31,7 +31,7 @@
             android:paddingBottom="@dimen/space_20">
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="1 · 보낼 내용" />
@@ -139,7 +139,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -205,7 +205,7 @@
 
                     <TextView
                         android:id="@+id/tv_send_file_info"
-                        style="@style/TextAppearance.ViaOs.Body"
+                        style="@style/TextAppearance.Via.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -238,7 +238,7 @@
 
             <TextView
                 android:id="@+id/tv_send_error"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -266,7 +266,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    style="@style/TextAppearance.ViaOs.Body"
+                    style="@style/TextAppearance.Via.Body1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
@@ -277,7 +277,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -422,7 +422,7 @@
 
             <TextView
                 android:id="@+id/tv_send_device_empty"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -434,7 +434,7 @@
                 android:visibility="gone" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Overline"
+                style="@style/TextAppearance.Via.Label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -486,7 +486,7 @@
 
             <TextView
                 android:id="@+id/tv_send_storage_policy"
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"

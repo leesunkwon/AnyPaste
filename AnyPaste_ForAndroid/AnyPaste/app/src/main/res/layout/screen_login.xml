@@ -26,7 +26,7 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.ScreenTitle"
+            style="@style/TextAppearance.Via.Title2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
@@ -34,7 +34,7 @@
             android:text="AnyPaste에 오신 것을\n환영해요" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
@@ -58,7 +58,7 @@
                 android:src="@drawable/ic_shield" />
 
             <TextView
-                style="@style/TextAppearance.ViaOs.Body"
+                style="@style/TextAppearance.Via.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_12"
@@ -110,7 +110,7 @@
 
         <TextView
             android:id="@+id/tv_login_error"
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -130,7 +130,7 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.ViaOs.Body"
+            style="@style/TextAppearance.Via.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_16"

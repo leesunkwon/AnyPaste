@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="더 매끄러운 동기화를\n위해 권한이 필요해요"
-                android:textSize="24px" />
+                android:textSize="24sp" />
 
             <TextView
                 style="@style/TextAppearance.ViaOs.Body"
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:text="필요한 권한만 요청하며, 언제든 설정에서 변경할 수 있습니다."
-                android:textSize="14px" />
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:id="@+id/card_permission_notifications"
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="새 클립보드와 파일 수신을 알려드려요."
-                        android:textSize="12px" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <TextView
@@ -111,7 +111,7 @@
                     android:paddingHorizontal="@dimen/space_8"
                     android:text="필요"
                     android:textColor="@color/warning_foreground"
-                    android:textSize="11px"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -155,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="Android 정책상 백그라운드에서는 알림 또는 앱 실행이 필요할 수 있어요."
-                    android:textSize="12px" />
+                    android:textSize="12sp" />
                 </LinearLayout>
 
                 <TextView
@@ -167,7 +167,7 @@
                     android:paddingHorizontal="@dimen/space_8"
                     android:text="안내"
                     android:textColor="@color/primary_contrast"
-                    android:textSize="11px"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -209,7 +209,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="수신한 항목은 5분 후 삭제되며, 새 항목이 오면 즉시 대체돼요."
-                        android:textSize="12px" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
@@ -236,7 +236,7 @@
                     android:gravity="center"
                     android:text="!"
                     android:textColor="@color/warning_foreground"
-                    android:textSize="20px"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -247,7 +247,7 @@
                     android:layout_weight="1"
                     android:text="비밀번호나 인증번호처럼 민감한 내용은 동기화하지 않는 것을 권장해요."
                     android:textColor="@color/warning_foreground"
-                    android:textSize="12px" />
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

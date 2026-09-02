@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
             android:text="하나의 계정으로 내 기기의 클립보드를 연결해 보세요."
-            android:textSize="16px" />
+            android:textSize="16sp" />
 
         <TextView
             style="@style/TextAppearance.ViaOs.Overline"
@@ -157,7 +157,7 @@
             android:layout_marginTop="@dimen/space_8"
             android:accessibilityLiveRegion="polite"
             android:textColor="@color/danger_foreground"
-            android:textSize="12px"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
@@ -186,7 +186,7 @@
             android:gravity="center"
             android:text="이미 계정이 있으신가요? 로그인"
             android:textColor="@color/primary_contrast"
-            android:textSize="13px"
+            android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>

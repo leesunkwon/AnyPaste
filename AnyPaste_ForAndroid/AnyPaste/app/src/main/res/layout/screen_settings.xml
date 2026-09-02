@@ -25,7 +25,7 @@
                 android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
                 android:text="설정"
-                android:textSize="24px" />
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:id="@+id/btn_account"
@@ -47,7 +47,7 @@
                     android:gravity="center"
                     android:text="수"
                     android:textColor="@color/white"
-                    android:textSize="18px"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -63,7 +63,7 @@
                         android:layout_height="wrap_content"
                         android:text="수진"
                         android:textColor="@color/ink"
-                        android:textSize="16px"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -73,7 +73,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="sujin@example.com"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12px" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <ImageView
@@ -123,7 +123,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화"
-                            android:textSize="12px" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -144,7 +144,7 @@
                     android:padding="@dimen/space_12"
                     android:text="안내: Android 보안 정책에 따라 자동 동기화는 AnyPaste 화면이 열려 있을 때만 작동합니다. 앱을 다시 열면 마지막으로 복사한 항목을 확인해 동기화합니다."
                     android:textColor="@color/informative_foreground"
-                    android:textSize="12px" />
+                    android:textSize="12sp" />
 
                 <TextView
                     style="@style/TextAppearance.ViaOs.Body"
@@ -156,7 +156,7 @@
                     android:padding="@dimen/space_12"
                     android:text="보관 안내: 모든 항목은 5분 동안만 보관됩니다. 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
                     android:textColor="@color/informative_foreground"
-                    android:textSize="12px" />
+                    android:textSize="12sp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -189,7 +189,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="모바일 데이터 사용을 줄여요"
-                            android:textSize="12px" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -210,7 +210,7 @@
                 android:background="@drawable/bg_card_warning"
                 android:padding="@dimen/space_16"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12px"
+                android:textSize="12sp"
                 android:visibility="gone" />
 
             <TextView
@@ -262,7 +262,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="새 항목이 오면 알려드려요"
-                            android:textSize="12px" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -316,7 +316,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="클립보드 동기화와 5분 보관 정책"
-                            android:textSize="12px" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <ImageView
@@ -344,7 +344,7 @@
                 android:paddingHorizontal="@dimen/space_16"
                 android:text="AnyPaste 1.0.0"
                 android:textColor="@color/ink_secondary"
-                android:textSize="13px" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/btn_logout"

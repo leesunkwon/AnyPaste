@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
             android:text="가입한 이메일과 비밀번호로 로그인해 주세요."
-            android:textSize="16px" />
+            android:textSize="16sp" />
 
         <TextView
             style="@style/TextAppearance.ViaOs.Overline"
@@ -97,7 +97,7 @@
             android:gravity="center_vertical"
             android:text="비밀번호를 잊으셨나요?"
             android:textColor="@color/primary_contrast"
-            android:textSize="13px"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
@@ -108,7 +108,7 @@
             android:layout_marginTop="@dimen/space_8"
             android:accessibilityLiveRegion="polite"
             android:textColor="@color/danger_foreground"
-            android:textSize="12px"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <LinearLayout
@@ -134,7 +134,7 @@
                 android:layout_weight="1"
                 android:text="계정과 동기화 데이터는 안전하게 보호됩니다."
                 android:textColor="@color/ink"
-                android:textSize="12px" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -154,7 +154,7 @@
             android:gravity="center"
             android:text="계정이 없으신가요? 회원가입"
             android:textColor="@color/primary_contrast"
-            android:textSize="13px"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <ProgressBar

@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sk_bg_muted" />
+            <corners android:radius="@dimen/sk_r_md" />
+        </shape>
+    </item>
     <item android:state_pressed="true" android:state_selected="true">
         <shape android:shape="rectangle">
             <solid android:color="@color/sk_accent_pressed" />
-            <corners android:radius="@dimen/radius_full" />
+            <corners android:radius="@dimen/sk_r_md" />
         </shape>
     </item>
     <item android:state_selected="true">
         <shape android:shape="rectangle">
             <solid android:color="@color/sk_accent" />
-            <corners android:radius="@dimen/radius_full" />
+            <corners android:radius="@dimen/sk_r_md" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/surface_pressed" />
-            <corners android:radius="@dimen/radius_full" />
+            <solid android:color="@color/sk_bg_muted" />
+            <corners android:radius="@dimen/sk_r_md" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/surface" />
-            <corners android:radius="@dimen/radius_full" />
+            <solid android:color="@color/sk_bg_elevated" />
+            <corners android:radius="@dimen/sk_r_md" />
         </shape>
     </item>
 </selector>

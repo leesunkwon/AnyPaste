@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
+            style="@style/TextAppearance.ViaOs.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -63,13 +63,13 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_name"
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.ViaOs.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
                 android:gravity="center"
                 android:text="MacBook Pro"
-                android:textSize="24sp" />
+                android:textSize="24px" />
 
             <LinearLayout
                 android:id="@+id/badge_device_detail_status"
@@ -93,7 +93,7 @@
                     android:layout_marginStart="@dimen/space_4"
                     android:text="온라인 · 동기화 가능"
                     android:textColor="@color/success_foreground"
-                    android:textSize="12sp"
+                    android:textSize="12px"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -106,7 +106,7 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Overline"
+                    style="@style/TextAppearance.ViaOs.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="기기 정보" />
@@ -179,7 +179,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -208,16 +208,16 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.AnyPaste.Body"
+                        style="@style/TextAppearance.ViaOs.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="새 텍스트와 이미지를 자동으로 받아요."
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    style="@style/Widget.AnyPaste.Switch"
+                    style="@style/Widget.ViaOs.Switch"
                     android:id="@+id/switch_device_auto_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -247,16 +247,16 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.AnyPaste.Body"
+                        style="@style/TextAppearance.ViaOs.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="새 파일이 도착하면 알려드려요."
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    style="@style/Widget.AnyPaste.Switch"
+                    style="@style/Widget.ViaOs.Switch"
                     android:id="@+id/switch_device_file_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -287,13 +287,13 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_error"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
                 android:textColor="@color/danger_foreground"
-                android:textSize="12sp"
+                android:textSize="12px"
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>

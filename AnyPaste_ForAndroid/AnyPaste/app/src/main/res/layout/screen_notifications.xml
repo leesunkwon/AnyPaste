@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
+            style="@style/TextAppearance.ViaOs.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -38,7 +38,7 @@
             android:gravity="center"
             android:text="모두 읽음"
             android:textColor="@color/primary_contrast"
-            android:textSize="12sp"
+            android:textSize="12px"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -67,7 +67,7 @@
 
             <TextView
                 android:id="@+id/tv_notifications_empty"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -75,7 +75,7 @@
                 android:gravity="center"
                 android:padding="@dimen/space_24"
                 android:text="새 알림이 없어요."
-                android:textSize="13sp"
+                android:textSize="13px"
                 android:visibility="gone" />
 
             <LinearLayout

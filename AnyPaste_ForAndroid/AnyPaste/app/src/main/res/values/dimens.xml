@@ -1,4 +1,30 @@
 <resources>
+    <dimen name="sk_space_1">4dp</dimen>
+    <dimen name="sk_space_2">8dp</dimen>
+    <dimen name="sk_space_3">12dp</dimen>
+    <dimen name="sk_space_4">16dp</dimen>
+    <dimen name="sk_space_5">20dp</dimen>
+    <dimen name="sk_space_6">24dp</dimen>
+    <dimen name="sk_space_8">32dp</dimen>
+    <dimen name="sk_space_10">40dp</dimen>
+    <dimen name="sk_space_12">48dp</dimen>
+    <dimen name="sk_space_16">64dp</dimen>
+
+    <dimen name="sk_touch">44dp</dimen>
+    <dimen name="sk_control_md">44dp</dimen>
+    <dimen name="sk_control_lg">52dp</dimen>
+    <dimen name="sk_control_circle">88dp</dimen>
+    <dimen name="sk_r_sm">10dp</dimen>
+    <dimen name="sk_r_md">16dp</dimen>
+    <dimen name="sk_r_lg">24dp</dimen>
+    <dimen name="sk_r_xl">32dp</dimen>
+    <dimen name="sk_r_full">999dp</dimen>
+    <dimen name="sk_screen_pad">16dp</dimen>
+    <dimen name="sk_safe_top">54dp</dimen>
+    <dimen name="sk_safe_bottom">34dp</dimen>
+    <dimen name="sk_tabbar">56dp</dimen>
+
+    <!-- Compatibility dimensions used by existing XML. -->
     <dimen name="space_2">2dp</dimen>
     <dimen name="space_4">4dp</dimen>
     <dimen name="space_6">6dp</dimen>
@@ -19,17 +45,16 @@
     <dimen name="space_56">56dp</dimen>
     <dimen name="space_64">64dp</dimen>
 
-    <dimen name="radius_xs">8dp</dimen>
-    <dimen name="radius_s">12dp</dimen>
+    <dimen name="radius_xs">10dp</dimen>
+    <dimen name="radius_s">16dp</dimen>
     <dimen name="radius_m">16dp</dimen>
     <dimen name="radius_l">24dp</dimen>
     <dimen name="radius_full">999dp</dimen>
-
     <dimen name="screen_gutter">16dp</dimen>
     <dimen name="screen_bottom_space">56dp</dimen>
     <dimen name="component_gap">12dp</dimen>
     <dimen name="nav_title_gap">20dp</dimen>
-    <dimen name="touch_target">48dp</dimen>
+    <dimen name="touch_target">44dp</dimen>
     <dimen name="top_navigation_height">56dp</dimen>
     <dimen name="control_height_large">52dp</dimen>
 </resources>

@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
+            style="@style/TextAppearance.ViaOs.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -52,25 +52,25 @@
                 android:gravity="center"
                 android:text="+"
                 android:textColor="@color/white"
-                android:textSize="40sp" />
+                android:textSize="40px" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.ViaOs.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
                 android:gravity="center"
                 android:text="Mac을 연결해 볼까요?"
-                android:textSize="24sp" />
+                android:textSize="24px" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
                 android:text="Mac용 AnyPaste에서 같은 계정으로 로그인하면\n자동으로 기기를 찾을 수 있어요."
-                android:textSize="14sp" />
+                android:textSize="14px" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -81,7 +81,7 @@
                 android:padding="@dimen/space_20">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Overline"
+                    style="@style/TextAppearance.ViaOs.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="연결 방법" />
@@ -178,14 +178,14 @@
                     android:src="@drawable/ic_shield" />
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="동일 계정으로 로그인한 기기만 연결됩니다."
-                    android:textColor="@color/on_primary_container"
-                    android:textSize="12sp" />
+                    android:textColor="@color/ink"
+                    android:textSize="12px" />
             </LinearLayout>
 
             <ProgressBar
@@ -198,13 +198,13 @@
 
             <TextView
                 android:id="@+id/tv_device_discovery_status"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
                 android:text="새 기기를 기다리는 중이에요."
-                android:textSize="12sp" />
+                android:textSize="12px" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

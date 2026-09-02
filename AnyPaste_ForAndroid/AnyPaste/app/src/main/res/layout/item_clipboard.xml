@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2"
             android:textColor="@color/ink_secondary"
-            android:textSize="12sp" />
+            android:textSize="12px" />
     </LinearLayout>
 
     <ImageView

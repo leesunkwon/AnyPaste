@@ -1014,10 +1014,10 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                     root = root,
                     progressView = progressView,
                     stateBackground = R.drawable.bg_circle_primary,
-                    progressColor = R.color.primary_contrast,
-                    progressTrackColor = R.color.primary_container,
+                    progressColor = R.color.sk_solid,
+                    progressTrackColor = R.color.sk_bg_muted,
                     noticeBackground = R.drawable.bg_card_primary,
-                    noticeTextColor = R.color.on_primary_container,
+                    noticeTextColor = R.color.ink,
                     showNoticeIcon = false,
                     showNotice = true,
                 )
@@ -1242,9 +1242,8 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             val selected = item.id in selectedClipboardIds
             val type = item.resolvedType()
 
-            itemView.setBackgroundResource(
-                if (selected) R.drawable.bg_card_primary else R.drawable.bg_card,
-            )
+            itemView.isSelected = selected
+            itemView.setBackgroundResource(R.drawable.sk_tile)
             itemView.findViewById<ImageView>(R.id.iv_clipboard_type).apply {
                 setImageResource(typeIcon(item))
                 setBackgroundResource(

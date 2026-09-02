@@ -24,7 +24,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
+            style="@style/TextAppearance.ViaOs.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -75,22 +75,22 @@
                     android:layout_marginStart="@dimen/space_4"
                     android:text="텍스트"
                     android:textColor="@color/primary_contrast"
-                    android:textSize="12sp"
+                    android:textSize="12px"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_detail_title"
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.ViaOs.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
                 android:text="MacBook Pro에서 받은 항목"
-                android:textSize="22sp" />
+                android:textSize="22px" />
 
             <TextView
                 android:id="@+id/tv_detail_meta"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_4"
@@ -107,7 +107,7 @@
                 android:padding="@dimen/space_20"
                 android:text="git checkout -b feature/clipboard\n\n# 클립보드 동기화 작업 브랜치\ngit push -u origin feature/clipboard"
                 android:textColor="@color/ink"
-                android:textSize="14sp" />
+                android:textSize="14px" />
 
             <ImageView
                 android:id="@+id/iv_detail_preview"
@@ -122,7 +122,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_download_file"
-                style="@style/Widget.AnyPaste.Button.Outline"
+                style="@style/Widget.ViaOs.Button.Outline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -170,7 +170,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="발신 기기 · 온라인"
                         android:textColor="@color/success_foreground"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -190,7 +190,7 @@
                     android:layout_weight="1"
                     android:text="이 항목은 5분 후 자동 만료됩니다."
                     android:textColor="@color/warning_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
 
                 <TextView
                     android:id="@+id/tv_detail_expiry_badge"
@@ -215,7 +215,7 @@
                     android:layout_height="wrap_content"
                     android:text="전달 상태"
                     android:textColor="@color/ink_secondary"
-                    android:textSize="12sp"
+                    android:textSize="12px"
                     android:textStyle="bold" />
 
                 <TextView
@@ -224,7 +224,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
                     android:textColor="@color/ink"
-                    android:textSize="13sp" />
+                    android:textSize="13px" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -237,7 +237,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_resend"
-            style="@style/Widget.AnyPaste.Button.Secondary"
+            style="@style/Widget.ViaOs.Button.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -247,13 +247,13 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_copy"
-            style="@style/Widget.AnyPaste.Button.Primary"
+            style="@style/Widget.ViaOs.Button.Primary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
             android:layout_weight="1"
             android:text="클립보드에 복사"
-            android:textSize="12sp"
+            android:textSize="12px"
             app:icon="@drawable/ic_copy"
             app:iconGravity="textStart"
             app:iconPadding="3dp" />

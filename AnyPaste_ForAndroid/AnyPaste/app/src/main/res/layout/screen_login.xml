@@ -22,11 +22,11 @@
             android:gravity="center"
             android:text="A"
             android:textColor="@color/white"
-            android:textSize="26sp"
+            android:textSize="26px"
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.ScreenTitle"
+            style="@style/TextAppearance.ViaOs.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
@@ -34,13 +34,13 @@
             android:text="AnyPaste에 오신 것을\n환영해요" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Body"
+            style="@style/TextAppearance.ViaOs.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
             android:gravity="center"
             android:text="같은 계정으로 로그인한 내 기기끼리\n클립보드를 안전하게 공유합니다."
-            android:textSize="16sp" />
+            android:textSize="16px" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -58,29 +58,29 @@
                 android:src="@drawable/ic_shield" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_12"
                 android:layout_weight="1"
                 android:text="공유 항목은 내 계정의 기기에서만 볼 수 있어요."
-                android:textColor="@color/on_primary_container" />
+                android:textColor="@color/ink" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
-            style="@style/Widget.AnyPaste.Button.Outline"
+            style="@style/Widget.ViaOs.Button.Outline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
             android:text="Google로 계속하기"
-            android:textSize="16sp"
+            android:textSize="16px"
             app:iconGravity="textStart"
             app:iconPadding="12dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login_email"
-            style="@style/Widget.AnyPaste.Button.Primary"
+            style="@style/Widget.ViaOs.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
@@ -97,7 +97,7 @@
             android:gravity="center"
             android:text="처음이신가요? 회원가입"
             android:textColor="@color/primary_contrast"
-            android:textSize="13sp"
+            android:textSize="13px"
             android:textStyle="bold" />
 
         <ProgressBar
@@ -110,13 +110,13 @@
 
         <TextView
             android:id="@+id/tv_login_error"
-            style="@style/TextAppearance.AnyPaste.Body"
+            style="@style/TextAppearance.ViaOs.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
             android:gravity="center"
             android:textColor="@color/danger_foreground"
-            android:textSize="12sp"
+            android:textSize="12px"
             android:visibility="gone" />
 
         <TextView
@@ -130,13 +130,13 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Body"
+            style="@style/TextAppearance.ViaOs.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_16"
             android:gravity="center"
             android:text="계속하면 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다."
             android:textColor="@color/ink_tertiary"
-            android:textSize="12sp" />
+            android:textSize="12px" />
     </LinearLayout>
 </ScrollView>

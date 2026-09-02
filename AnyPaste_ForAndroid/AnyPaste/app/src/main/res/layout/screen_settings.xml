@@ -20,12 +20,12 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.ViaOs.Title"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
                 android:text="설정"
-                android:textSize="24sp" />
+                android:textSize="24px" />
 
             <LinearLayout
                 android:id="@+id/btn_account"
@@ -47,7 +47,7 @@
                     android:gravity="center"
                     android:text="수"
                     android:textColor="@color/white"
-                    android:textSize="18sp"
+                    android:textSize="18px"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -63,7 +63,7 @@
                         android:layout_height="wrap_content"
                         android:text="수진"
                         android:textColor="@color/ink"
-                        android:textSize="16sp"
+                        android:textSize="16px"
                         android:textStyle="bold" />
 
                     <TextView
@@ -73,7 +73,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="sujin@example.com"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <ImageView
@@ -84,7 +84,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -118,16 +118,16 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.AnyPaste.Body"
+                            style="@style/TextAppearance.ViaOs.Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
+                        style="@style/Widget.ViaOs.Switch"
                         android:id="@+id/switch_auto_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
                 </LinearLayout>
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
@@ -144,10 +144,10 @@
                     android:padding="@dimen/space_12"
                     android:text="안내: Android 보안 정책에 따라 자동 동기화는 AnyPaste 화면이 열려 있을 때만 작동합니다. 앱을 다시 열면 마지막으로 복사한 항목을 확인해 동기화합니다."
                     android:textColor="@color/informative_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_8"
@@ -156,7 +156,7 @@
                     android:padding="@dimen/space_12"
                     android:text="보관 안내: 모든 항목은 5분 동안만 보관됩니다. 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
                     android:textColor="@color/informative_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
 
                 <View
                     android:layout_width="match_parent"
@@ -184,16 +184,16 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.AnyPaste.Body"
+                            style="@style/TextAppearance.ViaOs.Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="모바일 데이터 사용을 줄여요"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
+                        style="@style/Widget.ViaOs.Switch"
                         android:id="@+id/switch_wifi_only"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -203,18 +203,18 @@
 
             <TextView
                 android:id="@+id/tv_background_sync_guidance"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card_warning"
                 android:padding="@dimen/space_16"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12sp"
+                android:textSize="12px"
                 android:visibility="gone" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -257,16 +257,16 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.AnyPaste.Body"
+                            style="@style/TextAppearance.ViaOs.Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="새 항목이 오면 알려드려요"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
+                        style="@style/Widget.ViaOs.Switch"
                         android:id="@+id/switch_receive_notifications"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -311,12 +311,12 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            style="@style/TextAppearance.AnyPaste.Body"
+                            style="@style/TextAppearance.ViaOs.Body"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="클립보드 동기화와 5분 보관 정책"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
                     </LinearLayout>
 
                     <ImageView
@@ -328,7 +328,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -344,7 +344,7 @@
                 android:paddingHorizontal="@dimen/space_16"
                 android:text="AnyPaste 1.0.0"
                 android:textColor="@color/ink_secondary"
-                android:textSize="13sp" />
+                android:textSize="13px" />
 
             <TextView
                 android:id="@+id/btn_logout"

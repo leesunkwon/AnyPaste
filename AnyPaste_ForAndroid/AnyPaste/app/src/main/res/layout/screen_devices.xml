@@ -27,32 +27,32 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Title"
+                    style="@style/TextAppearance.ViaOs.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="내 기기"
-                    android:textSize="24sp" />
+                    android:textSize="24px" />
 
                 <TextView
                     android:id="@+id/btn_add_device"
                     android:layout_width="96dp"
                     android:layout_height="@dimen/touch_target"
-                    android:background="@drawable/bg_card_primary"
+                    android:background="@drawable/sk_btn_solid"
                     android:gravity="center"
                     android:text="+ 기기 연결"
-                    android:textColor="@color/primary_contrast"
-                    android:textSize="12sp"
+                    android:textColor="@color/sk_fg_on_solid"
+                    android:textSize="12px"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_4"
                 android:text="같은 계정으로 로그인한 기기만 표시돼요."
-                android:textSize="14sp" />
+                android:textSize="14px" />
 
             <LinearLayout
                 android:id="@+id/card_devices_summary"
@@ -76,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_12"
                     android:layout_weight="1"
-                    android:textColor="@color/on_primary_container"
+                    android:textColor="@color/ink"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -89,7 +89,7 @@
 
             <TextView
                 android:id="@+id/tv_devices_count"
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28" />
@@ -105,7 +105,7 @@
 
             <TextView
                 android:id="@+id/tv_devices_empty"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -113,7 +113,7 @@
                 android:gravity="center"
                 android:padding="@dimen/space_24"
                 android:text="연결된 기기가 없어요."
-                android:textSize="13sp"
+                android:textSize="13px"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -138,14 +138,14 @@
                     android:src="@drawable/ic_shield" />
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="모르는 기기가 보이면 즉시 연결을 해제하세요."
                     android:textColor="@color/warning_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

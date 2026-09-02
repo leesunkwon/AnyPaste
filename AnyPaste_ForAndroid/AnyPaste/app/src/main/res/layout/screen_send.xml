@@ -9,12 +9,12 @@
     android:paddingTop="@dimen/space_16">
 
     <TextView
-        style="@style/TextAppearance.AnyPaste.Title"
+        style="@style/TextAppearance.ViaOs.Title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/top_navigation_height"
         android:gravity="center_vertical"
         android:text="보내기"
-        android:textSize="24sp" />
+        android:textSize="24px" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:paddingBottom="@dimen/space_20">
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="1 · 보낼 내용" />
@@ -69,7 +69,7 @@
                         android:duplicateParentState="true"
                         android:text="텍스트"
                         android:textColor="@color/selection_content"
-                        android:textSize="12sp"
+                        android:textSize="12px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -101,7 +101,7 @@
                         android:duplicateParentState="true"
                         android:text="이미지"
                         android:textColor="@color/selection_content"
-                        android:textSize="12sp"
+                        android:textSize="12px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -133,27 +133,27 @@
                         android:duplicateParentState="true"
                         android:text="파일"
                         android:textColor="@color/selection_content"
-                        android:textSize="12sp"
+                        android:textSize="12px"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
                 android:text="내용 입력" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.AnyPaste.TextInputLayout"
+                style="@style/Widget.ViaOs.TextInputLayout"
                 android:id="@+id/layout_send_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/Widget.AnyPaste.TextInputEditText"
+                    style="@style/Widget.ViaOs.TextInputEditText"
                     android:id="@+id/input_send_text"
                     android:layout_width="match_parent"
                     android:layout_height="148dp"
@@ -161,7 +161,7 @@
                     android:hint="보낼 내용을 입력해 주세요"
                     android:padding="@dimen/space_16"
                     android:textColor="@color/ink"
-                    android:textSize="16sp" />
+                    android:textSize="16px" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -205,12 +205,12 @@
 
                     <TextView
                         android:id="@+id/tv_send_file_info"
-                        style="@style/TextAppearance.AnyPaste.Body"
+                        style="@style/TextAppearance.ViaOs.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="이미지 또는 파일 탐색기에서 선택"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <TextView
@@ -221,7 +221,7 @@
                     android:gravity="center"
                     android:text="선택"
                     android:textColor="@color/primary_contrast"
-                    android:textSize="12sp"
+                    android:textSize="12px"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -238,12 +238,12 @@
 
             <TextView
                 android:id="@+id/tv_send_error"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12sp"
+                android:textSize="12px"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -262,22 +262,22 @@
                     android:gravity="center"
                     android:text="!"
                     android:textColor="@color/warning_foreground"
-                    android:textSize="18sp"
+                    android:textSize="18px"
                     android:textStyle="bold" />
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="비밀번호, 인증번호 등 민감한 정보는 보내지 마세요."
                     android:textColor="@color/warning_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -313,7 +313,7 @@
                         android:layout_marginStart="@dimen/space_8"
                         android:text="전체 기기"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -342,7 +342,7 @@
                         android:layout_marginStart="@dimen/space_8"
                         android:text="특정 기기"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -381,7 +381,7 @@
                         android:layout_height="wrap_content"
                         android:text="전체 기기 전송"
                         android:textColor="@color/primary_contrast"
-                        android:textSize="11sp"
+                        android:textSize="11px"
                         android:textStyle="bold" />
 
                     <TextView
@@ -399,7 +399,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="온라인 · 즉시 전송 가능"
                         android:textColor="@color/success_foreground"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
 
                     <TextView
                         android:id="@+id/tv_send_target_change"
@@ -408,7 +408,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="기기 변경"
                         android:textColor="@color/primary_contrast"
-                        android:textSize="12sp"
+                        android:textSize="12px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -422,7 +422,7 @@
 
             <TextView
                 android:id="@+id/tv_send_device_empty"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -430,11 +430,11 @@
                 android:gravity="center"
                 android:padding="@dimen/space_20"
                 android:text="전송할 수 있는 다른 기기가 없어요."
-                android:textSize="13sp"
+                android:textSize="13px"
                 android:visibility="gone" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.ViaOs.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -480,26 +480,26 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="새 항목이 들어오면 기존 항목은 즉시 삭제됩니다"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_send_storage_policy"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card_stroke"
                 android:padding="@dimen/space_12"
                 android:text="파일 저장 공간 0 B / 1 GB 사용 중"
-                android:textSize="12sp" />
+                android:textSize="12px" />
         </LinearLayout>
     </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_transfer"
-        style="@style/Widget.AnyPaste.Button.Primary"
+        style="@style/Widget.ViaOs.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/space_12"

@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.TopNavigation"
+            style="@style/TextAppearance.ViaOs.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -52,27 +52,27 @@
                 android:gravity="center"
                 android:text="↗"
                 android:textColor="@color/white"
-                android:textSize="40sp" />
+                android:textSize="40px" />
 
             <TextView
                 android:id="@+id/tv_transfer_title"
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.ViaOs.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
                 android:gravity="center"
                 android:text="MacBook Pro로 보내는 중"
-                android:textSize="22sp" />
+                android:textSize="22px" />
 
             <TextView
                 android:id="@+id/tv_transfer_message"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
                 android:text="기기를 닫아도 전송은 계속돼요."
-                android:textSize="14sp" />
+                android:textSize="14px" />
 
             <LinearLayout
                 android:id="@+id/card_transfer_progress"
@@ -122,7 +122,7 @@
                             android:layout_marginTop="@dimen/space_4"
                             android:text="텍스트 · 324 B"
                             android:textColor="@color/ink_secondary"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
                     </LinearLayout>
 
                     <TextView
@@ -143,8 +143,8 @@
                     android:indeterminate="false"
                     android:max="100"
                     android:progress="68"
-                    android:progressBackgroundTint="@color/primary_container"
-                    android:progressTint="@color/primary_contrast" />
+                    android:progressBackgroundTint="@color/sk_bg_muted"
+                    android:progressTint="@color/sk_solid" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -159,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:text="받는 기기"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="11sp" />
+                        android:textSize="11px" />
 
                     <TextView
                         android:id="@+id/tv_transfer_target_name"
@@ -170,7 +170,7 @@
                         android:maxLines="1"
                         android:text="전체 기기"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
 
                     <View
@@ -184,7 +184,7 @@
                         android:layout_height="wrap_content"
                         android:text="보관 기한"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="11sp" />
+                        android:textSize="11px" />
 
                     <TextView
                         android:id="@+id/tv_transfer_expiry"
@@ -193,18 +193,18 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="전송 완료 후 5분 보관"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tv_transfer_network_status"
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_12"
                     android:text="네트워크 상태가 좋습니다 · 약 2초 남음"
-                    android:textSize="12sp" />
+                    android:textSize="12px" />
             </LinearLayout>
 
             <LinearLayout
@@ -226,7 +226,7 @@
 
                 <TextView
                     android:id="@+id/tv_transfer_notice"
-                    style="@style/TextAppearance.AnyPaste.Body"
+                    style="@style/TextAppearance.ViaOs.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
@@ -238,31 +238,31 @@
 
             <TextView
                 android:id="@+id/tv_transfer_failure_reason"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
                 android:background="@drawable/bg_card_warning"
                 android:padding="@dimen/space_16"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12sp"
+                android:textSize="12px"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tv_transfer_retry_queue"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:background="@drawable/bg_card_stroke"
                 android:padding="@dimen/space_16"
                 android:textColor="@color/ink_secondary"
-                android:textSize="12sp"
+                android:textSize="12px"
                 android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_retry_transfer"
-                style="@style/Widget.AnyPaste.Button.Primary"
+                style="@style/Widget.ViaOs.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"

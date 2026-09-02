@@ -24,36 +24,36 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.ScreenTitle"
+            style="@style/TextAppearance.ViaOs.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_title_gap"
             android:text="회원가입" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Body"
+            style="@style/TextAppearance.ViaOs.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
             android:text="하나의 계정으로 내 기기의 클립보드를 연결해 보세요."
-            android:textSize="16sp" />
+            android:textSize="16px" />
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Overline"
+            style="@style/TextAppearance.ViaOs.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
             android:text="이메일" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.AnyPaste.TextInputLayout"
+            style="@style/Widget.ViaOs.TextInputLayout"
             android:id="@+id/layout_signup_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.AnyPaste.TextInputEditText"
+                style="@style/Widget.ViaOs.TextInputEditText"
                 android:id="@+id/input_signup_email"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -66,21 +66,21 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Overline"
+            style="@style/TextAppearance.ViaOs.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="이름" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.AnyPaste.TextInputLayout"
+            style="@style/Widget.ViaOs.TextInputLayout"
             android:id="@+id/layout_signup_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.AnyPaste.TextInputEditText"
+                style="@style/Widget.ViaOs.TextInputEditText"
                 android:id="@+id/input_signup_name"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -94,14 +94,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Overline"
+            style="@style/TextAppearance.ViaOs.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="비밀번호" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.AnyPaste.TextInputLayout"
+            style="@style/Widget.ViaOs.TextInputLayout"
             android:id="@+id/layout_signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.AnyPaste.TextInputEditText"
+                style="@style/Widget.ViaOs.TextInputEditText"
                 android:id="@+id/input_signup_password"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -122,14 +122,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.AnyPaste.Overline"
+            style="@style/TextAppearance.ViaOs.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="비밀번호 확인" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.AnyPaste.TextInputLayout"
+            style="@style/Widget.ViaOs.TextInputLayout"
             android:id="@+id/layout_signup_password_confirmation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -137,7 +137,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.AnyPaste.TextInputEditText"
+                style="@style/Widget.ViaOs.TextInputEditText"
                 android:id="@+id/input_signup_password_confirmation"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -151,18 +151,18 @@
 
         <TextView
             android:id="@+id/tv_signup_error"
-            style="@style/TextAppearance.AnyPaste.Body"
+            style="@style/TextAppearance.ViaOs.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
             android:accessibilityLiveRegion="polite"
             android:textColor="@color/danger_foreground"
-            android:textSize="12sp"
+            android:textSize="12px"
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_create_account"
-            style="@style/Widget.AnyPaste.Button.Primary"
+            style="@style/Widget.ViaOs.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
@@ -186,7 +186,7 @@
             android:gravity="center"
             android:text="이미 계정이 있으신가요? 로그인"
             android:textColor="@color/primary_contrast"
-            android:textSize="13sp"
+            android:textSize="13px"
             android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>

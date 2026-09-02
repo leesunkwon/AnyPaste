@@ -16,10 +16,11 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
+        android:background="@drawable/sk_nav_item"
         android:contentDescription="최근 항목"
         android:padding="20dp"
         android:src="@drawable/ic_home"
+        android:stateListAnimator="@null"
         android:tint="@color/navigation_icon" />
 
     <ImageButton
@@ -27,10 +28,11 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
+        android:background="@drawable/sk_nav_item"
         android:contentDescription="보내기"
         android:padding="20dp"
         android:src="@drawable/ic_send"
+        android:stateListAnimator="@null"
         android:tint="@color/navigation_icon" />
 
     <ImageButton
@@ -38,10 +40,11 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
+        android:background="@drawable/sk_nav_item"
         android:contentDescription="내 기기"
         android:padding="20dp"
         android:src="@drawable/ic_devices"
+        android:stateListAnimator="@null"
         android:tint="@color/navigation_icon" />
 
     <ImageButton
@@ -49,9 +52,10 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
+        android:background="@drawable/sk_nav_item"
         android:contentDescription="설정"
         android:padding="20dp"
         android:src="@drawable/ic_settings"
+        android:stateListAnimator="@null"
         android:tint="@color/navigation_icon" />
 </LinearLayout>

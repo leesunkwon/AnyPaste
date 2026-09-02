@@ -26,12 +26,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Title"
+                    style="@style/TextAppearance.ViaOs.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="홈"
-                    android:textSize="24sp" />
+                    android:textSize="24px" />
 
                 <ImageButton
                     android:id="@+id/btn_notifications"
@@ -71,7 +71,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="2대의 기기가 연결되어 있어요"
-                        android:textColor="@color/on_primary_container"
+                        android:textColor="@color/ink"
                         android:textStyle="bold" />
 
                     <TextView
@@ -81,7 +81,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="마지막 동기화  ·  방금 전"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <ImageView
@@ -100,12 +100,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Title"
+                    style="@style/TextAppearance.ViaOs.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="빠른 전송"
-                    android:textSize="18sp" />
+                    android:textSize="18px" />
 
                 <TextView
                     android:id="@+id/btn_send_all"
@@ -116,7 +116,7 @@
                     android:minWidth="@dimen/touch_target"
                     android:text="자세히"
                     android:textColor="@color/primary_contrast"
-                    android:textSize="13sp"
+                    android:textSize="13px"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -149,7 +149,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="텍스트"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -177,7 +177,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="이미지"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -205,7 +205,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="파일"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -218,12 +218,12 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextAppearance.AnyPaste.Title"
+                    style="@style/TextAppearance.ViaOs.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="현재 전송 항목"
-                    android:textSize="18sp" />
+                    android:textSize="18px" />
             </LinearLayout>
 
             <ProgressBar
@@ -237,7 +237,7 @@
 
             <TextView
                 android:id="@+id/tv_home_recent_empty"
-                style="@style/TextAppearance.AnyPaste.Body"
+                style="@style/TextAppearance.ViaOs.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -245,7 +245,7 @@
                 android:gravity="center"
                 android:padding="@dimen/space_24"
                 android:text="아직 동기화된 항목이 없어요."
-                android:textSize="13sp"
+                android:textSize="13px"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -289,7 +289,7 @@
                             android:maxLines="2"
                             android:text="git checkout -b feature/clipboard"
                             android:textColor="@color/ink"
-                            android:textSize="15sp"
+                            android:textSize="15px"
                             android:textStyle="bold" />
 
                         <TextView
@@ -299,7 +299,7 @@
                             android:layout_marginTop="@dimen/space_4"
                             android:text="MacBook Pro  ·  방금 전"
                             android:textColor="@color/ink_secondary"
-                            android:textSize="12sp" />
+                            android:textSize="12px" />
 
                         <TextView
                             android:id="@+id/tv_home_clipboard_preview"
@@ -309,7 +309,7 @@
                             android:ellipsize="end"
                             android:maxLines="2"
                             android:textColor="@color/ink_secondary"
-                            android:textSize="12sp"
+                            android:textSize="12px"
                             android:visibility="gone" />
                     </LinearLayout>
 
@@ -337,7 +337,7 @@
                         android:gravity="center"
                         android:text="복사"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="13px"
                         android:textStyle="bold" />
 
                     <TextView
@@ -346,13 +346,13 @@
                         android:layout_height="@dimen/touch_target"
                         android:layout_marginStart="@dimen/space_8"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_card_primary"
+                        android:background="@drawable/sk_btn_solid"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:text="상세 보기"
-                        android:textColor="@color/primary_contrast"
-                        android:textSize="13sp"
+                        android:textColor="@color/sk_fg_on_solid"
+                        android:textSize="13px"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -393,7 +393,7 @@
                         android:maxLines="1"
                         android:text="Screenshot_2026-08-22.png"
                         android:textColor="@color/ink"
-                        android:textSize="14sp"
+                        android:textSize="14px"
                         android:textStyle="bold" />
 
                     <TextView
@@ -403,7 +403,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="MacBook Pro  ·  8분 전  ·  1.8 MB"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <ImageView
@@ -449,7 +449,7 @@
                         android:maxLines="1"
                         android:text="서비스_기획서.pdf"
                         android:textColor="@color/ink"
-                        android:textSize="14sp"
+                        android:textSize="14px"
                         android:textStyle="bold" />
 
                     <TextView
@@ -459,7 +459,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="MacBook Pro  ·  어제  ·  2.4 MB"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12px" />
                 </LinearLayout>
 
                 <ImageView

@@ -63,6 +63,12 @@
     <color name="sk_focus">#0A0A0C</color>
     <color name="sk_cluster">#070708</color>
     <color name="sk_hud">#050506</color>
+    <color name="sk_press">#B4B4BB</color>
+    <color name="sk_solid_disabled">#590A0A0C</color>
+    <color name="sk_accent_disabled">#59F4EC28</color>
+    <color name="sk_danger_disabled">#59FF4D2E</color>
+    <color name="sk_fg_on_danger">#FFFFFF</color>
+    <color name="sk_switch_off">#D0D0D5</color>
 
     <!-- Compatibility aliases used by the existing XML layouts and Kotlin. -->
     <color name="black">#0A0A0C</color>
@@ -75,7 +81,7 @@
 
     <color name="primary">#0A0A0C</color>
     <color name="primary_dark">#141416</color>
-    <color name="primary_contrast">#0A0A0C</color>
+    <color name="primary_contrast">@color/sk_fg_on_solid</color>
     <color name="primary_container">#F4EC28</color>
     <color name="primary_container_pressed">#E5DC10</color>
     <color name="on_primary_container">#0A0A0C</color>

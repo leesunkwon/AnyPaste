@@ -40,6 +40,22 @@
     <dimen name="sk_icon_sm">16dp</dimen>
     <dimen name="sk_grid_gap">10dp</dimen>
     <dimen name="sk_phone">390dp</dimen>
+    <dimen name="sk_nowbar">52dp</dimen>
+    <dimen name="sk_fab">56dp</dimen>
+    <dimen name="sk_switch_w">48dp</dimen>
+    <dimen name="sk_switch_h">28dp</dimen>
+    <dimen name="sk_check">22dp</dimen>
+    <dimen name="sk_badge">22dp</dimen>
+    <dimen name="sk_count">16dp</dimen>
+    <dimen name="sk_tile_min">132dp</dimen>
+    <dimen name="sk_art">168dp</dimen>
+    <dimen name="sk_play">72dp</dimen>
+    <dimen name="sk_avatar_sm">28dp</dimen>
+    <dimen name="sk_avatar_md">40dp</dimen>
+    <dimen name="sk_avatar_lg">72dp</dimen>
+    <dimen name="sk_story">56dp</dimen>
+    <dimen name="sk_ep_art">44dp</dimen>
+    <dimen name="sk_home_ind">5dp</dimen>
 
     <!-- Typography follows Android-scaled sp units. -->
     <dimen name="sk_fs_display">56sp</dimen>

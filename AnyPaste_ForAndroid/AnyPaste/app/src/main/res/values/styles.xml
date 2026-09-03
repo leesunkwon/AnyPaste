@@ -84,6 +84,8 @@
     <style name="Widget.ViaOs.Button.Primary" parent="Widget.MaterialComponents.Button">
         <item name="android:background">@drawable/sk_btn_solid</item>
         <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:minHeight">@dimen/sk_control_lg</item>
         <item name="android:stateListAnimator">@null</item>
@@ -100,6 +102,8 @@
     <style name="Widget.ViaOs.Button.Secondary" parent="Widget.MaterialComponents.Button">
         <item name="android:background">@drawable/sk_btn_muted</item>
         <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:minHeight">@dimen/sk_control_lg</item>
         <item name="android:stateListAnimator">@null</item>
@@ -149,9 +153,11 @@
 
     <style name="Widget.ViaOs.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
         <item name="android:minHeight">@dimen/sk_touch</item>
-        <item name="android:minWidth">@dimen/space_52</item>
-        <item name="switchMinWidth">@dimen/space_52</item>
-        <item name="thumbTint">@color/switch_thumb</item>
-        <item name="trackTint">@color/switch_track</item>
+        <item name="android:minWidth">@dimen/sk_switch_w</item>
+        <item name="switchMinWidth">@dimen/sk_switch_w</item>
+        <item name="android:thumb">@drawable/sk_switch_thumb</item>
+        <item name="track">@drawable/sk_switch_track</item>
+        <item name="thumbTint">@null</item>
+        <item name="trackTint">@null</item>
     </style>
 </resources>

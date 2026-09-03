@@ -918,7 +918,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 else "오프라인 기기도 연결되면 자동으로 받습니다",
             )
             root.findViewById<ImageView>(R.id.iv_send_target_device)
-                .setImageResource(R.drawable.ic_devices)
+                .setImageResource(R.drawable.sk_ic_keyboard)
         } else {
             val device = requireNotNull(remote)
             root.setText(R.id.tv_send_target_mode, "특정 기기 전송")
@@ -979,9 +979,9 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         )
         root.findViewById<ImageView>(R.id.iv_transfer_type).setImageResource(
             when (state.transferType) {
-                ClipboardType.TEXT -> R.drawable.ic_text
-                ClipboardType.IMAGE -> R.drawable.ic_image
-                ClipboardType.FILE -> R.drawable.ic_file
+                ClipboardType.TEXT -> R.drawable.sk_ic_quote
+                ClipboardType.IMAGE -> R.drawable.sk_ic_image
+                ClipboardType.FILE -> R.drawable.sk_ic_file
             },
         )
 
@@ -1941,14 +1941,14 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
 
     @DrawableRes
     private fun deviceIcon(device: Device): Int =
-        if (device.resolvedPlatform() == DevicePlatform.MACOS) R.drawable.ic_desktop
-        else R.drawable.ic_phone
+        if (device.resolvedPlatform() == DevicePlatform.MACOS) R.drawable.sk_ic_keyboard
+        else R.drawable.sk_ic_phone
 
     @DrawableRes
     private fun typeIcon(item: ClipboardItem): Int = when (item.resolvedType()) {
-        ClipboardType.TEXT -> R.drawable.ic_text
-        ClipboardType.IMAGE -> R.drawable.ic_image
-        ClipboardType.FILE -> R.drawable.ic_file
+        ClipboardType.TEXT -> R.drawable.sk_ic_quote
+        ClipboardType.IMAGE -> R.drawable.sk_ic_image
+        ClipboardType.FILE -> R.drawable.sk_ic_file
     }
 
     private fun typeLabel(item: ClipboardItem): String = typeLabel(item.resolvedType())

@@ -55,7 +55,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:contentDescription="보안"
-                android:src="@drawable/ic_shield" />
+                android:src="@drawable/sk_ic_shield" />
 
             <TextView
                 style="@style/TextAppearance.Via.Body1"
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
             android:text="이메일로 로그인"
-            app:icon="@drawable/ic_text"
+            app:icon="@drawable/sk_ic_quote"
             app:iconGravity="textStart"
             app:iconPadding="12dp" />
 

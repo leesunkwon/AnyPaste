@@ -70,7 +70,7 @@ class AnyPasteNotificationManager(context: Context) {
         )
 
         return NotificationCompat.Builder(appContext, CHANNEL_SYNC)
-            .setSmallIcon(R.drawable.ic_copy)
+            .setSmallIcon(R.drawable.sk_ic_copy)
             .setContentTitle("AnyPaste 동기화 중")
             .setContentText(status)
             .setContentIntent(mainPendingIntent())
@@ -79,7 +79,7 @@ class AnyPasteNotificationManager(context: Context) {
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .addAction(R.drawable.ic_check, "동기화 중지", stopPendingIntent)
+            .addAction(R.drawable.sk_ic_check, "동기화 중지", stopPendingIntent)
             .build()
     }
 
@@ -92,7 +92,7 @@ class AnyPasteNotificationManager(context: Context) {
         notifyIncoming(
             id = itemId,
             channelId = CHANNEL_CLIPBOARD_RECEIVED,
-            smallIcon = R.drawable.ic_text,
+            smallIcon = R.drawable.sk_ic_quote,
             title = "새 텍스트를 받았습니다",
             content = preview.ifBlank { "클립보드에 복사했습니다" },
             sourceDeviceId = sourceDeviceId,
@@ -105,7 +105,7 @@ class AnyPasteNotificationManager(context: Context) {
         notifyIncoming(
             id = itemId,
             channelId = CHANNEL_CLIPBOARD_RECEIVED,
-            smallIcon = R.drawable.ic_image,
+            smallIcon = R.drawable.sk_ic_image,
             title = "새 이미지를 받았습니다",
             content = fileName?.takeIf(String::isNotBlank) ?: "AnyPaste에서 이미지를 확인하세요",
             sourceDeviceId = sourceDeviceId,
@@ -117,7 +117,7 @@ class AnyPasteNotificationManager(context: Context) {
         notifyIncoming(
             id = itemId,
             channelId = CHANNEL_FILE_RECEIVED,
-            smallIcon = R.drawable.ic_file,
+            smallIcon = R.drawable.sk_ic_file,
             title = "새 파일을 받았습니다",
             content = fileName?.takeIf(String::isNotBlank) ?: "AnyPaste에서 파일을 확인하세요",
             sourceDeviceId = sourceDeviceId,
@@ -137,7 +137,7 @@ class AnyPasteNotificationManager(context: Context) {
             else -> notifyIncoming(
                 id = itemId,
                 channelId = CHANNEL_CLIPBOARD_RECEIVED,
-                smallIcon = R.drawable.ic_text,
+                smallIcon = R.drawable.sk_ic_quote,
                 title = "새 텍스트를 받았습니다",
                 content = "AnyPaste에서 받은 내용을 확인하세요",
                 sourceDeviceId = sourceDeviceId,

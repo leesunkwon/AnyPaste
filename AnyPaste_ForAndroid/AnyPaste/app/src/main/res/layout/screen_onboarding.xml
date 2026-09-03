@@ -73,7 +73,7 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:contentDescription="Mac"
-                    android:src="@drawable/ic_desktop" />
+                    android:src="@drawable/sk_ic_keyboard" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
                     android:layout_width="34dp"
                     android:layout_height="34dp"
                     android:contentDescription="Android"
-                    android:src="@drawable/ic_phone" />
+                    android:src="@drawable/sk_ic_phone" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -126,7 +126,7 @@
                 style="@style/TextAppearance.Via.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_check"
+                android:drawableStart="@drawable/sk_ic_check"
                 android:drawablePadding="@dimen/space_12"
                 android:gravity="center_vertical"
                 android:text="텍스트, 이미지, 파일을 한 번에"
@@ -138,7 +138,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
-                android:drawableStart="@drawable/ic_check"
+                android:drawableStart="@drawable/sk_ic_check"
                 android:drawablePadding="@dimen/space_12"
                 android:gravity="center_vertical"
                 android:text="내 기기에만 안전하게 동기화"
@@ -177,7 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
             android:text="시작하기"
-            app:icon="@drawable/ic_arrow_right"
+            app:icon="@drawable/sk_ic_chevron_right"
             app:iconGravity="textEnd" />
     </LinearLayout>
 </ScrollView>

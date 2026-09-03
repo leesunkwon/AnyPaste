@@ -32,6 +32,12 @@
     <color name="sk_danger_soft">#29FF4D2E</color>
     <color name="sk_danger_fg">#FFC7BA</color>
     <color name="sk_focus">#F5F5F7</color>
+    <color name="sk_press">#484850</color>
+    <color name="sk_solid_disabled">#59F5F5F7</color>
+    <color name="sk_accent_disabled">#59F4EC28</color>
+    <color name="sk_danger_disabled">#59FF6A45</color>
+    <color name="sk_fg_on_danger">#FFFFFF</color>
+    <color name="sk_switch_off">#484850</color>
 
     <color name="black">#F5F5F7</color>
     <color name="white">#0A0A0C</color>
@@ -43,7 +49,7 @@
 
     <color name="primary">#F5F5F7</color>
     <color name="primary_dark">#C2C2C8</color>
-    <color name="primary_contrast">#F5F5F7</color>
+    <color name="primary_contrast">@color/sk_fg_on_solid</color>
     <color name="primary_container">#F4EC28</color>
     <color name="primary_container_pressed">#E5DC10</color>
     <color name="on_primary_container">#0A0A0C</color>

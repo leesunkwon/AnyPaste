@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
-    android:layout_marginBottom="16dp"
-    android:layout_height="@dimen/space_64"
-    android:layout_marginTop="@dimen/space_12"
-    android:background="@drawable/bg_nav"
+    android:layout_height="@dimen/sk_tabbar"
+    android:background="@drawable/sk_tabbar"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/space_12">
+    android:paddingHorizontal="@dimen/sk_s_2"
+    android:paddingVertical="6dp">
 
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/sk_touch"
         android:layout_weight="1"
         android:gravity="center">
 
@@ -22,17 +19,18 @@
             android:layout_width="@dimen/sk_touch"
             android:layout_height="@dimen/sk_touch"
             android:layout_gravity="center"
-            android:background="@drawable/sk_nav_item"
-            android:contentDescription="최근 항목"
+            android:background="@drawable/sk_tab"
+            android:contentDescription="@string/sk_cd_home"
             android:padding="@dimen/space_10"
-            android:src="@drawable/ic_home"
+            android:scaleType="center"
+            android:src="@drawable/sk_ic_home"
             android:stateListAnimator="@null"
-            android:tint="@color/navigation_icon" />
+            android:tint="@color/sk_tab_tint" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/sk_touch"
         android:layout_weight="1"
         android:gravity="center">
 
@@ -41,17 +39,18 @@
             android:layout_width="@dimen/sk_touch"
             android:layout_height="@dimen/sk_touch"
             android:layout_gravity="center"
-            android:background="@drawable/sk_nav_item"
-            android:contentDescription="보내기"
+            android:background="@drawable/sk_tab"
+            android:contentDescription="@string/sk_cd_send"
             android:padding="@dimen/space_10"
-            android:src="@drawable/ic_send"
+            android:scaleType="center"
+            android:src="@drawable/sk_ic_send"
             android:stateListAnimator="@null"
-            android:tint="@color/navigation_icon" />
+            android:tint="@color/sk_tab_tint" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/sk_touch"
         android:layout_weight="1"
         android:gravity="center">
 
@@ -60,17 +59,18 @@
             android:layout_width="@dimen/sk_touch"
             android:layout_height="@dimen/sk_touch"
             android:layout_gravity="center"
-            android:background="@drawable/sk_nav_item"
-            android:contentDescription="내 기기"
+            android:background="@drawable/sk_tab"
+            android:contentDescription="@string/sk_cd_devices"
             android:padding="@dimen/space_10"
-            android:src="@drawable/ic_devices"
+            android:scaleType="center"
+            android:src="@drawable/sk_ic_keyboard"
             android:stateListAnimator="@null"
-            android:tint="@color/navigation_icon" />
+            android:tint="@color/sk_tab_tint" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/sk_touch"
         android:layout_weight="1"
         android:gravity="center">
 
@@ -79,11 +79,12 @@
             android:layout_width="@dimen/sk_touch"
             android:layout_height="@dimen/sk_touch"
             android:layout_gravity="center"
-            android:background="@drawable/sk_nav_item"
-            android:contentDescription="설정"
+            android:background="@drawable/sk_tab"
+            android:contentDescription="@string/sk_cd_settings"
             android:padding="@dimen/space_10"
-            android:src="@drawable/ic_settings"
+            android:scaleType="center"
+            android:src="@drawable/sk_ic_settings"
             android:stateListAnimator="@null"
-            android:tint="@color/navigation_icon" />
+            android:tint="@color/sk_tab_tint" />
     </FrameLayout>
 </LinearLayout>

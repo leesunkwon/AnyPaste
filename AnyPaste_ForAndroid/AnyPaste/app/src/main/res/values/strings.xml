@@ -1,7 +1,3 @@
 <resources>
     <string name="app_name">AnyPaste</string>
-    <string name="sk_cd_home">홈</string>
-    <string name="sk_cd_send">보내기</string>
-    <string name="sk_cd_devices">내 기기</string>
-    <string name="sk_cd_settings">설정</string>
 </resources>

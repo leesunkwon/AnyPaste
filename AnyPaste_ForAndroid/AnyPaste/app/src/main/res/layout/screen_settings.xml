@@ -80,7 +80,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="계정 관리"
-                    android:src="@drawable/sk_ic_chevron_right" />
+                    android:src="@drawable/ic_arrow_right" />
             </LinearLayout>
 
             <TextView
@@ -240,7 +240,7 @@
                         android:background="@drawable/bg_icon_primary"
                         android:contentDescription="알림"
                         android:padding="8dp"
-                        android:src="@drawable/sk_ic_bell" />
+                        android:src="@drawable/ic_bell" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -294,7 +294,7 @@
                         android:background="@drawable/bg_icon_purple"
                         android:contentDescription="개인정보"
                         android:padding="8dp"
-                        android:src="@drawable/sk_ic_shield" />
+                        android:src="@drawable/ic_shield" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -323,7 +323,7 @@
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:contentDescription="권한 상세"
-                        android:src="@drawable/sk_ic_chevron_right" />
+                        android:src="@drawable/ic_arrow_right" />
                 </LinearLayout>
             </LinearLayout>
 

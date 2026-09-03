@@ -25,7 +25,7 @@
             android:background="@drawable/sk_nav_item"
             android:contentDescription="최근 항목"
             android:padding="@dimen/space_10"
-            android:src="@drawable/sk_ic_home"
+            android:src="@drawable/ic_home"
             android:stateListAnimator="@null"
             android:tint="@color/navigation_icon" />
     </FrameLayout>
@@ -44,7 +44,7 @@
             android:background="@drawable/sk_nav_item"
             android:contentDescription="보내기"
             android:padding="@dimen/space_10"
-            android:src="@drawable/sk_ic_send"
+            android:src="@drawable/ic_send"
             android:stateListAnimator="@null"
             android:tint="@color/navigation_icon" />
     </FrameLayout>
@@ -63,7 +63,7 @@
             android:background="@drawable/sk_nav_item"
             android:contentDescription="내 기기"
             android:padding="@dimen/space_10"
-            android:src="@drawable/sk_ic_keyboard"
+            android:src="@drawable/ic_devices"
             android:stateListAnimator="@null"
             android:tint="@color/navigation_icon" />
     </FrameLayout>
@@ -82,7 +82,7 @@
             android:background="@drawable/sk_nav_item"
             android:contentDescription="설정"
             android:padding="@dimen/space_10"
-            android:src="@drawable/sk_ic_settings"
+            android:src="@drawable/ic_settings"
             android:stateListAnimator="@null"
             android:tint="@color/navigation_icon" />
     </FrameLayout>

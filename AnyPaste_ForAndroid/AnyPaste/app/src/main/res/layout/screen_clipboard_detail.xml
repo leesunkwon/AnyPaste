@@ -21,7 +21,7 @@
             android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
             android:padding="@dimen/space_12"
-            android:src="@drawable/sk_ic_chevron_left" />
+            android:src="@drawable/ic_back" />
 
         <TextView
             style="@style/TextAppearance.Via.Title4"
@@ -66,7 +66,7 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:contentDescription="텍스트"
-                    android:src="@drawable/sk_ic_quote" />
+                    android:src="@drawable/ic_text" />
 
                 <TextView
                     android:id="@+id/tv_detail_type"
@@ -146,7 +146,7 @@
                     android:background="@drawable/bg_icon_primary"
                     android:contentDescription="발신 기기"
                     android:padding="8dp"
-                    android:src="@drawable/sk_ic_keyboard" />
+                    android:src="@drawable/ic_desktop" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -242,7 +242,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="다시 보내기"
-            app:icon="@drawable/sk_ic_send"
+            app:icon="@drawable/ic_send"
             app:iconGravity="textStart" />
 
         <com.google.android.material.button.MaterialButton
@@ -254,7 +254,7 @@
             android:layout_weight="1"
             android:text="클립보드에 복사"
             android:textSize="12sp"
-            app:icon="@drawable/sk_ic_copy"
+            app:icon="@drawable/ic_copy"
             app:iconGravity="textStart"
             app:iconPadding="3dp" />
     </LinearLayout>

@@ -20,7 +20,7 @@
             android:background="@drawable/bg_icon_action"
             android:contentDescription="뒤로가기"
             android:padding="@dimen/space_12"
-            android:src="@drawable/sk_ic_chevron_left" />
+            android:src="@drawable/ic_back" />
 
         <TextView
             style="@style/TextAppearance.Via.Title4"
@@ -175,7 +175,7 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:contentDescription="보안"
-                    android:src="@drawable/sk_ic_shield" />
+                    android:src="@drawable/ic_shield" />
 
                 <TextView
                     style="@style/TextAppearance.Via.Body1"

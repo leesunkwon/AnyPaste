@@ -84,7 +84,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="연결 상태"
-                    android:src="@drawable/sk_ic_check" />
+                    android:src="@drawable/ic_check" />
             </LinearLayout>
 
             <TextView
@@ -135,7 +135,7 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:contentDescription="안내"
-                    android:src="@drawable/sk_ic_shield" />
+                    android:src="@drawable/ic_shield" />
 
                 <TextView
                     style="@style/TextAppearance.Via.Body1"

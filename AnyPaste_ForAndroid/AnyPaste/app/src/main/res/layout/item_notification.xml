@@ -19,7 +19,7 @@
         android:background="@drawable/bg_icon_primary"
         android:contentDescription="알림 유형"
         android:padding="10dp"
-        android:src="@drawable/sk_ic_quote" />
+        android:src="@drawable/ic_text" />
 
     <LinearLayout
         android:layout_width="0dp"

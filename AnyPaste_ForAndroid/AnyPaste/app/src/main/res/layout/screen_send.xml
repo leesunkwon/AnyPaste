@@ -58,7 +58,7 @@
                         android:layout_height="25dp"
                         android:contentDescription="텍스트"
                         android:duplicateParentState="true"
-                        android:src="@drawable/sk_ic_quote"
+                        android:src="@drawable/ic_text"
                         android:tint="@color/selection_content" />
 
                     <TextView
@@ -90,7 +90,7 @@
                         android:layout_height="25dp"
                         android:contentDescription="이미지"
                         android:duplicateParentState="true"
-                        android:src="@drawable/sk_ic_image"
+                        android:src="@drawable/ic_image"
                         android:tint="@color/selection_content" />
 
                     <TextView
@@ -122,7 +122,7 @@
                         android:layout_height="25dp"
                         android:contentDescription="파일"
                         android:duplicateParentState="true"
-                        android:src="@drawable/sk_ic_file"
+                        android:src="@drawable/ic_file"
                         android:tint="@color/selection_content" />
 
                     <TextView
@@ -184,7 +184,7 @@
                     android:background="@drawable/bg_icon_teal"
                     android:contentDescription="전송할 파일 선택"
                     android:padding="10dp"
-                    android:src="@drawable/sk_ic_file" />
+                    android:src="@drawable/ic_file" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -305,7 +305,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:contentDescription=""
-                        android:src="@drawable/sk_ic_keyboard" />
+                        android:src="@drawable/ic_devices" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -334,7 +334,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:contentDescription=""
-                        android:src="@drawable/sk_ic_keyboard" />
+                        android:src="@drawable/ic_desktop" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -366,7 +366,7 @@
                     android:background="@drawable/bg_icon_primary"
                     android:contentDescription="MacBook Pro"
                     android:padding="9dp"
-                    android:src="@drawable/sk_ic_keyboard" />
+                    android:src="@drawable/ic_desktop" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -417,7 +417,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:contentDescription="선택됨"
-                    android:src="@drawable/sk_ic_check" />
+                    android:src="@drawable/ic_check" />
             </LinearLayout>
 
             <TextView
@@ -456,7 +456,7 @@
                     android:background="@drawable/bg_icon_teal"
                     android:contentDescription="보관 정책"
                     android:padding="9dp"
-                    android:src="@drawable/sk_ic_settings" />
+                    android:src="@drawable/ic_settings" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -504,7 +504,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/space_12"
         android:text="MacBook Pro로 보내기"
-        app:icon="@drawable/sk_ic_send"
+        app:icon="@drawable/ic_send"
         app:iconGravity="textStart"
         app:iconPadding="10dp" />
 

@@ -40,7 +40,7 @@
                     android:background="@drawable/bg_icon_action"
                     android:contentDescription="알림"
                     android:padding="@dimen/space_12"
-                    android:src="@drawable/sk_ic_bell" />
+                    android:src="@drawable/ic_bell" />
             </LinearLayout>
 
             <LinearLayout
@@ -89,7 +89,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="연결됨"
-                    android:src="@drawable/sk_ic_check" />
+                    android:src="@drawable/ic_check" />
             </LinearLayout>
 
             <LinearLayout
@@ -141,7 +141,7 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:contentDescription="텍스트 전송"
-                        android:src="@drawable/sk_ic_quote" />
+                        android:src="@drawable/ic_text" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -169,7 +169,7 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:contentDescription="이미지 전송"
-                        android:src="@drawable/sk_ic_image" />
+                        android:src="@drawable/ic_image" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -197,7 +197,7 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:contentDescription="파일 전송"
-                        android:src="@drawable/sk_ic_file" />
+                        android:src="@drawable/ic_file" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -272,7 +272,7 @@
                         android:background="@drawable/bg_icon_primary"
                         android:contentDescription="텍스트"
                         android:padding="14dp"
-                        android:src="@drawable/sk_ic_quote" />
+                        android:src="@drawable/ic_text" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -317,7 +317,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:contentDescription="상세 보기"
-                        android:src="@drawable/sk_ic_chevron_right" />
+                        android:src="@drawable/ic_arrow_right" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -376,7 +376,7 @@
                     android:background="@drawable/bg_icon_teal"
                     android:contentDescription="이미지"
                     android:padding="10dp"
-                    android:src="@drawable/sk_ic_image" />
+                    android:src="@drawable/ic_image" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -410,7 +410,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:contentDescription="상세 보기"
-                    android:src="@drawable/sk_ic_chevron_right" />
+                    android:src="@drawable/ic_arrow_right" />
             </LinearLayout>
 
             <LinearLayout
@@ -432,7 +432,7 @@
                     android:background="@drawable/bg_icon_purple"
                     android:contentDescription="파일"
                     android:padding="10dp"
-                    android:src="@drawable/sk_ic_file" />
+                    android:src="@drawable/ic_file" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -466,7 +466,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:contentDescription="상세 보기"
-                    android:src="@drawable/sk_ic_chevron_right" />
+                    android:src="@drawable/ic_arrow_right" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

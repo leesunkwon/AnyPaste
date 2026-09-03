@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -125,7 +125,7 @@
 
         <TextView
             android:id="@+id/tv_selected_clipboard_count"
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -170,7 +170,7 @@
 
             <TextView
                 android:id="@+id/tv_clipboards_empty"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -189,7 +189,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete_selected"
-                style="@style/Widget.ViaOs.Button.Critical"
+                style="@style/Widget.AnyPaste.Button.Critical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"

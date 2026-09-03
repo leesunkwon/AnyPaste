@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -63,7 +63,7 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_name"
-                style="@style/TextAppearance.Via.Title3"
+                style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
@@ -106,7 +106,7 @@
                 android:padding="@dimen/space_16">
 
                 <TextView
-                    style="@style/TextAppearance.Via.Label"
+                    style="@style/TextAppearance.AnyPaste.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="기기 정보" />
@@ -179,7 +179,7 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.Via.Label"
+                style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -208,7 +208,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.Via.Body1"
+                        style="@style/TextAppearance.AnyPaste.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -217,7 +217,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    style="@style/Widget.ViaOs.Switch"
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_device_auto_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -247,7 +247,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.Via.Body1"
+                        style="@style/TextAppearance.AnyPaste.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -256,7 +256,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    style="@style/Widget.ViaOs.Switch"
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_device_file_notifications"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -287,7 +287,7 @@
 
             <TextView
                 android:id="@+id/tv_device_detail_error"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"

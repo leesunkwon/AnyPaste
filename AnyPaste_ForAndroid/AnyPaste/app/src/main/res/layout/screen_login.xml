@@ -26,7 +26,7 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title2"
+            style="@style/TextAppearance.AnyPaste.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
@@ -34,7 +34,7 @@
             android:text="AnyPaste에 오신 것을\n환영해요" />
 
         <TextView
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
@@ -58,18 +58,18 @@
                 android:src="@drawable/ic_shield" />
 
             <TextView
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_12"
                 android:layout_weight="1"
                 android:text="공유 항목은 내 계정의 기기에서만 볼 수 있어요."
-                android:textColor="@color/ink" />
+                android:textColor="@color/on_primary_container" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
-            style="@style/Widget.ViaOs.Button.Outline"
+            style="@style/Widget.AnyPaste.Button.Outline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
@@ -80,7 +80,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login_email"
-            style="@style/Widget.ViaOs.Button.Primary"
+            style="@style/Widget.AnyPaste.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
@@ -110,7 +110,7 @@
 
         <TextView
             android:id="@+id/tv_login_error"
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -130,7 +130,7 @@
             android:textStyle="bold" />
 
         <TextView
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_16"

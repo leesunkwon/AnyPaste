@@ -19,10 +19,10 @@ import android.provider.OpenableColumns
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.text.format.Formatter
-import android.util.TypedValue
 import android.util.Patterns
 import android.view.View
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -35,6 +35,7 @@ import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -54,13 +55,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.kotlinsun.anypaste.core.AppPreferences
-import com.kotlinsun.anypaste.databinding.ViewActionBottomSheetBinding
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
 import com.kotlinsun.anypaste.model.Device
@@ -630,27 +628,22 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             }
         root.onClick(R.id.btn_rename_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
-            showRenameDeviceSheet(device)
+            showRenameDeviceDialog(device)
         }
         root.onClick(R.id.btn_disconnect_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
-            val sheet = createActionBottomSheet(
-                title = "기기 연결을 해제할까요?",
-                body = "${device.deviceName}에서 로그아웃되고 이후 동기화가 차단됩니다. " +
-                    "다시 사용하려면 새 기기로 연결해야 합니다.",
-            )
-            sheet.binding.btnBottomSheetPrimary.apply {
-                isVisible = true
-                text = "연결 해제"
-                setBackgroundResource(R.drawable.bg_action_critical)
-                setTextColor(ContextCompat.getColor(this@MainActivity, R.color.sk_fg_on_solid))
-                setOnClickListener {
-                    sheet.dialog.dismiss()
+            AlertDialog.Builder(this)
+                .setTitle("기기 연결을 해제할까요?")
+                .setMessage(
+                    "${device.deviceName}에서 로그아웃되고 이후 동기화가 차단됩니다. " +
+                        "다시 사용하려면 새 기기로 연결해야 합니다.",
+                )
+                .setNegativeButton("취소", null)
+                .setPositiveButton("연결 해제") { _, _ ->
                     viewModel.removeDevice(device)
                     showScreen(Screen.DEVICES)
                 }
-            }
-            sheet.dialog.show()
+                .show()
         }
     }
 
@@ -680,30 +673,22 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         }
     }
 
-    private fun showRenameDeviceSheet(device: Device) {
-        val sheet = createActionBottomSheet(
-            title = "기기 이름 변경",
-            body = "이 이름은 같은 계정으로 연결된 모든 기기에 표시됩니다.",
-        )
-        val inputLayout = sheet.binding.inputBottomSheetNameLayout
-        val input = sheet.binding.inputBottomSheetName
-        inputLayout.isVisible = true
-        input.setText(device.deviceName)
-        input.setSelection(device.deviceName.length)
-        sheet.binding.btnBottomSheetPrimary.apply {
-            isVisible = true
-            text = "변경"
-            setOnClickListener {
-                val name = input.text?.toString()?.trim().orEmpty()
-                if (name.isBlank()) {
-                    inputLayout.error = "기기 이름을 입력해 주세요."
-                    return@setOnClickListener
-                }
-                sheet.dialog.dismiss()
-                viewModel.renameDevice(device, name)
-            }
+    private fun showRenameDeviceDialog(device: Device) {
+        val input = EditText(this).apply {
+            setText(device.deviceName)
+            setSelectAllOnFocus(false)
+            setSingleLine(true)
+            setPadding(48, 0, 48, 0)
         }
-        sheet.dialog.show()
+        AlertDialog.Builder(this)
+            .setTitle("기기 이름 변경")
+            .setMessage("이 이름은 같은 계정으로 연결된 모든 기기에 표시됩니다.")
+            .setView(input)
+            .setNegativeButton("취소", null)
+            .setPositiveButton("변경") { _, _ ->
+                viewModel.renameDevice(device, input.text?.toString().orEmpty())
+            }
+            .show()
     }
 
     private fun bindPermissionActions(root: View) {
@@ -1029,10 +1014,10 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                     root = root,
                     progressView = progressView,
                     stateBackground = R.drawable.bg_circle_primary,
-                    progressColor = R.color.sk_solid,
-                    progressTrackColor = R.color.sk_bg_muted,
+                    progressColor = R.color.primary_contrast,
+                    progressTrackColor = R.color.primary_container,
                     noticeBackground = R.drawable.bg_card_primary,
-                    noticeTextColor = R.color.ink,
+                    noticeTextColor = R.color.on_primary_container,
                     showNoticeIcon = false,
                     showNotice = true,
                 )
@@ -1257,8 +1242,9 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             val selected = item.id in selectedClipboardIds
             val type = item.resolvedType()
 
-            itemView.isSelected = selected
-            itemView.setBackgroundResource(R.drawable.sk_tile)
+            itemView.setBackgroundResource(
+                if (selected) R.drawable.bg_card_primary else R.drawable.bg_card,
+            )
             itemView.findViewById<ImageView>(R.id.iv_clipboard_type).apply {
                 setImageResource(typeIcon(item))
                 setBackgroundResource(
@@ -1765,72 +1751,19 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         val currentId = viewModel.state.value.sendTargetDeviceId
         val selections = listOf<String?>(null) + devices.map(Device::id)
         val checkedIndex = selections.indexOf(currentId).coerceAtLeast(0)
-        val labels = listOf("전체 기기 · ${devices.size}대") + devices.map { device ->
+        val labels = (listOf("전체 기기 · ${devices.size}대") + devices.map { device ->
             val platform = if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android"
             "${device.deviceName} · $platform · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
-        }
-        val sheet = createActionBottomSheet(
-            title = "전송 대상 선택",
-            body = "선택한 기기로만 항목을 전송합니다.",
-        )
-        sheet.binding.btnBottomSheetSecondary.text = "닫기"
-        val optionContainer = sheet.binding.layoutBottomSheetOptions
-        labels.forEachIndexed { index, label ->
-            val selected = index == checkedIndex
-            val option = TextView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    resources.getDimensionPixelSize(R.dimen.sk_control_lg),
-                ).apply {
-                    if (index > 0) topMargin = resources.getDimensionPixelSize(R.dimen.sk_s_2)
-                }
-                background = ContextCompat.getDrawable(this@MainActivity, R.drawable.sk_tile)
-                contentDescription = "$label, ${if (selected) "선택됨" else "선택"}"
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                isClickable = true
-                isFocusable = true
-                isSelected = selected
-                setPadding(
-                    resources.getDimensionPixelSize(R.dimen.sk_s_4),
-                    0,
-                    resources.getDimensionPixelSize(R.dimen.sk_s_4),
-                    0,
-                )
-                setTextColor(
-                    ContextCompat.getColor(
-                        this@MainActivity,
-                        if (selected) R.color.sk_fg_on_accent else R.color.sk_fg,
-                    ),
-                )
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                text = label
-                ViewCompat.setStateDescription(this, if (selected) "선택됨" else null)
-                setOnClickListener {
-                    sheet.dialog.dismiss()
-                    viewModel.selectSendTarget(selections[index])
-                    renderCurrent(viewModel.state.value)
-                }
+        }).toTypedArray()
+        AlertDialog.Builder(this)
+            .setTitle("전송 대상 선택")
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                viewModel.selectSendTarget(selections[which])
+                dialog.dismiss()
+                renderCurrent(viewModel.state.value)
             }
-            optionContainer.addView(option)
-        }
-        sheet.dialog.show()
-    }
-
-    private fun createActionBottomSheet(title: String, body: String?): ActionBottomSheet {
-        val binding = ViewActionBottomSheetBinding.inflate(layoutInflater)
-        val dialog = BottomSheetDialog(this).apply {
-            setTitle(title)
-            setContentView(binding.root)
-        }
-        binding.tvBottomSheetTitle.text = title
-        binding.tvBottomSheetBody.apply {
-            isVisible = !body.isNullOrBlank()
-            text = body.orEmpty()
-        }
-        binding.btnBottomSheetSecondary.setOnClickListener {
-            dialog.dismiss()
-        }
-        return ActionBottomSheet(dialog, binding)
+            .setNegativeButton("취소", null)
+            .show()
     }
 
     private fun renderHomeCurrentItem(root: View, item: ClipboardItem) {
@@ -2116,11 +2049,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     private fun toast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
-
-    private data class ActionBottomSheet(
-        val dialog: BottomSheetDialog,
-        val binding: ViewActionBottomSheetBinding,
-    )
 
     private data class SelectedFile(
         val uri: Uri,

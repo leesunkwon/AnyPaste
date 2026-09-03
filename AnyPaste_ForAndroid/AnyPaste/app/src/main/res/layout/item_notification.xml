@@ -37,7 +37,7 @@
 
         <TextView
             android:id="@+id/tv_notification_body"
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_2"

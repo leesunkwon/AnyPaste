@@ -24,14 +24,14 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title2"
+            style="@style/TextAppearance.AnyPaste.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_title_gap"
             android:text="회원가입" />
 
         <TextView
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
@@ -39,21 +39,21 @@
             android:textSize="16sp" />
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
             android:text="이메일" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_email"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -66,21 +66,21 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="이름" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_name"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -94,14 +94,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="비밀번호" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_password"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -122,14 +122,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="비밀번호 확인" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_signup_password_confirmation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -137,7 +137,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_signup_password_confirmation"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -151,7 +151,7 @@
 
         <TextView
             android:id="@+id/tv_signup_error"
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -162,7 +162,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_create_account"
-            style="@style/Widget.ViaOs.Button.Primary"
+            style="@style/Widget.AnyPaste.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"

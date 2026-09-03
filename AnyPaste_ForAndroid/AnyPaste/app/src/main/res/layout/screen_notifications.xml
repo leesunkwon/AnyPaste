@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -67,7 +67,7 @@
 
             <TextView
                 android:id="@+id/tv_notifications_empty"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"

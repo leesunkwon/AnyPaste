@@ -24,7 +24,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -81,7 +81,7 @@
 
             <TextView
                 android:id="@+id/tv_detail_title"
-                style="@style/TextAppearance.Via.Title3"
+                style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_16"
@@ -90,7 +90,7 @@
 
             <TextView
                 android:id="@+id/tv_detail_meta"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_4"
@@ -122,7 +122,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_download_file"
-                style="@style/Widget.ViaOs.Button.Outline"
+                style="@style/Widget.AnyPaste.Button.Outline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -237,7 +237,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_resend"
-            style="@style/Widget.ViaOs.Button.Secondary"
+            style="@style/Widget.AnyPaste.Button.Secondary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -247,7 +247,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_copy"
-            style="@style/Widget.ViaOs.Button.Primary"
+            style="@style/Widget.AnyPaste.Button.Primary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"

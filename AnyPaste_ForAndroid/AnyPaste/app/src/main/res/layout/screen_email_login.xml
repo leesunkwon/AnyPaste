@@ -24,14 +24,14 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title2"
+            style="@style/TextAppearance.AnyPaste.ScreenTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_title_gap"
             android:text="이메일 로그인" />
 
         <TextView
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_6"
@@ -39,21 +39,21 @@
             android:textSize="16sp" />
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
             android:text="이메일" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_email"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -64,14 +64,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            style="@style/TextAppearance.Via.Label"
+            style="@style/TextAppearance.AnyPaste.Overline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/component_gap"
             android:text="비밀번호" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ViaOs.TextInputLayout"
+            style="@style/Widget.AnyPaste.TextInputLayout"
             android:id="@+id/layout_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
-                style="@style/Widget.ViaOs.TextInputEditText"
+                style="@style/Widget.AnyPaste.TextInputEditText"
                 android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
@@ -102,7 +102,7 @@
 
         <TextView
             android:id="@+id/tv_auth_error"
-            style="@style/TextAppearance.Via.Body1"
+            style="@style/TextAppearance.AnyPaste.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
@@ -127,19 +127,19 @@
                 android:src="@drawable/ic_shield" />
 
             <TextView
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/space_8"
                 android:layout_weight="1"
                 android:text="계정과 동기화 데이터는 안전하게 보호됩니다."
-                android:textColor="@color/ink"
+                android:textColor="@color/on_primary_container"
                 android:textSize="12sp" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_email_continue"
-            style="@style/Widget.ViaOs.Button.Primary"
+            style="@style/Widget.AnyPaste.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"

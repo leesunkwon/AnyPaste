@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -45,14 +45,14 @@
             android:paddingBottom="@dimen/space_20">
 
             <TextView
-                style="@style/TextAppearance.Via.Title3"
+                style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="더 매끄러운 동기화를\n위해 권한이 필요해요"
                 android:textSize="24sp" />
 
             <TextView
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -94,7 +94,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.Via.Body1"
+                        style="@style/TextAppearance.AnyPaste.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -150,7 +150,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.Via.Body1"
+                        style="@style/TextAppearance.AnyPaste.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -204,7 +204,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        style="@style/TextAppearance.Via.Body1"
+                        style="@style/TextAppearance.AnyPaste.Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
@@ -213,7 +213,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    style="@style/Widget.ViaOs.Switch"
+                    style="@style/Widget.AnyPaste.Switch"
                     android:id="@+id/switch_auto_expiry"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -240,7 +240,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    style="@style/TextAppearance.Via.Body1"
+                    style="@style/TextAppearance.AnyPaste.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
@@ -254,7 +254,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_continue_permissions"
-        style="@style/Widget.ViaOs.Button.Primary"
+        style="@style/Widget.AnyPaste.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/space_12"

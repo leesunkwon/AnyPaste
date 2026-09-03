@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back" />
 
         <TextView
-            style="@style/TextAppearance.Via.Title4"
+            style="@style/TextAppearance.AnyPaste.TopNavigation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_12"
@@ -55,7 +55,7 @@
                 android:textSize="40sp" />
 
             <TextView
-                style="@style/TextAppearance.Via.Title3"
+                style="@style/TextAppearance.AnyPaste.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_20"
@@ -64,7 +64,7 @@
                 android:textSize="24sp" />
 
             <TextView
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
@@ -81,7 +81,7 @@
                 android:padding="@dimen/space_20">
 
                 <TextView
-                    style="@style/TextAppearance.Via.Label"
+                    style="@style/TextAppearance.AnyPaste.Overline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="연결 방법" />
@@ -178,13 +178,13 @@
                     android:src="@drawable/ic_shield" />
 
                 <TextView
-                    style="@style/TextAppearance.Via.Body1"
+                    style="@style/TextAppearance.AnyPaste.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:text="동일 계정으로 로그인한 기기만 연결됩니다."
-                    android:textColor="@color/ink"
+                    android:textColor="@color/on_primary_container"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -198,7 +198,7 @@
 
             <TextView
                 android:id="@+id/tv_device_discovery_status"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"

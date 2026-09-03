@@ -27,7 +27,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    style="@style/TextAppearance.Via.Title3"
+                    style="@style/TextAppearance.AnyPaste.Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -38,16 +38,16 @@
                     android:id="@+id/btn_add_device"
                     android:layout_width="96dp"
                     android:layout_height="@dimen/touch_target"
-                    android:background="@drawable/sk_btn_solid"
+                    android:background="@drawable/bg_card_primary"
                     android:gravity="center"
                     android:text="+ 기기 연결"
-                    android:textColor="@color/sk_fg_on_solid"
+                    android:textColor="@color/primary_contrast"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_4"
@@ -76,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_12"
                     android:layout_weight="1"
-                    android:textColor="@color/ink"
+                    android:textColor="@color/on_primary_container"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -89,7 +89,7 @@
 
             <TextView
                 android:id="@+id/tv_devices_count"
-                style="@style/TextAppearance.Via.Label"
+                style="@style/TextAppearance.AnyPaste.Overline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28" />
@@ -105,7 +105,7 @@
 
             <TextView
                 android:id="@+id/tv_devices_empty"
-                style="@style/TextAppearance.Via.Body1"
+                style="@style/TextAppearance.AnyPaste.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
@@ -138,7 +138,7 @@
                     android:src="@drawable/ic_shield" />
 
                 <TextView
-                    style="@style/TextAppearance.Via.Body1"
+                    style="@style/TextAppearance.AnyPaste.Body"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/space_8"

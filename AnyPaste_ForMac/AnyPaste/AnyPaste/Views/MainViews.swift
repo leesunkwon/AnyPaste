@@ -431,7 +431,7 @@ struct ClipboardRecordRow: View {
                 }
                 HStack(spacing: PasteSpacing.sm) {
                     Text(WorkspacePresentation.relativeDate(record.createdAt))
-                    if !record.isRead(by: currentDeviceID) {
+                    if isUnreadIncoming {
                         Label("읽지 않음", systemImage: "circle.fill")
                             .labelStyle(.titleAndIcon)
                             .foregroundStyle(PasteColors.brandForeground)
@@ -455,6 +455,13 @@ struct ClipboardRecordRow: View {
 
     private var previewSize: CGFloat {
         prominent ? 76 : 36
+    }
+
+    private var isUnreadIncoming: Bool {
+        record.sourceDeviceId != currentDeviceID
+            && (record.targetDeviceId.isEmpty || record.targetDeviceId == currentDeviceID)
+            && !record.isExpired
+            && !record.isRead(by: currentDeviceID)
     }
 
     private var recordPreview: String {

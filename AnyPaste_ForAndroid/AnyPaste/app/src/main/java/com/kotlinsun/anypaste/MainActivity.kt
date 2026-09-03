@@ -531,7 +531,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
 
     private fun bindHomeActions(root: View) {
         root.onClick(R.id.btn_notifications) { showScreen(Screen.NOTIFICATIONS) }
-        root.onClick(R.id.btn_send_all) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
         root.onClick(R.id.btn_send_file) { openSend(ClipboardType.FILE, openPicker = true) }
@@ -758,26 +757,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun renderHome(root: View, state: MainUiState) {
-        val remote = remoteDevices(state)
-        val onlineCount = remote.count(::isDeviceOnline)
-        root.setText(
-            R.id.tv_home_device_summary,
-            if (remote.isEmpty()) "연결된 다른 기기가 없어요" else "${remote.size}대의 기기가 연결되어 있어요",
-        )
-        root.setText(
-            R.id.tv_home_last_sync,
-            if (remote.isEmpty()) "기기 연결 화면에서 연결 방법을 확인하세요"
-            else "현재 ${onlineCount}대 온라인 · ${lastItemTime(state.clipboardItems)}",
-        )
-        val hasOnlineDevice = onlineCount > 0
-        root.findViewById<View>(R.id.card_home_device_status).setBackgroundResource(
-            if (hasOnlineDevice) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
-        )
-        root.findViewById<View>(R.id.view_home_sync_indicator).isVisible = hasOnlineDevice
-        root.findViewById<ImageView>(R.id.iv_home_device_status).isVisible = hasOnlineDevice
-        root.findViewById<TextView>(R.id.tv_home_device_summary).setTextColor(
-            ContextCompat.getColor(this, if (hasOnlineDevice) R.color.success_foreground else R.color.ink),
-        )
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
@@ -1079,14 +1058,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         )
         root.setText(R.id.tv_devices_count, "연결된 기기 ${state.devices.size}")
         val hasOnlineDevice = online > 0
-        root.findViewById<View>(R.id.card_devices_summary).setBackgroundResource(
-            if (hasOnlineDevice) R.drawable.bg_card_success else R.drawable.bg_card_stroke,
-        )
         root.findViewById<View>(R.id.view_devices_summary_indicator).isVisible = hasOnlineDevice
-        root.findViewById<ImageView>(R.id.iv_devices_summary_status).isVisible = hasOnlineDevice
-        root.findViewById<TextView>(R.id.tv_devices_summary).setTextColor(
-            ContextCompat.getColor(this, if (hasOnlineDevice) R.color.success_foreground else R.color.ink),
-        )
         root.findViewById<ProgressBar>(R.id.progress_devices).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_devices_empty).isVisible =
             state.authResolved && state.devices.isEmpty()
@@ -2126,22 +2098,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 R.id.iv_clipboard_first_type,
                 R.id.tv_clipboard_first_title,
                 R.id.tv_clipboard_first_meta,
-                View.NO_ID,
-                View.NO_ID,
-            ),
-            ClipboardCardIds(
-                R.id.item_clipboard_second,
-                R.id.iv_clipboard_second_type,
-                R.id.tv_clipboard_second_title,
-                R.id.tv_clipboard_second_meta,
-                View.NO_ID,
-                View.NO_ID,
-            ),
-            ClipboardCardIds(
-                R.id.item_clipboard_third,
-                R.id.iv_clipboard_third_type,
-                R.id.tv_clipboard_third_title,
-                R.id.tv_clipboard_third_meta,
                 View.NO_ID,
                 View.NO_ID,
             ),

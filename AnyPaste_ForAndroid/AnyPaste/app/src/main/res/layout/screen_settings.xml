@@ -5,7 +5,7 @@
     android:background="@color/background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/screen_gutter"
-    android:paddingTop="@dimen/space_16">
+    android:paddingTop="@dimen/space_12">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,18 +20,17 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Title"
+                style="@style/TextAppearance.AnyPaste.ScreenTitle"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/top_navigation_height"
                 android:gravity="center_vertical"
-                android:text="설정"
-                android:textSize="24sp" />
+                android:text="설정" />
 
             <LinearLayout
                 android:id="@+id/btn_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
+                android:layout_marginTop="@dimen/space_20"
                 android:background="@drawable/bg_card"
                 android:clickable="true"
                 android:focusable="true"
@@ -138,25 +137,21 @@
                     style="@style/TextAppearance.AnyPaste.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_12"
-                    android:background="@drawable/bg_card_informative"
+                    android:layout_marginTop="@dimen/space_10"
                     android:lineSpacingExtra="2dp"
-                    android:padding="@dimen/space_12"
-                    android:text="안내: Android 보안 정책에 따라 자동 동기화는 AnyPaste 화면이 열려 있을 때만 작동합니다. 앱을 다시 열면 마지막으로 복사한 항목을 확인해 동기화합니다."
-                    android:textColor="@color/informative_foreground"
-                    android:textSize="12sp" />
+                    android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화합니다."
+                    android:textColor="@color/ink_secondary"
+                    android:textSize="13sp" />
 
                 <TextView
                     style="@style/TextAppearance.AnyPaste.Body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_8"
-                    android:background="@drawable/bg_card_informative"
+                    android:layout_marginTop="@dimen/space_6"
                     android:lineSpacingExtra="2dp"
-                    android:padding="@dimen/space_12"
                     android:text="보관 안내: 모든 항목은 5분 동안만 보관됩니다. 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
-                    android:textColor="@color/informative_foreground"
-                    android:textSize="12sp" />
+                    android:textColor="@color/ink_secondary"
+                    android:textSize="13sp" />
 
                 <View
                     android:layout_width="match_parent"

@@ -1003,9 +1003,11 @@ final class AppModel: ObservableObject {
                     idToken: session.idToken
                 )
             }
-            let remoteHeadID = latest.first(where: { !$0.isExpired })?.id
-            let localHeadID = clipboardItems.first?.id
-            if remoteHeadID != localHeadID {
+            let remoteHead = latest.first(where: { !$0.isExpired })
+            let localHead = clipboardItems.first
+            // 읽음·수신 상태는 같은 항목의 배열만 변경되므로 ID가 같아도
+            // 원격 항목 전체가 달라졌다면 화면 데이터를 새로 반영해야 합니다.
+            if remoteHead != localHead {
                 await refreshContent(reportErrors: false)
             } else if autoSync, pendingIncomingCount > 0 {
                 await receiveUnreadItems()

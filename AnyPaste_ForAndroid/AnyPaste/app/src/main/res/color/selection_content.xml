@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:color="@color/ink_disabled" android:state_enabled="false" />
-    <item android:color="@color/on_primary_container" android:state_selected="true" android:state_pressed="true" />
-    <item android:color="@color/primary_contrast" android:state_selected="true" />
-    <item android:color="@color/ink" android:state_pressed="true" />
-    <item android:color="@color/ink_secondary" />
+    <item android:color="@color/sk_fg_on_accent" android:state_selected="true" android:state_pressed="true" />
+    <item android:color="@color/sk_fg_on_accent" android:state_selected="true" />
+    <item android:color="@color/sk_fg" android:state_pressed="true" />
+    <item android:color="@color/sk_fg" />
 </selector>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sk_solid"/>
+            <corners android:radius="6dp"/>
+            <size android:width="@dimen/sk_check" android:height="@dimen/sk_check"/>
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/sk_ic_check_on"
+        android:gravity="center"
+        android:width="14dp"
+        android:height="14dp"/>
+</layer-list>

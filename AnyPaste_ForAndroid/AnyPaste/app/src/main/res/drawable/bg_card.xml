@@ -1,14 +1,21 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sk_bg_elevated" />
+            <corners android:radius="@dimen/sk_r_lg" />
+            <stroke android:width="2dp" android:color="@color/sk_focus" />
+        </shape>
+    </item>
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/surface_pressed" />
-            <corners android:radius="@dimen/radius_m" />
+            <solid android:color="@color/sk_press" />
+            <corners android:radius="@dimen/sk_r_lg" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/surface" />
-            <corners android:radius="@dimen/radius_m" />
+            <solid android:color="@color/sk_bg_elevated" />
+            <corners android:radius="@dimen/sk_r_lg" />
         </shape>
     </item>
 </selector>

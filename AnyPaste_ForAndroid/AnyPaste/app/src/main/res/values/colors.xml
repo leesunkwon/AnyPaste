@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Existing layouts use these aliases; visual values live in via_colors.xml. -->
+    <color name="black">@color/sk_fg</color>
+    <color name="white">@color/sk_bg_elevated</color>
+    <color name="background">@color/sk_bg</color>
+    <color name="surface">@color/sk_bg_elevated</color>
+    <color name="surface_variant">@color/sk_bg</color>
+    <color name="surface_pressed">@color/sk_press</color>
+    <color name="surface_disabled">@color/sk_bg_muted</color>
 
-    <color name="background">#F3F4F5</color>
-    <color name="surface">#FFFFFFFF</color>
-    <color name="surface_variant">#F7F8F9</color>
-    <color name="surface_pressed">#EEEFF1</color>
-    <color name="surface_disabled">#F3F4F5</color>
+    <color name="primary">@color/sk_solid</color>
+    <color name="primary_dark">@color/sk_solid_hover</color>
+    <color name="primary_contrast">@color/sk_fg_on_solid</color>
+    <color name="primary_container">@color/sk_accent</color>
+    <color name="primary_container_pressed">@color/sk_accent_hover</color>
+    <color name="on_primary_container">@color/sk_fg_on_accent</color>
 
-    <color name="primary">#FF6600</color>
-    <color name="primary_dark">#E14D00</color>
-    <color name="primary_contrast">#B93901</color>
-    <color name="primary_container">#FFF2EC</color>
-    <color name="primary_container_pressed">#FFE8DB</color>
-    <color name="on_primary_container">#862B00</color>
+    <color name="ink">@color/sk_fg</color>
+    <color name="neutral_action">@color/sk_solid</color>
+    <color name="neutral_action_pressed">@color/sk_solid_hover</color>
+    <color name="ink_secondary">@color/sk_fg_muted</color>
+    <color name="ink_tertiary">@color/sk_fg_subtle</color>
+    <color name="ink_placeholder">@color/sk_gray_500</color>
+    <color name="ink_disabled">@color/sk_gray_400</color>
+    <color name="line">@color/sk_gray_300</color>
+    <color name="line_strong">@color/sk_fg_muted</color>
+    <color name="focus_ring">@color/sk_focus</color>
 
-    <color name="ink">#1A1C20</color>
-    <color name="neutral_action">#2A3038</color>
-    <color name="neutral_action_pressed">#555D6D</color>
-    <color name="ink_secondary">#555D6D</color>
-    <color name="ink_tertiary">#868B94</color>
-    <color name="ink_placeholder">#B0B3BA</color>
-    <color name="ink_disabled">#D1D3D8</color>
-    <color name="line">#DCDEE3</color>
-    <color name="line_strong">#555D6D</color>
-    <color name="focus_ring">#5E98FE</color>
+    <color name="success">@color/sk_success</color>
+    <color name="success_pressed">@color/sk_solid_hover</color>
+    <color name="success_foreground">@color/sk_fg</color>
+    <color name="success_container">@color/sk_success_soft</color>
+    <color name="warning">@color/sk_warning</color>
+    <color name="warning_foreground">@color/sk_warning_fg</color>
+    <color name="warning_container">@color/sk_warning_soft</color>
+    <color name="danger">@color/sk_danger</color>
+    <color name="danger_pressed">@color/sk_sig_600</color>
+    <color name="danger_foreground">@color/sk_danger_fg</color>
+    <color name="danger_container">@color/sk_danger_soft</color>
+    <color name="informative">@color/sk_solid</color>
+    <color name="informative_foreground">@color/sk_fg</color>
+    <color name="informative_container">@color/sk_bg_muted</color>
 
-    <color name="success">#079171</color>
-    <color name="success_pressed">#00745F</color>
-    <color name="success_foreground">#006B54</color>
-    <color name="success_container">#EDFAF6</color>
-    <color name="warning">#9B7821</color>
-    <color name="warning_foreground">#6B4E00</color>
-    <color name="warning_container">#FFF7DE</color>
-    <color name="danger">#FA342C</color>
-    <color name="danger_pressed">#CA1D13</color>
-    <color name="danger_foreground">#B3261E</color>
-    <color name="danger_container">#FDF0F0</color>
-    <color name="informative">#217CF9</color>
-    <color name="informative_foreground">#0B57D0</color>
-    <color name="informative_container">#EFF6FF</color>
+    <color name="purple">@color/sk_solid</color>
+    <color name="purple_container">@color/sk_bg_muted</color>
+    <color name="teal">@color/sk_solid</color>
+    <color name="teal_container">@color/sk_bg_muted</color>
 
-    <color name="purple">#8969EA</color>
-    <color name="purple_container">#F5F3FE</color>
-    <color name="teal">#079171</color>
-    <color name="teal_container">#EDFAF6</color>
 </resources>

@@ -441,7 +441,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             Screen.LOGIN -> {
                 root.onClick(R.id.btn_login) { beginGoogleSignIn() }
                 root.findViewById<View>(R.id.btn_login_email).setOnClickListener {
-                    showScreen(Screen.EMAIL_LOGIN, force = true)
+                    showEmailLoginScreen()
                 }
                 root.onClick(R.id.btn_sign_up) { showScreen(Screen.SIGN_UP) }
                 root.onClick(R.id.btn_show_onboarding) { showScreen(Screen.ONBOARDING) }
@@ -465,23 +465,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
 
     private fun bindEmailActions(root: View) {
         root.onClick(R.id.btn_sign_up) { showScreen(Screen.SIGN_UP) }
-        root.onClick(R.id.btn_email_continue) {
-            val email = root.findViewById<TextInputEditText>(R.id.input_email).text
-                ?.toString()?.trim().orEmpty()
-            val password = root.findViewById<TextInputEditText>(R.id.input_password).text
-                ?.toString().orEmpty()
-            val emailLayout = root.findViewById<TextInputLayout>(R.id.layout_email)
-            val passwordLayout = root.findViewById<TextInputLayout>(R.id.layout_password)
-            emailLayout.error = null
-            passwordLayout.error = null
-
-            when {
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                    emailLayout.error = "올바른 이메일을 입력해 주세요."
-                password.length < 6 -> passwordLayout.error = "비밀번호는 6자 이상 입력해 주세요."
-                else -> viewModel.signInWithEmail(email, password)
-            }
-        }
+        root.onClick(R.id.btn_email_continue) { attemptEmailLogin(root) }
         root.onClick(R.id.btn_forgot_password) {
             val email = root.findViewById<TextInputEditText>(R.id.input_email).text
                 ?.toString()?.trim().orEmpty()
@@ -491,6 +475,42 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             } else {
                 viewModel.sendPasswordReset(email)
             }
+        }
+    }
+
+    /** XML click fallback for the first login screen. */
+    @Suppress("unused")
+    fun openEmailLogin(@Suppress("UNUSED_PARAMETER") view: View) {
+        showEmailLoginScreen()
+    }
+
+    /** XML click fallback for the email/password form. */
+    @Suppress("unused")
+    fun submitEmailLogin(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (currentScreen == Screen.EMAIL_LOGIN) {
+            currentRoot?.let(::attemptEmailLogin)
+        }
+    }
+
+    private fun showEmailLoginScreen() {
+        showScreen(Screen.EMAIL_LOGIN, force = true)
+    }
+
+    private fun attemptEmailLogin(root: View) {
+        val email = root.findViewById<TextInputEditText>(R.id.input_email).text
+            ?.toString()?.trim().orEmpty()
+        val password = root.findViewById<TextInputEditText>(R.id.input_password).text
+            ?.toString().orEmpty()
+        val emailLayout = root.findViewById<TextInputLayout>(R.id.layout_email)
+        val passwordLayout = root.findViewById<TextInputLayout>(R.id.layout_password)
+        emailLayout.error = null
+        passwordLayout.error = null
+
+        when {
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                emailLayout.error = "올바른 이메일을 입력해 주세요."
+            password.length < 6 -> passwordLayout.error = "비밀번호는 6자 이상 입력해 주세요."
+            else -> viewModel.signInWithEmail(email, password)
         }
     }
 

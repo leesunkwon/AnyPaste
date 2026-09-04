@@ -1,139 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/bottom_navigation_height"
-    android:background="@drawable/bg_bottom_navigation"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/space_8"
-    android:paddingTop="@dimen/space_6"
-    android:paddingBottom="@dimen/space_6"
+    android:layout_height="88dp"
+    android:background="@color/background"
+    android:paddingHorizontal="20dp"
+    android:paddingBottom="12dp"
+    android:paddingTop="8dp"
     android:visibility="gone">
 
     <LinearLayout
-        android:id="@+id/nav_home"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/bg_bottom_navigation_item"
-        android:clickable="true"
-        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_dashboard_dock"
         android:gravity="center"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/space_4">
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp">
 
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:contentDescription="@null"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_home"
-            android:tint="@color/navigation_icon" />
+        <FrameLayout
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dashboard_dock_item"
+            android:clickable="true"
+            android:contentDescription="홈"
+            android:focusable="true">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:duplicateParentState="true"
-            android:text="홈"
-            android:textColor="@color/navigation_icon"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_home"
+                android:tint="@color/navigation_icon" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/btn_send"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dashboard_dock_item"
+            android:clickable="true"
+            android:contentDescription="보내기"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_send"
+                android:tint="@color/navigation_icon" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/nav_devices"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dashboard_dock_item"
+            android:clickable="true"
+            android:contentDescription="기기"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_devices"
+                android:tint="@color/navigation_icon" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_dashboard_dock_item"
+            android:clickable="true"
+            android:contentDescription="설정"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_settings"
+                android:tint="@color/navigation_icon" />
+        </FrameLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/btn_send"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/space_4"
-        android:layout_weight="1"
-        android:background="@drawable/bg_bottom_navigation_item"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/space_4">
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:contentDescription="@null"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_send"
-            android:tint="@color/navigation_icon" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:duplicateParentState="true"
-            android:text="보내기"
-            android:textColor="@color/navigation_icon"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/nav_devices"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@drawable/bg_bottom_navigation_item"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/space_4">
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:contentDescription="@null"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_devices"
-            android:tint="@color/navigation_icon" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:duplicateParentState="true"
-            android:text="기기"
-            android:textColor="@color/navigation_icon"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/nav_settings"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/space_4"
-        android:layout_weight="1"
-        android:background="@drawable/bg_bottom_navigation_item"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingVertical="@dimen/space_4">
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:contentDescription="@null"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_settings"
-            android:tint="@color/navigation_icon" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:duplicateParentState="true"
-            android:text="설정"
-            android:textColor="@color/navigation_icon"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

@@ -21,12 +21,10 @@ import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.util.Patterns
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,7 +32,6 @@ import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -57,6 +54,8 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.kotlinsun.anypaste.core.AppPreferences
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
@@ -448,7 +447,10 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             Screen.CLIPBOARD_DETAIL -> bindClipboardDetailActions(root)
             Screen.SEND -> bindSendActions(root)
             Screen.TRANSFER_STATUS -> root.onClick(R.id.btn_retry_transfer) { retryTransfer() }
-            Screen.DEVICES -> root.onClick(R.id.btn_add_device) { showScreen(Screen.CONNECT_DEVICE) }
+            Screen.DEVICES -> {
+                root.onClick(R.id.btn_add_device) { showScreen(Screen.CONNECT_DEVICE) }
+                root.onClick(R.id.btn_connect_device) { showScreen(Screen.CONNECT_DEVICE) }
+            }
             Screen.DEVICE_DETAIL -> bindDeviceDetailActions(root)
             Screen.CONNECT_DEVICE -> Unit
             Screen.SETTINGS -> bindSettingsActions(root)
@@ -547,7 +549,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun bindHomeActions(root: View) {
-        root.onClick(R.id.card_home_devices) { showScreen(Screen.DEVICES) }
         root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
         root.onClick(R.id.btn_send_file) { openSend(ClipboardType.FILE, openPicker = true) }
@@ -614,22 +615,11 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             }
         root.onClick(R.id.btn_rename_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
-            showRenameDeviceDialog(device)
+            showRenameDeviceSheet(device)
         }
         root.onClick(R.id.btn_disconnect_device) {
             val device = viewModel.selectedDevice() ?: return@onClick
-            AlertDialog.Builder(this)
-                .setTitle("기기 연결을 해제할까요?")
-                .setMessage(
-                    "${device.deviceName}에서 로그아웃되고 이후 동기화가 차단됩니다. " +
-                        "다시 사용하려면 새 기기로 연결해야 합니다.",
-                )
-                .setNegativeButton("취소", null)
-                .setPositiveButton("연결 해제") { _, _ ->
-                    viewModel.removeDevice(device)
-                    showScreen(Screen.DEVICES)
-                }
-                .show()
+            showDisconnectDeviceSheet(device)
         }
     }
 
@@ -661,22 +651,20 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         }
     }
 
-    private fun showRenameDeviceDialog(device: Device) {
-        val input = EditText(this).apply {
+    private fun showRenameDeviceSheet(device: Device) {
+        val dialog = BottomSheetDialog(this)
+        val sheet = layoutInflater.inflate(R.layout.sheet_rename_device, null)
+        val input = sheet.findViewById<TextInputEditText>(R.id.input_sheet_device_name).apply {
             setText(device.deviceName)
-            setSelectAllOnFocus(false)
-            setSingleLine(true)
-            setPadding(48, 0, 48, 0)
+            setSelection(text?.length ?: 0)
         }
-        AlertDialog.Builder(this)
-            .setTitle("기기 이름 변경")
-            .setMessage("이 이름은 같은 계정으로 연결된 모든 기기에 표시됩니다.")
-            .setView(input)
-            .setNegativeButton("취소", null)
-            .setPositiveButton("변경") { _, _ ->
-                viewModel.renameDevice(device, input.text?.toString().orEmpty())
-            }
-            .show()
+        sheet.onClick(R.id.btn_sheet_cancel) { dialog.dismiss() }
+        sheet.onClick(R.id.btn_sheet_confirm) {
+            viewModel.renameDevice(device, input.text?.toString().orEmpty())
+            dialog.dismiss()
+        }
+        dialog.setContentView(sheet)
+        dialog.show()
     }
 
     private fun bindPermissionActions(root: View) {
@@ -758,15 +746,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 remote.isEmpty() -> "이 기기만 연결되어 있어요"
                 online > 0 -> "온라인 기기 ${online}대 · 바로 보낼 수 있어요"
                 else -> "연결된 기기 ${remote.size}대 · 모두 오프라인"
-            },
-        )
-        root.setText(R.id.tv_home_devices_count, "연결된 기기 ${state.devices.size}대")
-        root.setText(
-            R.id.tv_home_devices_meta,
-            when {
-                online > 0 -> "지금 ${online}대가 온라인이에요"
-                remote.isEmpty() -> "Mac을 연결하면 바로 보낼 수 있어요"
-                else -> "다른 기기가 오프라인이에요"
             },
         )
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
@@ -1037,7 +1016,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             if (state.devices.isEmpty()) "연결된 기기가 없습니다"
             else "${state.devices.size}대 중 ${online}대가 현재 온라인이에요",
         )
-        root.setText(R.id.tv_devices_count, "연결된 기기 ${state.devices.size}")
+        root.setText(R.id.tv_devices_count, "${state.devices.size}대")
         val hasOnlineDevice = online > 0
         root.findViewById<View>(R.id.view_devices_summary_indicator).isVisible = hasOnlineDevice
         root.findViewById<ProgressBar>(R.id.progress_devices).isVisible = !state.authResolved
@@ -1196,7 +1175,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 else "${platformLabel(device)} · 마지막 동기화 ${relativeTime(device.lastSeenAt?.toDate())}"
             itemView.findViewById<View>(R.id.view_device_status).isVisible = online
             itemView.findViewById<View>(R.id.layout_device_status_chip).setBackgroundResource(
-                if (online) R.drawable.bg_status_chip else R.drawable.bg_soft_action,
+                if (online) R.drawable.bg_dashboard_chip else R.drawable.bg_dashboard_type,
             )
             itemView.findViewById<TextView>(R.id.tv_device_status).apply {
                 text = if (online) "온라인" else "오프라인"
@@ -1552,21 +1531,58 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             return
         }
         val currentId = viewModel.state.value.sendTargetDeviceId
-        val selections = listOf<String?>(null) + devices.map(Device::id)
-        val checkedIndex = selections.indexOf(currentId).coerceAtLeast(0)
-        val labels = (listOf("전체 기기 · ${devices.size}대") + devices.map { device ->
-            val platform = if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android"
-            "${device.deviceName} · $platform · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
-        }).toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("전송 대상 선택")
-            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
-                viewModel.selectSendTarget(selections[which])
+        val dialog = BottomSheetDialog(this)
+        val sheet = layoutInflater.inflate(R.layout.sheet_send_target, null)
+        val container = sheet.findViewById<LinearLayout>(R.id.layout_target_options)
+        val options = listOf<Pair<String?, Device?>>(null to null) + devices.map { it.id to it }
+
+        options.forEach { (deviceId, device) ->
+            val row = layoutInflater.inflate(R.layout.item_target_option, container, false)
+            val selected = deviceId == currentId
+            row.isSelected = selected
+            row.findViewById<TextView>(R.id.tv_target_option_title).text =
+                device?.deviceName ?: "전체 기기"
+            row.findViewById<TextView>(R.id.tv_target_option_meta).text = when (device) {
+                null -> "연결된 ${devices.size}대에 전송"
+                else -> {
+                    val platform = if (device.resolvedPlatform() == DevicePlatform.MACOS) "macOS" else "Android"
+                    "$platform · ${if (isDeviceOnline(device)) "온라인" else "오프라인"}"
+                }
+            }
+            row.findViewById<ImageView>(R.id.iv_target_option).setImageResource(
+                device?.let(::deviceIcon) ?: R.drawable.ic_devices,
+            )
+            row.findViewById<View>(R.id.view_target_option_selected).apply {
+                setBackgroundResource(
+                    if (selected) R.drawable.bg_circle_primary else R.drawable.bg_circle_neutral,
+                )
+                contentDescription = if (selected) "선택됨" else "선택 안 됨"
+            }
+            row.setOnClickListener {
+                viewModel.selectSendTarget(deviceId)
                 dialog.dismiss()
                 renderCurrent(viewModel.state.value)
             }
-            .setNegativeButton("취소", null)
-            .show()
+            container.addView(row)
+        }
+        sheet.onClick(R.id.btn_sheet_cancel) { dialog.dismiss() }
+        dialog.setContentView(sheet)
+        dialog.show()
+    }
+
+    private fun showDisconnectDeviceSheet(device: Device) {
+        val dialog = BottomSheetDialog(this)
+        val sheet = layoutInflater.inflate(R.layout.sheet_disconnect_device, null)
+        sheet.findViewById<TextView>(R.id.tv_disconnect_message).text =
+            "${device.deviceName}에서 로그아웃되고 이후 동기화가 차단됩니다. 다시 사용하려면 새 기기로 연결해야 합니다."
+        sheet.onClick(R.id.btn_sheet_cancel) { dialog.dismiss() }
+        sheet.onClick(R.id.btn_sheet_disconnect) {
+            viewModel.removeDevice(device)
+            dialog.dismiss()
+            showScreen(Screen.DEVICES)
+        }
+        dialog.setContentView(sheet)
+        dialog.show()
     }
 
     private fun renderHomeCurrentItem(root: View, item: ClipboardItem) {
@@ -1578,6 +1594,8 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         root.findViewById<TextView>(R.id.btn_home_clipboard_primary).text =
             if (type == ClipboardType.TEXT) "복사" else "다운로드"
         root.setText(R.id.tv_home_expiry, expiryLabel(item))
+        val imagePreview = root.findViewById<ImageView>(R.id.iv_home_clipboard_image_preview)
+        imagePreview.isVisible = false
         val icon = root.findViewById<ImageView>(R.id.iv_clipboard_first_type)
         val iconPadding = resources.getDimensionPixelSize(R.dimen.space_12)
         icon.apply {
@@ -1599,6 +1617,8 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 icon.setImageBitmap(bitmap)
                 icon.scaleType = ImageView.ScaleType.CENTER_CROP
                 icon.setPadding(0, 0, 0, 0)
+                imagePreview.setImageBitmap(bitmap)
+                imagePreview.isVisible = true
             } else if (requestedImageThumbnailIds.add(item.id)) {
                 viewModel.loadImagePreview(item)
             }
@@ -1847,7 +1867,10 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun toast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(this, R.color.surface_elevated))
+            .setTextColor(ContextCompat.getColor(this, R.color.ink))
+            .show()
     }
 
     private data class SelectedFile(

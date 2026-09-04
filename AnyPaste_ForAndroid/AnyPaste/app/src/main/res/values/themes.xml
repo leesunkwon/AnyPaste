@@ -15,19 +15,30 @@
         <item name="colorAccent">@color/primary</item>
         <item name="textInputStyle">@style/Widget.AnyPaste.TextInputLayout</item>
         <item name="switchStyle">@style/Widget.AnyPaste.Switch</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.AnyPaste.BottomSheet</item>
         <item name="android:colorAccent">@color/primary</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="android:colorControlHighlight">@color/surface_pressed</item>
+        <item name="android:colorControlHighlight">@android:color/transparent</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/ink</item>
         <item name="android:textColorSecondary">@color/ink_secondary</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:statusBarColor">@color/background</item>
-        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/background</item>
     </style>
 
     <style name="Theme.AnyPaste" parent="Base.Theme.AnyPaste" />
+
+    <style name="ThemeOverlay.AnyPaste.BottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.AnyPaste.BottomSheet</item>
+        <item name="android:navigationBarColor">@color/app_surface</item>
+    </style>
+
+    <style name="Widget.AnyPaste.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet</item>
+        <item name="backgroundTint">@color/app_surface</item>
+    </style>
 </resources>

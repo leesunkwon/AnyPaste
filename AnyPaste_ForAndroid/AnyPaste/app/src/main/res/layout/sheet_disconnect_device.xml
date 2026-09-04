@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/screen_gutter"
+    android:paddingTop="@dimen/space_12"
+    android:paddingEnd="@dimen/screen_gutter"
+    android:paddingBottom="@dimen/space_24">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_progress_fill" />
+
+    <TextView
+        style="@style/TextAppearance.AnyPaste.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_20"
+        android:text="기기 연결 해제" />
+
+    <TextView
+        android:id="@+id/tv_disconnect_message"
+        style="@style/TextAppearance.AnyPaste.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sheet_disconnect"
+        style="@style/Widget.AnyPaste.Button.Critical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_24"
+        android:text="연결 해제" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sheet_cancel"
+        style="@style/Widget.AnyPaste.Button.Outline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8"
+        android:text="취소" />
+</LinearLayout>

@@ -157,6 +157,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         sessionJob?.cancel()
         sessionJob = null
         authRepository.signOut()
+        preferences.autoSyncEnabled = false
+        preferences.lastTransferTargetDeviceId = ""
+        retryableTransfers.clear()
+        mutableState.update {
+            it.copy(
+                authResolved = true,
+                user = null,
+                clipboardItems = emptyList(),
+                devices = emptyList(),
+                selectedItemId = null,
+                selectedDeviceId = null,
+                sendTargetDeviceId = "",
+                storageUsageBytes = 0L,
+                isBusy = false,
+                transferProgress = null,
+                transferStatus = TransferStatus.IDLE,
+                transferFailureReason = null,
+                failedTransfers = emptyList(),
+                pendingEvents = emptyList(),
+            )
+        }
     }
 
     fun sendText(

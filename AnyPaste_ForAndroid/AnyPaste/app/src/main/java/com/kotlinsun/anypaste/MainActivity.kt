@@ -665,10 +665,12 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         root.onClick(R.id.btn_logout) {
             ClipboardSyncService.stop(this)
             preferences.autoSyncEnabled = false
+            root.findViewById<View>(R.id.btn_logout).isEnabled = false
+            viewModel.signOut()
+            showScreen(Screen.LOGIN, force = true)
             lifecycleScope.launch {
                 runCatching { credentialManager.clearCredentialState(ClearCredentialStateRequest()) }
             }
-            viewModel.signOut()
         }
     }
 
@@ -1133,10 +1135,15 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun renderSettings(root: View, state: MainUiState) {
-        val name = displayName(state)
+        val user = state.user
+        val name = user?.let { displayName(state) } ?: "로그인 필요"
         root.setText(R.id.tv_settings_avatar, name.firstOrNull()?.uppercase() ?: "A")
         root.setText(R.id.tv_settings_account_name, name)
-        root.setText(R.id.tv_settings_account_email, state.user?.email ?: "Google 계정")
+        root.setText(
+            R.id.tv_settings_account_email,
+            user?.email ?: "계정에 로그인해 주세요",
+        )
+        root.findViewById<View>(R.id.btn_logout).isVisible = user != null
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName ?: "1.0"
         root.setText(R.id.tv_app_version, "AnyPaste $versionName")
         root.findViewById<SwitchMaterial>(R.id.switch_auto_sync).setCheckedSilently(
@@ -1466,7 +1473,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 val option = GetGoogleIdOption.Builder()
                     .setFilterByAuthorizedAccounts(false)
                     .setServerClientId(serverClientId)
-                    .setAutoSelectEnabled(true)
+                    .setAutoSelectEnabled(false)
                     .build()
                 val request = GetCredentialRequest.Builder().addCredentialOption(option).build()
                 val result = credentialManager.getCredential(this@MainActivity, request)

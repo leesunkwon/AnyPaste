@@ -3,5 +3,5 @@
     <item android:color="@color/ink_disabled" android:state_enabled="false" />
     <item android:color="@color/sk_fg_on_accent" android:state_selected="true" />
     <item android:color="@color/sk_fg" android:state_pressed="true" />
-    <item android:color="@color/sk_fg" />
+    <item android:color="@color/sk_fg_muted" />
 </selector>

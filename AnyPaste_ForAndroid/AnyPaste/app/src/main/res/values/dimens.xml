@@ -25,8 +25,8 @@
     <dimen name="radius_l">24dp</dimen>
     <dimen name="radius_full">999dp</dimen>
 
-    <dimen name="screen_gutter">16dp</dimen>
-    <dimen name="screen_bottom_space">56dp</dimen>
+    <dimen name="screen_gutter">20dp</dimen>
+    <dimen name="screen_bottom_space">64dp</dimen>
     <dimen name="component_gap">12dp</dimen>
     <dimen name="nav_title_gap">20dp</dimen>
     <dimen name="touch_target">48dp</dimen>

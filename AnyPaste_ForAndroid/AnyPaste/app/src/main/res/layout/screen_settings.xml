@@ -5,7 +5,7 @@
     android:background="@color/background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/screen_gutter"
-    android:paddingTop="@dimen/space_12">
+    android:paddingTop="@dimen/space_16">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,8 +22,7 @@
             <TextView
                 style="@style/TextAppearance.AnyPaste.ScreenTitle"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/top_navigation_height"
-                android:gravity="center_vertical"
+                android:layout_height="wrap_content"
                 android:text="설정" />
 
             <LinearLayout
@@ -40,12 +39,12 @@
 
                 <TextView
                     android:id="@+id/tv_settings_avatar"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
                     android:background="@drawable/bg_circle_primary"
                     android:gravity="center"
                     android:text="수"
-                    android:textColor="@color/white"
+                    android:textColor="@color/sk_fg_on_solid"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -72,18 +71,18 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="sujin@example.com"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:contentDescription="계정 관리"
                     android:src="@drawable/ic_arrow_right" />
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -122,15 +121,15 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_auto_sync"
+                        style="@style/Widget.AnyPaste.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                    android:checked="true" />
+                        android:checked="true" />
                 </LinearLayout>
 
                 <TextView
@@ -139,19 +138,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_10"
                     android:lineSpacingExtra="2dp"
-                    android:text="앱을 열어 둔 동안 복사한 텍스트와 이미지를 자동으로 동기화합니다."
-                    android:textColor="@color/ink_secondary"
-                    android:textSize="13sp" />
-
-                <TextView
-                    style="@style/TextAppearance.AnyPaste.Body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_6"
-                    android:lineSpacingExtra="2dp"
                     android:text="보관 안내: 모든 항목은 5분 동안만 보관됩니다. 새 항목이 들어오면 기존 항목은 즉시 사라집니다."
                     android:textColor="@color/ink_secondary"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -184,12 +173,12 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="모바일 데이터 사용을 줄여요"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_wifi_only"
+                        style="@style/Widget.AnyPaste.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true" />
@@ -205,11 +194,11 @@
                 android:background="@drawable/bg_card_warning"
                 android:padding="@dimen/space_16"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone" />
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -230,11 +219,11 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/bg_icon_primary"
                         android:contentDescription="알림"
-                        android:padding="8dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_bell" />
 
                     <LinearLayout
@@ -257,12 +246,12 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="새 항목이 오면 알려드려요"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        style="@style/Widget.AnyPaste.Switch"
                         android:id="@+id/switch_receive_notifications"
+                        style="@style/Widget.AnyPaste.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true" />
@@ -284,11 +273,11 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/bg_icon_purple"
                         android:contentDescription="개인정보"
-                        android:padding="8dp"
+                        android:padding="10dp"
                         android:src="@drawable/ic_shield" />
 
                     <LinearLayout
@@ -311,19 +300,19 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
                             android:text="클립보드 동기화와 5분 보관 정책"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:contentDescription="권한 상세"
                         android:src="@drawable/ic_arrow_right" />
                 </LinearLayout>
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -334,22 +323,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_card_stroke"
+                android:background="@drawable/bg_card"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="@dimen/space_16"
                 android:text="AnyPaste 1.0.0"
                 android:textColor="@color/ink_secondary"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/btn_logout"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_height_large"
-                android:layout_marginTop="@dimen/space_12"
+                android:layout_marginTop="@dimen/space_16"
                 android:background="@drawable/bg_action_critical"
                 android:gravity="center"
                 android:text="로그아웃"
-                android:textColor="@color/white"
+                android:textColor="@color/sk_fg_on_solid"
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>

@@ -6,14 +6,20 @@
     android:background="@color/background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/screen_gutter"
-    android:paddingTop="@dimen/space_12">
+    android:paddingTop="@dimen/space_16">
 
     <TextView
         style="@style/TextAppearance.AnyPaste.ScreenTitle"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/top_navigation_height"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
         android:text="보내기" />
+
+    <TextView
+        style="@style/TextAppearance.AnyPaste.Caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_4"
+        android:text="텍스트, 이미지, 파일을 다른 기기로 바로 전달해요." />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,7 +36,7 @@
             android:paddingBottom="@dimen/space_20">
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="보낼 항목" />
@@ -44,17 +50,17 @@
                 <LinearLayout
                     android:id="@+id/btn_type_text"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/touch_target"
+                    android:layout_height="88dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_selection_card"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:contentDescription="텍스트"
                         android:duplicateParentState="true"
                         android:src="@drawable/ic_text"
@@ -64,7 +70,7 @@
                         android:id="@+id/tv_type_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_6"
+                        android:layout_marginTop="@dimen/space_6"
                         android:duplicateParentState="true"
                         android:text="텍스트"
                         android:textColor="@color/selection_content"
@@ -75,18 +81,18 @@
                 <LinearLayout
                     android:id="@+id/btn_type_image"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/touch_target"
-                    android:layout_marginStart="@dimen/space_12"
+                    android:layout_height="88dp"
+                    android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:background="@drawable/bg_selection_card"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:contentDescription="이미지"
                         android:duplicateParentState="true"
                         android:src="@drawable/ic_image"
@@ -96,7 +102,7 @@
                         android:id="@+id/tv_type_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_6"
+                        android:layout_marginTop="@dimen/space_6"
                         android:duplicateParentState="true"
                         android:text="이미지"
                         android:textColor="@color/selection_content"
@@ -107,18 +113,18 @@
                 <LinearLayout
                     android:id="@+id/btn_type_file"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/touch_target"
-                    android:layout_marginStart="@dimen/space_12"
+                    android:layout_height="88dp"
+                    android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:background="@drawable/bg_selection_card"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
                         android:contentDescription="파일"
                         android:duplicateParentState="true"
                         android:src="@drawable/ic_file"
@@ -128,7 +134,7 @@
                         android:id="@+id/tv_type_file"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/space_6"
+                        android:layout_marginTop="@dimen/space_6"
                         android:duplicateParentState="true"
                         android:text="파일"
                         android:textColor="@color/selection_content"
@@ -138,22 +144,22 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
                 android:text="내용" />
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.AnyPaste.TextInputLayout"
                 android:id="@+id/layout_send_text"
+                style="@style/Widget.AnyPaste.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/Widget.AnyPaste.TextInputEditText"
                     android:id="@+id/input_send_text"
+                    style="@style/Widget.AnyPaste.TextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="176dp"
                     android:gravity="top"
@@ -168,7 +174,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
-                android:background="@drawable/bg_card_stroke"
+                android:background="@drawable/bg_empty"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
@@ -178,11 +184,11 @@
 
                 <ImageView
                     android:id="@+id/iv_send_file_type"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="@drawable/bg_icon_teal"
                     android:contentDescription="전송할 파일 선택"
-                    android:padding="10dp"
+                    android:padding="12dp"
                     android:src="@drawable/ic_file" />
 
                 <LinearLayout
@@ -209,18 +215,19 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_4"
                         android:text="이미지 또는 파일 탐색기에서 선택"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/btn_select_file"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/touch_target"
-                    android:background="@drawable/bg_icon_action"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_soft_action"
                     android:gravity="center"
+                    android:paddingHorizontal="@dimen/space_12"
                     android:text="선택"
                     android:textColor="@color/primary_contrast"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -242,7 +249,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:textColor="@color/warning_foreground"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -272,11 +279,11 @@
                     android:layout_weight="1"
                     android:text="비밀번호, 인증번호 등 민감한 정보는 보내지 마세요."
                     android:textColor="@color/warning_foreground"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
+                style="@style/TextAppearance.AnyPaste.SectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_28"
@@ -291,7 +298,7 @@
                 <LinearLayout
                     android:id="@+id/btn_send_target_all"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/touch_target"
+                    android:layout_height="52dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_selection_card"
                     android:clickable="true"
@@ -303,23 +310,26 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:contentDescription=""
-                        android:src="@drawable/ic_devices" />
+                        android:contentDescription="@null"
+                        android:duplicateParentState="true"
+                        android:src="@drawable/ic_devices"
+                        android:tint="@color/selection_content" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/space_8"
+                        android:duplicateParentState="true"
                         android:text="전체 기기"
-                        android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textColor="@color/selection_content"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/btn_send_target_specific"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/touch_target"
+                    android:layout_height="52dp"
                     android:layout_marginStart="@dimen/space_8"
                     android:layout_weight="1"
                     android:background="@drawable/bg_selection_card"
@@ -332,16 +342,19 @@
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
-                        android:contentDescription=""
-                        android:src="@drawable/ic_desktop" />
+                        android:contentDescription="@null"
+                        android:duplicateParentState="true"
+                        android:src="@drawable/ic_desktop"
+                        android:tint="@color/selection_content" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/space_8"
+                        android:duplicateParentState="true"
                         android:text="특정 기기"
-                        android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textColor="@color/selection_content"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -360,11 +373,11 @@
 
                 <ImageView
                     android:id="@+id/iv_send_target_device"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/bg_icon_primary"
                     android:contentDescription="MacBook Pro"
-                    android:padding="9dp"
+                    android:padding="10dp"
                     android:src="@drawable/ic_desktop" />
 
                 <LinearLayout
@@ -380,13 +393,14 @@
                         android:layout_height="wrap_content"
                         android:text="전체 기기 전송"
                         android:textColor="@color/primary_contrast"
-                        android:textSize="12sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_send_target_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
                         android:text="MacBook Pro"
                         android:textColor="@color/ink"
                         android:textStyle="bold" />
@@ -398,7 +412,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="온라인 · 즉시 전송 가능"
                         android:textColor="@color/success_foreground"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/tv_send_target_change"
@@ -407,7 +421,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="기기 변경"
                         android:textColor="@color/primary_contrast"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -425,36 +439,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
-                android:background="@drawable/bg_card_stroke"
+                android:background="@drawable/bg_empty"
                 android:gravity="center"
                 android:padding="@dimen/space_20"
                 android:text="전송할 수 있는 다른 기기가 없어요."
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:visibility="gone" />
-
-            <TextView
-                style="@style/TextAppearance.AnyPaste.Overline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_28"
-                android:text="보관 안내" />
 
             <LinearLayout
                 android:id="@+id/card_send_expiry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:background="@drawable/bg_input"
+                android:layout_marginTop="@dimen/space_20"
+                android:background="@drawable/bg_card"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="@dimen/space_16">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/bg_icon_action"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_icon_primary"
                     android:contentDescription="보관 정책"
-                    android:padding="@dimen/space_8"
+                    android:padding="@dimen/space_10"
                     android:src="@drawable/ic_settings" />
 
                 <LinearLayout
@@ -479,7 +486,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="새 항목이 들어오면 기존 항목은 즉시 삭제됩니다"
                         android:textColor="@color/ink_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -492,7 +499,7 @@
                 android:paddingHorizontal="@dimen/space_4"
                 android:paddingVertical="@dimen/space_8"
                 android:text="파일 저장 공간 0 B / 1 GB 사용 중"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </ScrollView>
 

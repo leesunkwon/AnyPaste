@@ -12,27 +12,27 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/screen_gutter"
-        android:paddingTop="@dimen/space_32"
+        android:paddingTop="@dimen/space_40"
         android:paddingBottom="@dimen/screen_bottom_space">
 
         <TextView
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_circle_primary"
             android:gravity="center"
             android:text="A"
-            android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textColor="@color/sk_fg_on_solid"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_16"
-            android:letterSpacing="0.14"
+            android:letterSpacing="0.16"
             android:text="ANYPASTE"
             android:textColor="@color/primary_contrast"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_8"
             android:gravity="center"
-            android:text="복사한 모든 것을\n어디서나 붙여넣으세요" />
+            android:text="Mac과 Android 사이를\n한 번의 복사로" />
 
         <TextView
             style="@style/TextAppearance.AnyPaste.Body"
@@ -49,29 +49,29 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_12"
             android:gravity="center"
-            android:text="Mac과 Android 사이를 자연스럽게 연결해요."
-            android:textSize="16sp" />
+            android:text="텍스트, 이미지, 파일을 내 기기에만 안전하게 전달합니다."
+            android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="190dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_32"
             android:background="@drawable/bg_card_primary"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="@dimen/space_20">
+            android:padding="@dimen/space_16">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="124dp"
+                android:layout_height="120dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_card"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:contentDescription="Mac"
                     android:src="@drawable/ic_desktop" />
 
@@ -89,20 +89,20 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="↔"
-                android:textColor="@color/primary_contrast"
+                android:textColor="@color/on_primary_container"
                 android:textSize="28sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="124dp"
+                android:layout_height="120dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_card"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:contentDescription="Android"
                     android:src="@drawable/ic_phone" />
 
@@ -120,7 +120,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_24"
-            android:orientation="vertical">
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="@dimen/space_16">
 
             <TextView
                 style="@style/TextAppearance.AnyPaste.Body"
@@ -144,6 +146,18 @@
                 android:text="내 기기에만 안전하게 동기화"
                 android:textColor="@color/ink"
                 android:textStyle="bold" />
+
+            <TextView
+                style="@style/TextAppearance.AnyPaste.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:drawableStart="@drawable/ic_check"
+                android:drawablePadding="@dimen/space_12"
+                android:gravity="center_vertical"
+                android:text="최신 항목 1개만 5분 보관"
+                android:textColor="@color/ink"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -161,13 +175,13 @@
                 android:layout_width="6dp"
                 android:layout_height="6dp"
                 android:layout_marginStart="@dimen/space_8"
-                android:background="@drawable/bg_circle_success" />
+                android:background="@drawable/bg_circle_neutral" />
 
             <View
                 android:layout_width="6dp"
                 android:layout_height="6dp"
                 android:layout_marginStart="@dimen/space_8"
-                android:background="@drawable/bg_circle_success" />
+                android:background="@drawable/bg_circle_neutral" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

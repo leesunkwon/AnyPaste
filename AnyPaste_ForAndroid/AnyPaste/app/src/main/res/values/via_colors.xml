@@ -13,17 +13,17 @@
     <color name="sk_gray_900">#141416</color>
     <color name="sk_gray_950">#0A0A0C</color>
 
-    <!-- Yellow — FILL ONLY. Never text, icon, or CTA. -->
-    <color name="sk_y_50">#FFFEE8</color>
-    <color name="sk_y_100">#FFF7A3</color>
-    <color name="sk_y_200">#FBF36A</color>
-    <color name="sk_y_300">#F6EE3C</color>
-    <color name="sk_y_400">#F4EC28</color>
-    <color name="sk_y_500">#E5DC10</color>
-    <color name="sk_y_600">#C4BC00</color>
-    <color name="sk_y_700">#8A8500</color>
-    <color name="sk_y_800">#5C5900</color>
-    <color name="sk_y_900">#3A3800</color>
+    <!-- Brand orange — fills, selected chips, hero surfaces. -->
+    <color name="sk_y_50">#FFF3E8</color>
+    <color name="sk_y_100">#FFD8B8</color>
+    <color name="sk_y_200">#FFB07A</color>
+    <color name="sk_y_300">#FF8A4A</color>
+    <color name="sk_y_400">#FF7A38</color>
+    <color name="sk_y_500">#FF661A</color>
+    <color name="sk_y_600">#E04F0A</color>
+    <color name="sk_y_700">#BA3800</color>
+    <color name="sk_y_800">#8A2A00</color>
+    <color name="sk_y_900">#5C1C00</color>
 
     <!-- Signal — warning/danger. Not yellow. -->
     <color name="sk_sig_50">#FFEBE6</color>
@@ -34,44 +34,50 @@
     <color name="sk_sig_700">#B52810</color>
 
     <!-- Semantic · Light -->
-    <color name="sk_bg">#E8E8EC</color>
+    <color name="sk_bg">#F3EEE8</color>
     <color name="sk_bg_elevated">#FFFFFF</color>
-    <color name="sk_bg_muted">#D8D8DC</color>
-    <color name="sk_bg_inverse">#0A0A0C</color>
-    <color name="sk_bg_overlay">#660A0A0C</color>
-    <color name="sk_bg_accent">#F4EC28</color>
+    <color name="sk_bg_muted">#E8E0D6</color>
+    <color name="sk_bg_inverse">#1C1916</color>
+    <color name="sk_bg_overlay">#661C1916</color>
+    <color name="sk_bg_accent">#FF661A</color>
+    <color name="sk_accent_soft">#FFE8D6</color>
 
-    <color name="sk_fg">#0A0A0C</color>
-    <color name="sk_fg_muted">#5C5C66</color>
-    <color name="sk_fg_subtle">#6E6E76</color>
+    <color name="sk_fg">#1C1916</color>
+    <color name="sk_fg_muted">#6B645C</color>
+    <color name="sk_fg_subtle">#8A8278</color>
     <color name="sk_fg_inverse">#FFFFFF</color>
-    <color name="sk_fg_on_accent">#0A0A0C</color>
+    <color name="sk_fg_on_accent">#FFFFFF</color>
     <color name="sk_fg_on_solid">#FFFFFF</color>
 
-    <color name="sk_accent">#F4EC28</color>
-    <color name="sk_accent_hover">#F6EE3C</color>
-    <color name="sk_solid">#0A0A0C</color>
-    <color name="sk_solid_hover">#1C1C22</color>
+    <color name="sk_accent">#FF661A</color>
+    <color name="sk_accent_hover">#FF7A38</color>
+    <color name="sk_brand_deep">#BA3800</color>
+    <color name="sk_solid">#1C1916</color>
+    <color name="sk_solid_hover">#2A2522</color>
     <color name="sk_solid_fg">#FFFFFF</color>
 
-    <color name="sk_success">#0A0A0C</color>
-    <color name="sk_success_soft">#D8D8DC</color>
-    <color name="sk_warning">#FF4D2E</color>
-    <color name="sk_warning_soft">#FFEBE6</color>
-    <color name="sk_warning_fg">#B52810</color>
-    <color name="sk_danger">#FF4D2E</color>
-    <color name="sk_danger_soft">#FFEBE6</color>
-    <color name="sk_danger_fg">#B52810</color>
-    <color name="sk_focus">#0A0A0C</color>
+    <color name="sk_success">#0F7A5C</color>
+    <color name="sk_success_soft">#E5F5EF</color>
+    <color name="sk_warning">#C2410C</color>
+    <color name="sk_warning_soft">#FFF0E6</color>
+    <color name="sk_warning_fg">#9A3412</color>
+    <color name="sk_danger">#DC2626</color>
+    <color name="sk_danger_soft">#FEECEC</color>
+    <color name="sk_danger_fg">#B91C1C</color>
+    <color name="sk_focus">#FF661A</color>
 
-    <color name="sk_cluster">#070708</color>
-    <color name="sk_hud">#050506</color>
+    <color name="sk_teal">#0F7A6B</color>
+    <color name="sk_teal_soft">#E4F4F0</color>
+    <color name="sk_indigo">#5B4BDB</color>
+    <color name="sk_indigo_soft">#EEEAFE</color>
 
-    <!-- Interaction. Disabled = 35% of the fill (matches CSS opacity). -->
-    <color name="sk_press">#B4B4BB</color>
-    <color name="sk_solid_disabled">#590A0A0C</color>
-    <color name="sk_accent_disabled">#59F4EC28</color>
-    <color name="sk_danger_disabled">#59FF4D2E</color>
+    <color name="sk_cluster">#161310</color>
+    <color name="sk_hud">#12100E</color>
+
+    <color name="sk_press">#DDD5CB</color>
+    <color name="sk_solid_disabled">#591C1916</color>
+    <color name="sk_accent_disabled">#59FF661A</color>
+    <color name="sk_danger_disabled">#59DC2626</color>
     <color name="sk_fg_on_danger">#FFFFFF</color>
-    <color name="sk_switch_off">#D0D0D5</color>
+    <color name="sk_switch_off">#D4CCC2</color>
 </resources>

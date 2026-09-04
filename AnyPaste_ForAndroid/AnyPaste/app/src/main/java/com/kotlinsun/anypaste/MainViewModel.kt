@@ -435,32 +435,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteItem(item: ClipboardItem) {
-        val userId = requireUserId() ?: return
-        launchBusy(successMessage = "항목을 삭제했습니다.") {
-            clipboardRepository.deleteItem(userId, item.id)
-            if (item.storagePath.isNotBlank()) {
-                runCatching { storageRepository.delete(item.storagePath) }
-            }
-        }
-    }
-
-    fun deleteItems(items: List<ClipboardItem>) {
-        val userId = requireUserId() ?: return
-        if (items.isEmpty()) {
-            postMessage("삭제할 항목을 선택해 주세요.")
-            return
-        }
-        launchBusy(successMessage = "선택한 항목을 삭제했습니다.") {
-            items.forEach { item ->
-                clipboardRepository.deleteItem(userId, item.id)
-                if (item.storagePath.isNotBlank()) {
-                    runCatching { storageRepository.delete(item.storagePath) }
-                }
-            }
-        }
-    }
-
     private suspend fun deleteReplacedStorage(
         replacedItems: List<ClipboardItem>,
         keepingStoragePath: String,
@@ -477,20 +451,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     // The replacement is already visible; best-effort Storage cleanup can retry later.
                 }
             }
-    }
-
-    fun markAllRead() {
-        val userId = requireUserId() ?: return
-        val unread = state.value.clipboardItems.filter { item ->
-            item.sourceDeviceId != deviceId && !item.isReadBy(deviceId)
-        }
-        if (unread.isEmpty()) {
-            postMessage("모든 알림을 이미 확인했습니다.")
-            return
-        }
-        launchBusy(successMessage = "모든 알림을 읽음 처리했습니다.") {
-            unread.forEach { clipboardRepository.markAsRead(userId, it.id, deviceId) }
-        }
     }
 
     fun markRead(item: ClipboardItem) {

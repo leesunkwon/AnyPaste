@@ -21,7 +21,6 @@ import android.text.format.DateUtils
 import android.text.format.Formatter
 import android.util.Patterns
 import android.view.View
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -86,10 +85,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     private val bottomTabRoots = mutableMapOf<Screen, View>()
     private var authTransitionHandled = false
     private var lastUserId: String? = null
-
-    private var clipboardFilter = ClipboardFilter.ALL
-    private var clipboardSelectionMode = false
-    private val selectedClipboardIds = linkedSetOf<String>()
 
     private var sendType = ClipboardType.TEXT
     private var selectedFile: SelectedFile? = null
@@ -450,14 +445,12 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             Screen.EMAIL_LOGIN -> bindEmailActions(root)
             Screen.SIGN_UP -> bindSignUpActions(root)
             Screen.HOME -> bindHomeActions(root)
-            Screen.CLIPBOARD_LIST -> bindClipboardListActions(root)
             Screen.CLIPBOARD_DETAIL -> bindClipboardDetailActions(root)
             Screen.SEND -> bindSendActions(root)
             Screen.TRANSFER_STATUS -> root.onClick(R.id.btn_retry_transfer) { retryTransfer() }
             Screen.DEVICES -> root.onClick(R.id.btn_add_device) { showScreen(Screen.CONNECT_DEVICE) }
             Screen.DEVICE_DETAIL -> bindDeviceDetailActions(root)
             Screen.CONNECT_DEVICE -> Unit
-            Screen.NOTIFICATIONS -> root.onClick(R.id.btn_mark_all_read) { viewModel.markAllRead() }
             Screen.SETTINGS -> bindSettingsActions(root)
             Screen.PERMISSIONS -> bindPermissionActions(root)
         }
@@ -554,7 +547,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun bindHomeActions(root: View) {
-        root.onClick(R.id.btn_notifications) { showScreen(Screen.NOTIFICATIONS) }
+        root.onClick(R.id.card_home_devices) { showScreen(Screen.DEVICES) }
         root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
         root.onClick(R.id.btn_send_file) { openSend(ClipboardType.FILE, openPicker = true) }
@@ -568,36 +561,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 viewModel.selectItem(item.id)
                 showScreen(Screen.CLIPBOARD_DETAIL)
             }
-        }
-    }
-
-    private fun bindClipboardListActions(root: View) {
-        root.onClick(R.id.btn_select_clipboards) {
-            clipboardSelectionMode = !clipboardSelectionMode
-            if (!clipboardSelectionMode) selectedClipboardIds.clear()
-            renderCurrent(viewModel.state.value)
-        }
-        root.onClick(R.id.btn_select_all_clipboards) {
-            val visibleIds = filteredClipboardItems(viewModel.state.value.clipboardItems)
-                .map(ClipboardItem::id)
-            if (visibleIds.isNotEmpty() && visibleIds.all(selectedClipboardIds::contains)) {
-                selectedClipboardIds.removeAll(visibleIds.toSet())
-            } else {
-                selectedClipboardIds.addAll(visibleIds)
-            }
-            renderCurrent(viewModel.state.value)
-        }
-        root.onClick(R.id.filter_all) { updateClipboardFilter(ClipboardFilter.ALL) }
-        root.onClick(R.id.filter_text) { updateClipboardFilter(ClipboardFilter.TEXT) }
-        root.onClick(R.id.filter_image) { updateClipboardFilter(ClipboardFilter.IMAGE) }
-        root.onClick(R.id.filter_file) { updateClipboardFilter(ClipboardFilter.FILE) }
-        root.onClick(R.id.btn_delete_selected) {
-            val items = viewModel.state.value.clipboardItems
-                .filter { it.id in selectedClipboardIds }
-            viewModel.deleteItems(items)
-            selectedClipboardIds.clear()
-            clipboardSelectionMode = false
-            renderCurrent(viewModel.state.value)
         }
     }
 
@@ -750,14 +713,12 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             Screen.EMAIL_LOGIN -> renderEmail(root, state)
             Screen.SIGN_UP -> renderSignUp(root, state)
             Screen.HOME -> renderHome(root, state)
-            Screen.CLIPBOARD_LIST -> renderClipboardList(root, state)
             Screen.CLIPBOARD_DETAIL -> renderClipboardDetail(root, state)
             Screen.SEND -> renderSend(root, state)
             Screen.TRANSFER_STATUS -> renderTransferStatus(root, state)
             Screen.DEVICES -> renderDevices(root, state)
             Screen.DEVICE_DETAIL -> renderDeviceDetail(root, state)
             Screen.CONNECT_DEVICE -> renderConnectDevice(root, state)
-            Screen.NOTIFICATIONS -> renderNotifications(root, state)
             Screen.SETTINGS -> renderSettings(root, state)
             Screen.PERMISSIONS -> renderPermissions(root)
         }
@@ -783,42 +744,36 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun renderHome(root: View, state: MainUiState) {
+        val name = state.user?.displayName?.trim().orEmpty()
+            .ifBlank { state.user?.email?.substringBefore('@').orEmpty() }
+        root.setText(
+            R.id.tv_home_greeting,
+            if (name.isBlank()) "안녕하세요" else "${name}님, 안녕하세요",
+        )
+        val remote = remoteDevices(state)
+        val online = remote.count(::isDeviceOnline)
+        root.setText(
+            R.id.tv_home_status,
+            when {
+                remote.isEmpty() -> "이 기기만 연결되어 있어요"
+                online > 0 -> "온라인 기기 ${online}대 · 바로 보낼 수 있어요"
+                else -> "연결된 기기 ${remote.size}대 · 모두 오프라인"
+            },
+        )
+        root.setText(R.id.tv_home_devices_count, "연결된 기기 ${state.devices.size}대")
+        root.setText(
+            R.id.tv_home_devices_meta,
+            when {
+                online > 0 -> "지금 ${online}대가 온라인이에요"
+                remote.isEmpty() -> "Mac을 연결하면 바로 보낼 수 있어요"
+                else -> "다른 기기가 오프라인이에요"
+            },
+        )
         root.findViewById<ProgressBar>(R.id.progress_home_recent).isVisible = !state.authResolved
         root.findViewById<View>(R.id.tv_home_recent_empty).isVisible =
             state.authResolved && state.clipboardItems.isEmpty()
-        bindClipboardCards(root, state.clipboardItems.take(1), selectable = false)
+        bindClipboardCards(root, state.clipboardItems.take(1))
         state.clipboardItems.firstOrNull()?.let { renderHomeCurrentItem(root, it) }
-    }
-
-    private fun renderClipboardList(root: View, state: MainUiState) {
-        val availableIds = state.clipboardItems.mapTo(hashSetOf(), ClipboardItem::id)
-        selectedClipboardIds.retainAll(availableIds)
-        val items = filteredClipboardItems(state.clipboardItems)
-        val selectedVisibleCount = items.count { it.id in selectedClipboardIds }
-        val allVisibleSelected = items.isNotEmpty() && selectedVisibleCount == items.size
-
-        root.findViewById<ProgressBar>(R.id.progress_clipboards).isVisible = !state.authResolved
-        root.findViewById<View>(R.id.tv_clipboards_empty).isVisible =
-            state.authResolved && items.isEmpty()
-        root.findViewById<TextView>(R.id.btn_select_clipboards).text =
-            if (clipboardSelectionMode) "완료" else "선택"
-        root.findViewById<View>(R.id.layout_clipboard_selection_actions).isVisible =
-            clipboardSelectionMode
-        root.setText(R.id.tv_selected_clipboard_count, "${selectedVisibleCount}개 선택")
-        root.findViewById<TextView>(R.id.btn_select_all_clipboards).apply {
-            isEnabled = items.isNotEmpty()
-            text = if (allVisibleSelected) "전체 해제" else "전체 선택"
-        }
-        root.findViewById<View>(R.id.btn_delete_selected).apply {
-            isVisible = clipboardSelectionMode
-            isEnabled = selectedVisibleCount > 0
-        }
-        root.setText(
-            R.id.btn_delete_selected,
-            if (selectedVisibleCount > 0) "선택 항목 삭제 ($selectedVisibleCount)" else "선택 항목 삭제",
-        )
-        renderFilterButtons(root)
-        renderClipboardListItems(root, items)
     }
 
     private fun renderClipboardDetail(root: View, state: MainUiState) {
@@ -1147,17 +1102,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         )
     }
 
-    private fun renderNotifications(root: View, state: MainUiState) {
-        val items = state.clipboardItems
-            .filter { it.sourceDeviceId != viewModel.currentDeviceId() }
-        val unreadCount = items.count { !it.isReadBy(viewModel.currentDeviceId()) }
-        root.findViewById<ProgressBar>(R.id.progress_notifications).isVisible = !state.authResolved
-        root.findViewById<View>(R.id.tv_notifications_empty).isVisible =
-            state.authResolved && items.isEmpty()
-        root.findViewById<View>(R.id.btn_mark_all_read).isEnabled = unreadCount > 0
-        renderNotificationListItems(root, items, state)
-    }
-
     private fun renderSettings(root: View, state: MainUiState) {
         val user = state.user
         val name = user?.let { displayName(state) } ?: "로그인 필요"
@@ -1210,7 +1154,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         }
     }
 
-    private fun bindClipboardCards(root: View, items: List<ClipboardItem>, selectable: Boolean) {
+    private fun bindClipboardCards(root: View, items: List<ClipboardItem>) {
         CLIPBOARD_CARD_IDS.forEachIndexed { index, ids ->
             val container = root.findOptional<View>(ids.container) ?: return@forEachIndexed
             val item = items.getOrNull(index)
@@ -1219,77 +1163,10 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             root.findOptional<ImageView>(ids.icon)?.setImageResource(typeIcon(item))
             root.setText(ids.title, itemTitle(item))
             root.setText(ids.meta, itemMeta(item, viewModel.state.value))
-            root.findOptional<CheckBox>(ids.check)?.apply {
-                isVisible = selectable
-                isChecked = item.id in selectedClipboardIds
-                setOnClickListener { toggleClipboardSelection(item.id) }
-            }
-            root.findOptional<View>(ids.arrow)?.isVisible = !selectable
             container.setOnClickListener {
-                if (selectable) {
-                    toggleClipboardSelection(item.id)
-                } else {
-                    viewModel.selectItem(item.id)
-                    showScreen(Screen.CLIPBOARD_DETAIL)
-                }
+                viewModel.selectItem(item.id)
+                showScreen(Screen.CLIPBOARD_DETAIL)
             }
-        }
-    }
-
-    private fun renderClipboardListItems(root: View, items: List<ClipboardItem>) {
-        val listContainer = root.findViewById<LinearLayout>(R.id.layout_clipboard_items)
-        listContainer.removeAllViews()
-
-        items.forEach { item ->
-            val itemView = layoutInflater.inflate(R.layout.item_clipboard, listContainer, false)
-            val selected = item.id in selectedClipboardIds
-            val type = item.resolvedType()
-
-            itemView.setBackgroundResource(
-                if (selected) R.drawable.bg_card_primary else R.drawable.bg_card,
-            )
-            itemView.findViewById<ImageView>(R.id.iv_clipboard_type).apply {
-                setImageResource(typeIcon(item))
-                setBackgroundResource(
-                    when (type) {
-                        ClipboardType.TEXT -> R.drawable.bg_icon_primary
-                        ClipboardType.IMAGE -> R.drawable.bg_icon_teal
-                        ClipboardType.FILE -> R.drawable.bg_icon_purple
-                    },
-                )
-                contentDescription = typeLabel(type)
-                if (type == ClipboardType.IMAGE) {
-                    val thumbnail = imageThumbnails[item.id]
-                    if (thumbnail != null) {
-                        val bitmap = thumbnail
-                        setImageBitmap(bitmap)
-                        scaleType = ImageView.ScaleType.CENTER_CROP
-                        setPadding(0, 0, 0, 0)
-                    } else if (requestedImageThumbnailIds.add(item.id)) {
-                        viewModel.loadImagePreview(item)
-                    }
-                }
-            }
-            itemView.findViewById<TextView>(R.id.tv_clipboard_title).text = itemTitle(item)
-            itemView.findViewById<TextView>(R.id.tv_clipboard_meta).text =
-                itemMeta(item, viewModel.state.value)
-            itemView.findViewById<ImageView>(R.id.iv_clipboard_arrow).isVisible =
-                !clipboardSelectionMode
-            itemView.findViewById<CheckBox>(R.id.check_clipboard).apply {
-                isVisible = clipboardSelectionMode
-                isChecked = selected
-                contentDescription = "${itemTitle(item)} 선택"
-                setOnClickListener { toggleClipboardSelection(item.id) }
-            }
-            itemView.setOnClickListener {
-                if (clipboardSelectionMode) {
-                    toggleClipboardSelection(item.id)
-                } else {
-                    viewModel.selectItem(item.id)
-                    showScreen(Screen.CLIPBOARD_DETAIL)
-                }
-            }
-            listContainer.addView(itemView)
         }
     }
 
@@ -1318,6 +1195,9 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 if (current) "이 기기 · Android"
                 else "${platformLabel(device)} · 마지막 동기화 ${relativeTime(device.lastSeenAt?.toDate())}"
             itemView.findViewById<View>(R.id.view_device_status).isVisible = online
+            itemView.findViewById<View>(R.id.layout_device_status_chip).setBackgroundResource(
+                if (online) R.drawable.bg_status_chip else R.drawable.bg_soft_action,
+            )
             itemView.findViewById<TextView>(R.id.tv_device_status).apply {
                 text = if (online) "온라인" else "오프라인"
                 setTextColor(
@@ -1330,47 +1210,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
             itemView.setOnClickListener {
                 viewModel.selectDevice(device.id)
                 showScreen(Screen.DEVICE_DETAIL)
-            }
-            listContainer.addView(itemView)
-        }
-    }
-
-    private fun renderNotificationListItems(
-        root: View,
-        items: List<ClipboardItem>,
-        state: MainUiState,
-    ) {
-        val listContainer = root.findViewById<LinearLayout>(R.id.layout_notification_items)
-        listContainer.removeAllViews()
-
-        items.forEach { item ->
-            val itemView = layoutInflater.inflate(R.layout.item_notification, listContainer, false)
-            val unread = !item.isReadBy(viewModel.currentDeviceId())
-            val type = item.resolvedType()
-
-            itemView.setBackgroundResource(
-                if (unread) R.drawable.bg_card else R.drawable.bg_card_stroke,
-            )
-            itemView.findViewById<ImageView>(R.id.iv_notification_type).apply {
-                setImageResource(typeIcon(item))
-                setBackgroundResource(
-                    when (type) {
-                        ClipboardType.TEXT -> R.drawable.bg_icon_primary
-                        ClipboardType.IMAGE -> R.drawable.bg_icon_teal
-                        ClipboardType.FILE -> R.drawable.bg_icon_purple
-                    },
-                )
-                contentDescription = "${typeLabel(type)} 수신"
-            }
-            itemView.findViewById<TextView>(R.id.tv_notification_title).text =
-                "새 ${typeLabel(item)}를 받았어요"
-            itemView.findViewById<TextView>(R.id.tv_notification_body).text = itemTitle(item)
-            itemView.findViewById<TextView>(R.id.tv_notification_meta).text = itemMeta(item, state)
-            itemView.findViewById<View>(R.id.view_notification_unread).isVisible = unread
-            itemView.setOnClickListener {
-                viewModel.selectItem(item.id)
-                viewModel.markRead(item)
-                showScreen(Screen.CLIPBOARD_DETAIL)
             }
             listContainer.addView(itemView)
         }
@@ -1465,14 +1304,8 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                     if (viewModel.selectedItem()?.id == event.itemId && currentScreen == Screen.CLIPBOARD_DETAIL) {
                         currentRoot?.findViewById<ImageView>(R.id.iv_detail_preview)
                             ?.setImageBitmap(bitmap)
-                    } else if (currentScreen == Screen.CLIPBOARD_LIST || currentScreen == Screen.HOME) {
-                        currentRoot?.let { root ->
-                            if (currentScreen == Screen.HOME) {
-                                renderHome(root, viewModel.state.value)
-                            } else {
-                                renderClipboardList(root, viewModel.state.value)
-                            }
-                        }
+                    } else if (currentScreen == Screen.HOME) {
+                        currentRoot?.let { root -> renderHome(root, viewModel.state.value) }
                     }
                 }
             }
@@ -1697,44 +1530,11 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         when (currentScreen) {
             Screen.HOME, Screen.LOGIN -> finish()
             Screen.EMAIL_LOGIN, Screen.SIGN_UP, Screen.ONBOARDING -> showScreen(Screen.LOGIN)
-            Screen.CLIPBOARD_DETAIL, Screen.CLIPBOARD_LIST, Screen.SEND,
-            Screen.TRANSFER_STATUS, Screen.NOTIFICATIONS, Screen.PERMISSIONS ->
+            Screen.CLIPBOARD_DETAIL, Screen.SEND,
+            Screen.TRANSFER_STATUS, Screen.PERMISSIONS ->
                 showScreen(if (viewModel.state.value.user == null) Screen.LOGIN else Screen.HOME)
             Screen.DEVICE_DETAIL, Screen.CONNECT_DEVICE -> showScreen(Screen.DEVICES)
             Screen.DEVICES, Screen.SETTINGS -> showScreen(Screen.HOME)
-        }
-    }
-
-    private fun updateClipboardFilter(filter: ClipboardFilter) {
-        clipboardFilter = filter
-        selectedClipboardIds.clear()
-        renderCurrent(viewModel.state.value)
-    }
-
-    private fun toggleClipboardSelection(itemId: String) {
-        if (!selectedClipboardIds.add(itemId)) selectedClipboardIds.remove(itemId)
-        renderCurrent(viewModel.state.value)
-    }
-
-    private fun filteredClipboardItems(items: List<ClipboardItem>): List<ClipboardItem> =
-        when (clipboardFilter) {
-            ClipboardFilter.ALL -> items
-            ClipboardFilter.TEXT -> items.filter { it.resolvedType() == ClipboardType.TEXT }
-            ClipboardFilter.IMAGE -> items.filter { it.resolvedType() == ClipboardType.IMAGE }
-            ClipboardFilter.FILE -> items.filter { it.resolvedType() == ClipboardType.FILE }
-        }
-
-    private fun renderFilterButtons(root: View) {
-        listOf(
-            R.id.filter_all to ClipboardFilter.ALL,
-            R.id.filter_text to ClipboardFilter.TEXT,
-            R.id.filter_image to ClipboardFilter.IMAGE,
-            R.id.filter_file to ClipboardFilter.FILE,
-        ).forEach { (id, filter) ->
-            root.findViewById<TextView>(id).apply {
-                isSelected = filter == clipboardFilter
-                ViewCompat.setStateDescription(this, if (isSelected) "선택됨" else null)
-            }
         }
     }
 
@@ -1777,6 +1577,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         }
         root.findViewById<TextView>(R.id.btn_home_clipboard_primary).text =
             if (type == ClipboardType.TEXT) "복사" else "다운로드"
+        root.setText(R.id.tv_home_expiry, expiryLabel(item))
         val icon = root.findViewById<ImageView>(R.id.iv_clipboard_first_type)
         val iconPadding = resources.getDimensionPixelSize(R.dimen.space_12)
         icon.apply {
@@ -1949,10 +1750,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         }
     }
 
-    private fun lastItemTime(items: List<ClipboardItem>): String =
-        items.firstOrNull()?.createdAt?.toDate()?.let { "마지막 동기화 ${relativeTime(it)}" }
-            ?: "아직 동기화된 항목이 없습니다"
-
     private fun relativeTime(date: Date?): String {
         if (date == null) return "방금 전"
         return DateUtils.getRelativeTimeSpanString(
@@ -2065,11 +1862,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         @param:IdRes val icon: Int,
         @param:IdRes val title: Int,
         @param:IdRes val meta: Int,
-        @param:IdRes val arrow: Int,
-        @param:IdRes val check: Int,
     )
-
-    private enum class ClipboardFilter { ALL, TEXT, IMAGE, FILE }
 
     private enum class Screen(@param:LayoutRes val layoutRes: Int) {
         ONBOARDING(R.layout.screen_onboarding),
@@ -2077,14 +1870,12 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         EMAIL_LOGIN(R.layout.screen_email_login),
         SIGN_UP(R.layout.screen_sign_up),
         HOME(R.layout.screen_home),
-        CLIPBOARD_LIST(R.layout.screen_clipboard_list),
         SEND(R.layout.screen_send),
         TRANSFER_STATUS(R.layout.screen_transfer_status),
         CLIPBOARD_DETAIL(R.layout.screen_clipboard_detail),
         DEVICES(R.layout.screen_devices),
         DEVICE_DETAIL(R.layout.screen_device_detail),
         CONNECT_DEVICE(R.layout.screen_connect_device),
-        NOTIFICATIONS(R.layout.screen_notifications),
         SETTINGS(R.layout.screen_settings),
         PERMISSIONS(R.layout.screen_permissions),
 
@@ -2129,8 +1920,6 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
                 R.id.iv_clipboard_first_type,
                 R.id.tv_clipboard_first_title,
                 R.id.tv_clipboard_first_meta,
-                View.NO_ID,
-                View.NO_ID,
             ),
         )
 

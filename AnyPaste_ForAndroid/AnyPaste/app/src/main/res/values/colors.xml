@@ -11,10 +11,11 @@
 
     <color name="primary">@color/sk_solid</color>
     <color name="primary_dark">@color/sk_solid_hover</color>
-    <color name="primary_contrast">@color/sk_fg</color>
+    <color name="primary_contrast">@color/sk_brand_deep</color>
     <color name="primary_container">@color/sk_accent</color>
     <color name="primary_container_pressed">@color/sk_accent_hover</color>
     <color name="on_primary_container">@color/sk_fg_on_accent</color>
+    <color name="brand_soft">@color/sk_accent_soft</color>
 
     <color name="ink">@color/sk_fg</color>
     <color name="neutral_action">@color/sk_solid</color>
@@ -29,7 +30,7 @@
 
     <color name="success">@color/sk_success</color>
     <color name="success_pressed">@color/sk_solid_hover</color>
-    <color name="success_foreground">@color/sk_fg</color>
+    <color name="success_foreground">@color/sk_success</color>
     <color name="success_container">@color/sk_success_soft</color>
     <color name="warning">@color/sk_warning</color>
     <color name="warning_foreground">@color/sk_warning_fg</color>
@@ -38,13 +39,13 @@
     <color name="danger_pressed">@color/sk_sig_600</color>
     <color name="danger_foreground">@color/sk_danger_fg</color>
     <color name="danger_container">@color/sk_danger_soft</color>
-    <color name="informative">@color/sk_solid</color>
-    <color name="informative_foreground">@color/sk_fg</color>
-    <color name="informative_container">@color/sk_bg_muted</color>
+    <color name="informative">@color/sk_brand_deep</color>
+    <color name="informative_foreground">@color/sk_brand_deep</color>
+    <color name="informative_container">@color/sk_accent_soft</color>
 
-    <color name="purple">@color/sk_solid</color>
-    <color name="purple_container">@color/sk_bg_muted</color>
-    <color name="teal">@color/sk_solid</color>
-    <color name="teal_container">@color/sk_bg_muted</color>
+    <color name="purple">@color/sk_indigo</color>
+    <color name="purple_container">@color/sk_indigo_soft</color>
+    <color name="teal">@color/sk_teal</color>
+    <color name="teal_container">@color/sk_teal_soft</color>
 
 </resources>

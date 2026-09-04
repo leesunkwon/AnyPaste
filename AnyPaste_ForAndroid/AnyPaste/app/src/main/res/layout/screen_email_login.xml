@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/screen_gutter"
-        android:paddingTop="@dimen/space_16"
+        android:paddingTop="@dimen/space_20"
         android:paddingBottom="@dimen/screen_bottom_space">
 
         <ImageButton
@@ -97,7 +97,7 @@
             android:gravity="center_vertical"
             android:text="비밀번호를 잊으셨나요?"
             android:textColor="@color/primary_contrast"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <TextView
@@ -108,7 +108,7 @@
             android:layout_marginTop="@dimen/space_8"
             android:accessibilityLiveRegion="polite"
             android:textColor="@color/danger_foreground"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <LinearLayout
@@ -124,7 +124,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:contentDescription="안전한 로그인"
-                android:src="@drawable/ic_shield" />
+                android:src="@drawable/ic_shield"
+                android:tint="@color/on_primary_container" />
 
             <TextView
                 style="@style/TextAppearance.AnyPaste.Body"
@@ -134,7 +135,7 @@
                 android:layout_weight="1"
                 android:text="계정과 동기화 데이터는 안전하게 보호됩니다."
                 android:textColor="@color/on_primary_container"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -155,7 +156,7 @@
             android:gravity="center"
             android:text="계정이 없으신가요? 회원가입"
             android:textColor="@color/primary_contrast"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <ProgressBar

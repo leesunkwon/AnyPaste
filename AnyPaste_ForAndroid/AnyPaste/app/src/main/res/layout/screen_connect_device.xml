@@ -5,7 +5,7 @@
     android:background="@color/background"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/screen_gutter"
-    android:paddingTop="@dimen/space_12">
+    android:paddingTop="@dimen/space_16">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                 android:background="@drawable/bg_circle_primary"
                 android:gravity="center"
                 android:text="+"
-                android:textColor="@color/white"
+                android:textColor="@color/sk_fg_on_solid"
                 android:textSize="40sp" />
 
             <TextView
@@ -99,7 +99,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="1"
-                        android:textColor="@color/white"
+                        android:textColor="@color/sk_fg_on_solid"
                         android:textStyle="bold" />
 
                     <TextView
@@ -124,7 +124,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="2"
-                        android:textColor="@color/white"
+                        android:textColor="@color/sk_fg_on_solid"
                         android:textStyle="bold" />
 
                     <TextView
@@ -149,7 +149,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="3"
-                        android:textColor="@color/white"
+                        android:textColor="@color/sk_fg_on_solid"
                         android:textStyle="bold" />
 
                     <TextView
@@ -175,7 +175,8 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:contentDescription="보안"
-                    android:src="@drawable/ic_shield" />
+                    android:src="@drawable/ic_shield"
+                    android:tint="@color/on_primary_container" />
 
                 <TextView
                     style="@style/TextAppearance.AnyPaste.Body"
@@ -185,7 +186,7 @@
                     android:layout_weight="1"
                     android:text="동일 계정으로 로그인한 기기만 연결됩니다."
                     android:textColor="@color/on_primary_container"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <ProgressBar
@@ -204,7 +205,7 @@
                 android:layout_marginTop="@dimen/space_8"
                 android:gravity="center"
                 android:text="새 기기를 기다리는 중이에요."
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

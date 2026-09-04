@@ -5,79 +5,135 @@
     android:background="@drawable/sk_tabbar"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/space_12"
+    android:paddingHorizontal="@dimen/space_8"
+    android:paddingTop="@dimen/space_6"
+    android:paddingBottom="@dimen/space_6"
     android:visibility="gone">
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/nav_home"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@drawable/sk_tab"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/space_4">
 
-        <ImageButton
-            android:id="@+id/nav_home"
-            android:layout_width="@dimen/sk_touch"
-            android:layout_height="@dimen/sk_touch"
-            android:layout_gravity="center"
-            android:background="@drawable/sk_tab"
-            android:contentDescription="홈"
-            android:padding="@dimen/space_10"
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:duplicateParentState="true"
             android:src="@drawable/ic_home"
-            android:stateListAnimator="@null"
-            android:tint="@color/sk_tab_tint" />
-    </FrameLayout>
+            android:tint="@color/navigation_icon" />
 
-    <FrameLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:text="홈"
+            android:textColor="@color/navigation_icon"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btn_send"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_marginHorizontal="@dimen/space_4"
+        android:layout_weight="1"
+        android:background="@drawable/sk_tab"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/space_4">
 
-        <ImageButton
-            android:id="@+id/btn_send"
-            android:layout_width="@dimen/sk_touch"
-            android:layout_height="@dimen/sk_touch"
-            android:layout_gravity="center"
-            android:background="@drawable/sk_tab"
-            android:contentDescription="보내기"
-            android:padding="@dimen/space_10"
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:duplicateParentState="true"
             android:src="@drawable/ic_send"
-            android:stateListAnimator="@null"
-            android:tint="@color/sk_tab_tint" />
-    </FrameLayout>
+            android:tint="@color/navigation_icon" />
 
-    <FrameLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:text="보내기"
+            android:textColor="@color/navigation_icon"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_devices"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@drawable/sk_tab"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/space_4">
 
-        <ImageButton
-            android:id="@+id/nav_devices"
-            android:layout_width="@dimen/sk_touch"
-            android:layout_height="@dimen/sk_touch"
-            android:layout_gravity="center"
-            android:background="@drawable/sk_tab"
-            android:contentDescription="내 기기"
-            android:padding="@dimen/space_10"
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:duplicateParentState="true"
             android:src="@drawable/ic_devices"
-            android:stateListAnimator="@null"
-            android:tint="@color/sk_tab_tint" />
-    </FrameLayout>
+            android:tint="@color/navigation_icon" />
 
-    <FrameLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:text="기기"
+            android:textColor="@color/navigation_icon"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_settings"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_marginStart="@dimen/space_4"
+        android:layout_weight="1"
+        android:background="@drawable/sk_tab"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/space_4">
 
-        <ImageButton
-            android:id="@+id/nav_settings"
-            android:layout_width="@dimen/sk_touch"
-            android:layout_height="@dimen/sk_touch"
-            android:layout_gravity="center"
-            android:background="@drawable/sk_tab"
-            android:contentDescription="설정"
-            android:padding="@dimen/space_10"
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@null"
+            android:duplicateParentState="true"
             android:src="@drawable/ic_settings"
-            android:stateListAnimator="@null"
-            android:tint="@color/sk_tab_tint" />
-    </FrameLayout>
+            android:tint="@color/navigation_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:duplicateParentState="true"
+            android:text="설정"
+            android:textColor="@color/navigation_icon"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </LinearLayout>

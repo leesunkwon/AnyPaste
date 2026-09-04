@@ -31,7 +31,7 @@
     <dimen name="sk_screen_pad">16dp</dimen>
     <dimen name="sk_safe_top">54dp</dimen>
     <dimen name="sk_safe_bottom">34dp</dimen>
-    <dimen name="sk_tabbar">56dp</dimen>
+    <dimen name="sk_tabbar">68dp</dimen>
     <dimen name="sk_nowbar">52dp</dimen>
     <dimen name="sk_fab">56dp</dimen>
     <dimen name="sk_switch_w">48dp</dimen>
@@ -54,10 +54,10 @@
     <dimen name="sk_fs_title_1">36sp</dimen>
     <dimen name="sk_fs_title_2">28sp</dimen>
     <dimen name="sk_fs_title_3">22sp</dimen>
-    <dimen name="sk_fs_title_4">16sp</dimen>
+    <dimen name="sk_fs_title_4">17sp</dimen>
     <dimen name="sk_fs_body_1">16sp</dimen>
-    <dimen name="sk_fs_body_2">14sp</dimen>
-    <dimen name="sk_fs_caption">12sp</dimen>
-    <dimen name="sk_fs_label">12sp</dimen>
-    <dimen name="sk_fs_num">11sp</dimen>
+    <dimen name="sk_fs_body_2">15sp</dimen>
+    <dimen name="sk_fs_caption">14sp</dimen>
+    <dimen name="sk_fs_label">14sp</dimen>
+    <dimen name="sk_fs_num">14sp</dimen>
 </resources>

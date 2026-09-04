@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
 
         currentScreen = savedInstanceState?.getString(STATE_SCREEN)
             ?.let { name -> Screen.entries.firstOrNull { it.name == name } }
-            ?: if (preferences.hasSeenOnboarding) Screen.LOGIN else Screen.ONBOARDING
+            ?: if (viewModel.state.value.user != null) Screen.HOME else Screen.LOGIN
         restorePendingFile(savedInstanceState)
         showScreen(currentScreen, force = true)
         bindCollectors()

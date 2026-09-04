@@ -1,7 +1,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/sk_press" />
+            <solid android:color="@color/surface_pressed" />
             <corners android:radius="@dimen/radius_s" />
         </shape>
     </item>

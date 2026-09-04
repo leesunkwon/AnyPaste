@@ -32,4 +32,5 @@
     <dimen name="touch_target">48dp</dimen>
     <dimen name="top_navigation_height">56dp</dimen>
     <dimen name="control_height_large">52dp</dimen>
+    <dimen name="bottom_navigation_height">72dp</dimen>
 </resources>

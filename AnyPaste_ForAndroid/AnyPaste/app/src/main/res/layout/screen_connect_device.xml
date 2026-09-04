@@ -51,7 +51,7 @@
                 android:background="@drawable/bg_circle_primary"
                 android:gravity="center"
                 android:text="+"
-                android:textColor="@color/sk_fg_on_solid"
+                android:textColor="@color/on_brand"
                 android:textSize="40sp" />
 
             <TextView
@@ -99,7 +99,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="1"
-                        android:textColor="@color/sk_fg_on_solid"
+                        android:textColor="@color/on_brand"
                         android:textStyle="bold" />
 
                     <TextView
@@ -124,7 +124,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="2"
-                        android:textColor="@color/sk_fg_on_solid"
+                        android:textColor="@color/on_brand"
                         android:textStyle="bold" />
 
                     <TextView
@@ -149,7 +149,7 @@
                         android:background="@drawable/bg_circle_primary"
                         android:gravity="center"
                         android:text="3"
-                        android:textColor="@color/sk_fg_on_solid"
+                        android:textColor="@color/on_brand"
                         android:textStyle="bold" />
 
                     <TextView

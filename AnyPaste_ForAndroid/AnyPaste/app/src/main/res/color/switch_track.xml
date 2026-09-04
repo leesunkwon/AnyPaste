@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/line" android:state_checked="true" android:state_enabled="false" />
     <item android:color="@color/surface_disabled" android:state_enabled="false" />
-    <item android:color="@color/ink" android:state_checked="true" />
-    <item android:color="@color/line" />
+    <item android:color="@color/primary" android:state_checked="true" />
+    <item android:color="@color/line_strong" />
 </selector>

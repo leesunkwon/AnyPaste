@@ -44,7 +44,7 @@
                     android:background="@drawable/bg_circle_primary"
                     android:gravity="center"
                     android:text="수"
-                    android:textColor="@color/sk_fg_on_solid"
+                    android:textColor="@color/on_brand"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -338,7 +338,7 @@
                 android:background="@drawable/bg_action_critical"
                 android:gravity="center"
                 android:text="로그아웃"
-                android:textColor="@color/sk_fg_on_solid"
+                android:textColor="@color/on_brand"
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>

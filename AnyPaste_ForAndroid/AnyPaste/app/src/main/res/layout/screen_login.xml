@@ -21,7 +21,7 @@
             android:background="@drawable/bg_circle_primary"
             android:gravity="center"
             android:text="A"
-            android:textColor="@color/sk_fg_on_solid"
+            android:textColor="@color/on_brand"
             android:textSize="28sp"
             android:textStyle="bold" />
 

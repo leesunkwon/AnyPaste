@@ -1,170 +1,142 @@
 <resources>
-    <style name="TextAppearance.Via.Display" parent="TextAppearance.MaterialComponents.Headline1">
+    <style name="TextAppearance.AnyPaste.Overline" parent="TextAppearance.MaterialComponents.Overline">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/sk_fg</item>
-        <item name="android:textFontWeight">800</item>
-        <item name="android:letterSpacing">-0.05</item>
-        <item name="android:textSize">@dimen/sk_fs_display</item>
-    </style>
-
-    <style name="TextAppearance.Via.Title1" parent="TextAppearance.MaterialComponents.Headline3">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/sk_fg</item>
-        <item name="android:textFontWeight">800</item>
-        <item name="android:letterSpacing">-0.04</item>
-        <item name="android:textSize">@dimen/sk_fs_title_1</item>
-    </style>
-
-    <style name="TextAppearance.Via.Title2" parent="TextAppearance.MaterialComponents.Headline4">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:lineHeight">32sp</item>
-        <item name="android:textColor">@color/sk_fg</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:textColor">@color/ink_secondary</item>
         <item name="android:textFontWeight">700</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.ScreenTitle" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:letterSpacing">-0.02</item>
+        <item name="android:lineHeight">35sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textFontWeight">700</item>
         <item name="android:textSize">26sp</item>
     </style>
 
-    <style name="TextAppearance.Via.Title3" parent="TextAppearance.MaterialComponents.Headline6">
+    <style name="TextAppearance.AnyPaste.Title" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/sk_fg</item>
+        <item name="android:lineHeight">30sp</item>
+        <item name="android:textColor">@color/ink</item>
         <item name="android:textFontWeight">700</item>
         <item name="android:textSize">22sp</item>
     </style>
 
-    <style name="TextAppearance.Via.Title4" parent="TextAppearance.MaterialComponents.Subtitle1">
+    <style name="TextAppearance.AnyPaste.TopNavigation" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:lineHeight">27sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.AnyPaste.SectionTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:lineHeight">24sp</item>
-        <item name="android:textColor">@color/sk_fg</item>
+        <item name="android:textColor">@color/ink</item>
         <item name="android:textFontWeight">700</item>
-        <item name="android:textSize">@dimen/sk_fs_title_4</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextAppearance.Via.Body1" parent="TextAppearance.MaterialComponents.Body1">
+    <style name="TextAppearance.AnyPaste.Body" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:lineHeight">24sp</item>
-        <item name="android:textColor">@color/sk_fg_muted</item>
-        <item name="android:textSize">@dimen/sk_fs_body_1</item>
+        <item name="android:lineHeight">22sp</item>
+        <item name="android:textColor">@color/ink_secondary</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="TextAppearance.Via.Body1Strong" parent="TextAppearance.Via.Body1">
-        <item name="android:textColor">@color/sk_fg</item>
+    <style name="TextAppearance.AnyPaste.BodyStrong" parent="TextAppearance.AnyPaste.Body">
+        <item name="android:textColor">@color/ink</item>
         <item name="android:textFontWeight">700</item>
     </style>
 
-    <style name="TextAppearance.Via.Body2" parent="TextAppearance.MaterialComponents.Body2">
+    <style name="TextAppearance.AnyPaste.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/sk_fg_muted</item>
-        <item name="android:textSize">@dimen/sk_fs_body_2</item>
+        <item name="android:lineHeight">19sp</item>
+        <item name="android:textColor">@color/ink_secondary</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="TextAppearance.Via.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:lineHeight">20sp</item>
-        <item name="android:textColor">@color/sk_fg_muted</item>
-        <item name="android:textSize">@dimen/sk_fs_caption</item>
-    </style>
-
-    <style name="TextAppearance.Via.Label" parent="TextAppearance.MaterialComponents.Overline">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:letterSpacing">0</item>
-        <item name="android:textColor">@color/sk_fg_muted</item>
-        <item name="android:textFontWeight">700</item>
-        <item name="android:textSize">@dimen/sk_fs_label</item>
-    </style>
-
-    <style name="Widget.ViaOs.Button.Primary" parent="Widget.MaterialComponents.Button">
-        <item name="android:background">@drawable/sk_btn_solid</item>
+    <style name="Widget.AnyPaste.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/bg_button_primary</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
-        <item name="android:minHeight">@dimen/sk_control_lg</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/sk_btn_solid_text</item>
+        <item name="android:textColor">@color/on_brand</item>
         <item name="android:textFontWeight">700</item>
-        <item name="android:textSize">@dimen/sk_fs_title_4</item>
+        <item name="android:textSize">16sp</item>
         <item name="backgroundTint">@null</item>
         <item name="elevation">0dp</item>
         <item name="iconPadding">@dimen/space_8</item>
-        <item name="iconTint">@color/sk_btn_solid_text</item>
+        <item name="iconTint">@color/on_brand</item>
     </style>
 
-    <style name="Widget.ViaOs.Button.Secondary" parent="Widget.MaterialComponents.Button">
-        <item name="android:background">@drawable/sk_btn_outline</item>
+    <style name="Widget.AnyPaste.Button.Secondary" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/bg_button_secondary</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
-        <item name="android:minHeight">@dimen/sk_control_lg</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/sk_fg</item>
+        <item name="android:textColor">@color/ink</item>
         <item name="android:textFontWeight">700</item>
-        <item name="android:textSize">@dimen/sk_fs_body_1</item>
+        <item name="android:textSize">16sp</item>
         <item name="backgroundTint">@null</item>
         <item name="elevation">0dp</item>
         <item name="iconPadding">@dimen/space_8</item>
-        <item name="iconTint">@color/sk_fg</item>
+        <item name="iconTint">@color/ink</item>
     </style>
 
-    <style name="Widget.ViaOs.Button.Outline" parent="Widget.ViaOs.Button.Secondary" />
-
-    <style name="Widget.ViaOs.Button.Critical" parent="Widget.ViaOs.Button.Primary">
-        <item name="android:background">@drawable/sk_btn_danger</item>
-        <item name="android:textColor">@color/sk_fg_on_danger</item>
-        <item name="iconTint">@color/sk_fg_on_danger</item>
+    <style name="Widget.AnyPaste.Button.Outline" parent="Widget.AnyPaste.Button.Secondary">
+        <item name="android:background">@drawable/bg_button_outline</item>
     </style>
 
-    <style name="Widget.ViaOs.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxBackgroundColor">@color/sk_bg_elevated</item>
+    <style name="Widget.AnyPaste.Button.Critical" parent="Widget.AnyPaste.Button.Primary">
+        <item name="android:background">@drawable/bg_button_critical</item>
+        <item name="android:textColor">@color/on_brand</item>
+        <item name="iconTint">@color/on_brand</item>
+    </style>
+
+    <style name="Widget.AnyPaste.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/surface</item>
         <item name="boxBackgroundMode">outline</item>
-        <item name="boxCornerRadiusBottomEnd">@dimen/sk_r_md</item>
-        <item name="boxCornerRadiusBottomStart">@dimen/sk_r_md</item>
-        <item name="boxCornerRadiusTopEnd">@dimen/sk_r_md</item>
-        <item name="boxCornerRadiusTopStart">@dimen/sk_r_md</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_s</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_s</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_s</item>
+        <item name="boxCornerRadiusTopStart">@dimen/radius_s</item>
         <item name="boxStrokeColor">@color/input_stroke</item>
-        <item name="boxStrokeErrorColor">@color/sk_warning</item>
+        <item name="boxStrokeErrorColor">@color/danger</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
-        <item name="errorTextColor">@color/sk_warning</item>
+        <item name="errorTextColor">@color/danger_foreground</item>
         <item name="hintEnabled">false</item>
-        <item name="hintTextColor">@color/input_hint</item>
+        <item name="hintTextColor">@color/ink_placeholder</item>
     </style>
 
-    <style name="Widget.ViaOs.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+    <style name="Widget.AnyPaste.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:minHeight">@dimen/sk_control_lg</item>
+        <item name="android:minHeight">@dimen/control_height_large</item>
         <item name="android:paddingStart">@dimen/space_16</item>
         <item name="android:paddingEnd">@dimen/space_16</item>
-        <item name="android:textColor">@color/sk_fg</item>
-        <item name="android:textColorHint">@color/input_hint</item>
-        <item name="android:textSize">@dimen/sk_fs_body_1</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textColorHint">@color/ink_placeholder</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="Widget.ViaOs.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="android:minHeight">@dimen/sk_touch</item>
-        <item name="android:minWidth">@dimen/sk_switch_w</item>
-        <item name="switchMinWidth">@dimen/sk_switch_w</item>
-        <item name="thumbTint">@color/sk_switch_thumb</item>
-        <item name="trackTint">@color/sk_switch_track</item>
+    <style name="Widget.AnyPaste.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="android:minHeight">@dimen/touch_target</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="switchMinWidth">48dp</item>
+        <item name="thumbTint">@color/switch_thumb</item>
+        <item name="trackTint">@color/switch_track</item>
     </style>
-
-    <!-- Compatibility aliases keep the existing XML contracts intact. -->
-    <style name="TextAppearance.AnyPaste.Overline" parent="TextAppearance.Via.Label" />
-    <style name="TextAppearance.AnyPaste.Title" parent="TextAppearance.Via.Title3" />
-    <style name="TextAppearance.AnyPaste.ScreenTitle" parent="TextAppearance.Via.Title2" />
-    <style name="TextAppearance.AnyPaste.TopNavigation" parent="TextAppearance.Via.Title4" />
-    <style name="TextAppearance.AnyPaste.SectionTitle" parent="TextAppearance.Via.Title4" />
-    <style name="TextAppearance.AnyPaste.Body" parent="TextAppearance.Via.Body1" />
-    <style name="TextAppearance.AnyPaste.BodyStrong" parent="TextAppearance.Via.Body1Strong" />
-    <style name="TextAppearance.AnyPaste.Caption" parent="TextAppearance.Via.Caption" />
-
-    <style name="Widget.AnyPaste.Button.Primary" parent="Widget.ViaOs.Button.Primary" />
-    <style name="Widget.AnyPaste.Button.Secondary" parent="Widget.ViaOs.Button.Secondary" />
-    <style name="Widget.AnyPaste.Button.Outline" parent="Widget.ViaOs.Button.Outline" />
-    <style name="Widget.AnyPaste.Button.Critical" parent="Widget.ViaOs.Button.Critical" />
-    <style name="Widget.AnyPaste.TextInputLayout" parent="Widget.ViaOs.TextInputLayout" />
-    <style name="Widget.AnyPaste.TextInputEditText" parent="Widget.ViaOs.TextInputEditText" />
-    <style name="Widget.AnyPaste.Switch" parent="Widget.ViaOs.Switch" />
 </resources>

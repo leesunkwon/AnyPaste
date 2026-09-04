@@ -1,83 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Gray -->
-    <color name="sk_gray_50">#F7F7F8</color>
-    <color name="sk_gray_100">#EDEDF0</color>
-    <color name="sk_gray_200">#E1E1E4</color>
-    <color name="sk_gray_300">#D0D0D5</color>
-    <color name="sk_gray_400">#B4B4BB</color>
-    <color name="sk_gray_500">#8E8E96</color>
-    <color name="sk_gray_600">#6C6C74</color>
-    <color name="sk_gray_700">#484850</color>
-    <color name="sk_gray_800">#2C2C32</color>
-    <color name="sk_gray_900">#141416</color>
-    <color name="sk_gray_950">#0A0A0C</color>
+    <color name="sk_gray_50">@color/app_background</color>
+    <color name="sk_gray_100">@color/app_surface_pressed</color>
+    <color name="sk_gray_200">@color/app_surface_disabled</color>
+    <color name="sk_gray_300">@color/app_line</color>
+    <color name="sk_gray_400">@color/app_line_strong</color>
+    <color name="sk_gray_500">@color/app_ink_placeholder</color>
+    <color name="sk_gray_600">#73747A</color>
+    <color name="sk_gray_700">@color/app_ink_secondary</color>
+    <color name="sk_gray_800">#35353A</color>
+    <color name="sk_gray_900">#29292D</color>
+    <color name="sk_gray_950">@color/app_ink</color>
 
-    <!-- Brand orange — fills, selected chips, hero surfaces. -->
-    <color name="sk_y_50">#FFF3E8</color>
-    <color name="sk_y_100">#FFD8B8</color>
-    <color name="sk_y_200">#FFB07A</color>
-    <color name="sk_y_300">#FF8A4A</color>
-    <color name="sk_y_400">#FF7A38</color>
-    <color name="sk_y_500">#FF661A</color>
-    <color name="sk_y_600">#E04F0A</color>
-    <color name="sk_y_700">#BA3800</color>
-    <color name="sk_y_800">#8A2A00</color>
-    <color name="sk_y_900">#5C1C00</color>
+    <color name="sk_y_50">#FFF8F3</color>
+    <color name="sk_y_100">@color/app_brand_weak</color>
+    <color name="sk_y_200">#FFD7B5</color>
+    <color name="sk_y_300">#FFB477</color>
+    <color name="sk_y_400">#FF9647</color>
+    <color name="sk_y_500">#FF7D20</color>
+    <color name="sk_y_600">@color/app_brand</color>
+    <color name="sk_y_700">@color/app_brand_pressed</color>
+    <color name="sk_y_800">#C84C00</color>
+    <color name="sk_y_900">#963800</color>
 
-    <!-- Signal — warning/danger. Not yellow. -->
-    <color name="sk_sig_50">#FFEBE6</color>
-    <color name="sk_sig_100">#FFC7BA</color>
-    <color name="sk_sig_400">#FF6A45</color>
-    <color name="sk_sig_500">#FF4D2E</color>
-    <color name="sk_sig_600">#E03618</color>
-    <color name="sk_sig_700">#B52810</color>
+    <color name="sk_sig_50">@color/app_critical_weak</color>
+    <color name="sk_sig_100">#FFD9D5</color>
+    <color name="sk_sig_400">#ED5B50</color>
+    <color name="sk_sig_500">@color/app_critical</color>
+    <color name="sk_sig_600">@color/app_critical_pressed</color>
+    <color name="sk_sig_700">#96231D</color>
 
-    <!-- Semantic · Light -->
-    <color name="sk_bg">#F3EEE8</color>
-    <color name="sk_bg_elevated">#FFFFFF</color>
-    <color name="sk_bg_muted">#E8E0D6</color>
-    <color name="sk_bg_inverse">#1C1916</color>
-    <color name="sk_bg_overlay">#661C1916</color>
-    <color name="sk_bg_accent">#FF661A</color>
-    <color name="sk_accent_soft">#FFE8D6</color>
+    <color name="sk_bg">@color/app_background</color>
+    <color name="sk_bg_elevated">@color/app_surface</color>
+    <color name="sk_bg_muted">@color/app_fill</color>
+    <color name="sk_bg_inverse">@color/app_neutral_solid</color>
+    <color name="sk_bg_overlay">#99000000</color>
+    <color name="sk_bg_accent">@color/app_brand</color>
+    <color name="sk_accent_soft">@color/app_brand_weak</color>
 
-    <color name="sk_fg">#1C1916</color>
-    <color name="sk_fg_muted">#6B645C</color>
-    <color name="sk_fg_subtle">#8A8278</color>
-    <color name="sk_fg_inverse">#FFFFFF</color>
-    <color name="sk_fg_on_accent">#FFFFFF</color>
-    <color name="sk_fg_on_solid">#FFFFFF</color>
+    <color name="sk_fg">@color/app_ink</color>
+    <color name="sk_fg_muted">@color/app_ink_secondary</color>
+    <color name="sk_fg_subtle">@color/app_ink_tertiary</color>
+    <color name="sk_fg_inverse">@color/app_on_brand</color>
+    <color name="sk_fg_on_accent">@color/app_on_brand</color>
+    <color name="sk_fg_on_solid">@color/app_on_brand</color>
 
-    <color name="sk_accent">#FF661A</color>
-    <color name="sk_accent_hover">#FF7A38</color>
-    <color name="sk_brand_deep">#BA3800</color>
-    <color name="sk_solid">#1C1916</color>
-    <color name="sk_solid_hover">#2A2522</color>
-    <color name="sk_solid_fg">#FFFFFF</color>
+    <color name="sk_accent">@color/app_brand</color>
+    <color name="sk_accent_hover">@color/app_brand_pressed</color>
+    <color name="sk_brand_deep">@color/app_brand_foreground</color>
+    <color name="sk_solid">@color/app_neutral_solid</color>
+    <color name="sk_solid_hover">@color/app_neutral_solid_pressed</color>
+    <color name="sk_solid_fg">@color/app_on_brand</color>
 
-    <color name="sk_success">#0F7A5C</color>
-    <color name="sk_success_soft">#E5F5EF</color>
-    <color name="sk_warning">#C2410C</color>
-    <color name="sk_warning_soft">#FFF0E6</color>
-    <color name="sk_warning_fg">#9A3412</color>
-    <color name="sk_danger">#DC2626</color>
-    <color name="sk_danger_soft">#FEECEC</color>
-    <color name="sk_danger_fg">#B91C1C</color>
-    <color name="sk_focus">#FF661A</color>
+    <color name="sk_success">@color/app_positive</color>
+    <color name="sk_success_soft">@color/app_positive_weak</color>
+    <color name="sk_warning">@color/app_warning</color>
+    <color name="sk_warning_soft">@color/app_warning_weak</color>
+    <color name="sk_warning_fg">@color/app_warning</color>
+    <color name="sk_danger">@color/app_critical</color>
+    <color name="sk_danger_soft">@color/app_critical_weak</color>
+    <color name="sk_danger_fg">@color/app_critical</color>
+    <color name="sk_focus">@color/app_focus</color>
 
-    <color name="sk_teal">#0F7A6B</color>
-    <color name="sk_teal_soft">#E4F4F0</color>
-    <color name="sk_indigo">#5B4BDB</color>
-    <color name="sk_indigo_soft">#EEEAFE</color>
+    <color name="sk_teal">@color/app_teal</color>
+    <color name="sk_teal_soft">@color/app_teal_weak</color>
+    <color name="sk_indigo">@color/app_purple</color>
+    <color name="sk_indigo_soft">@color/app_purple_weak</color>
 
-    <color name="sk_cluster">#161310</color>
-    <color name="sk_hud">#12100E</color>
-
-    <color name="sk_press">#DDD5CB</color>
-    <color name="sk_solid_disabled">#591C1916</color>
-    <color name="sk_accent_disabled">#59FF661A</color>
-    <color name="sk_danger_disabled">#59DC2626</color>
-    <color name="sk_fg_on_danger">#FFFFFF</color>
-    <color name="sk_switch_off">#D4CCC2</color>
+    <color name="sk_cluster">@color/app_neutral_solid</color>
+    <color name="sk_hud">@color/app_neutral_solid</color>
+    <color name="sk_press">@color/app_surface_pressed</color>
+    <color name="sk_solid_disabled">@color/app_surface_disabled</color>
+    <color name="sk_accent_disabled">@color/app_surface_disabled</color>
+    <color name="sk_danger_disabled">@color/app_surface_disabled</color>
+    <color name="sk_fg_on_danger">@color/app_on_brand</color>
+    <color name="sk_switch_off">@color/app_line_strong</color>
 </resources>

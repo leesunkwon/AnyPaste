@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         bottomNavigation = findViewById(R.id.bottom_navigation)
         screenContainer = findViewById(R.id.screen_container)
         bottomTabPager = findViewById(R.id.bottom_tab_pager)
+        bottomNavigation.isVisible = false
         bottomTabPager.isVisible = false
         configureBottomTabPager()
         bindBottomNavigation()
@@ -409,7 +410,8 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun updateBottomNavigation() {
-        bottomNavigation.isVisible = bottomNavigationPosition(currentScreen) != null
+        bottomNavigation.isVisible =
+            viewModel.state.value.user != null && bottomNavigationPosition(currentScreen) != null
         updateBottomNavigationSelection()
     }
 
@@ -438,7 +440,9 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
 
             Screen.LOGIN -> {
                 root.onClick(R.id.btn_login) { beginGoogleSignIn() }
-                root.onClick(R.id.btn_login_email) { showScreen(Screen.EMAIL_LOGIN) }
+                root.findViewById<View>(R.id.btn_login_email).setOnClickListener {
+                    showScreen(Screen.EMAIL_LOGIN, force = true)
+                }
                 root.onClick(R.id.btn_sign_up) { showScreen(Screen.SIGN_UP) }
                 root.onClick(R.id.btn_show_onboarding) { showScreen(Screen.ONBOARDING) }
             }

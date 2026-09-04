@@ -5,7 +5,8 @@
     android:background="@drawable/sk_tabbar"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/space_12">
+    android:paddingHorizontal="@dimen/space_12"
+    android:visibility="gone">
 
     <FrameLayout
         android:layout_width="0dp"

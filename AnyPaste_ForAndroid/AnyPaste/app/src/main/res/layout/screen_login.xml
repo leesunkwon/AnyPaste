@@ -81,10 +81,12 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login_email"
             style="@style/Widget.AnyPaste.Button.Primary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
-            android:text="이메일로 로그인"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_12"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="이메일로 로그인"
             app:icon="@drawable/ic_text"
             app:iconGravity="textStart"
             app:iconPadding="12dp" />

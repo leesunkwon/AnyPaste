@@ -25,6 +25,7 @@ import com.kotlinsun.anypaste.data.FirebaseAuthRepository
 import com.kotlinsun.anypaste.data.FirebaseStorageRepository
 import com.kotlinsun.anypaste.data.FirestoreClipboardRepository
 import com.kotlinsun.anypaste.data.FirestoreDeviceRepository
+import com.kotlinsun.anypaste.data.MediaStoreImageSaver
 import com.kotlinsun.anypaste.data.DeviceSessionRevokedException
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
@@ -723,10 +724,22 @@ class ClipboardSyncService : Service() {
             val receivedFile = receivedImageFile(item)
             destination = receivedFile
             storageRepository.downloadFile(item.storagePath, receivedFile)
+            val savedToGallery = withContext(Dispatchers.IO) {
+                MediaStoreImageSaver.save(
+                    context = applicationContext,
+                    source = receivedFile,
+                    displayName = item.fileName,
+                    mimeType = item.mimeType.ifBlank { DEFAULT_IMAGE_MIME_TYPE },
+                )
+            }
             applyRemoteImage(receivedFile)
             updateStatus(
                 phase = ClipboardSyncPhase.SYNCING,
-                message = "받은 이미지를 클립보드에 복사했습니다",
+                message = if (savedToGallery != null) {
+                    "받은 이미지를 사진첩과 클립보드에 저장했습니다"
+                } else {
+                    "받은 이미지를 클립보드에 복사했습니다"
+                },
             )
             RemoteItemResult.HANDLED
         } catch (error: CancellationException) {
@@ -1205,6 +1218,7 @@ class ClipboardSyncService : Service() {
         private const val EXTRA_IS_SENSITIVE_COMPAT = "android.content.extra.IS_SENSITIVE"
         private const val IMAGE_MIME_PATTERN = "image/*"
         private const val IMAGE_MIME_PREFIX = "image/"
+        private const val DEFAULT_IMAGE_MIME_TYPE = "image/png"
         private const val DEFAULT_IMAGE_EXTENSION = "png"
         private const val RECEIVED_CACHE_DIRECTORY = "received"
         private const val MAX_CACHE_ID_LENGTH = 80

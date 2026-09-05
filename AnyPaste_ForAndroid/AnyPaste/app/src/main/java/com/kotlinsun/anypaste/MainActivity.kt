@@ -57,6 +57,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.kotlinsun.anypaste.core.AppPreferences
+import com.kotlinsun.anypaste.data.MediaStoreImageSaver
 import com.kotlinsun.anypaste.model.ClipboardItem
 import com.kotlinsun.anypaste.model.ClipboardType
 import com.kotlinsun.anypaste.model.Device
@@ -1433,7 +1434,29 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun openDownloadedFile(file: File, mimeType: String) {
+        if (mimeType.startsWith("image/")) {
+            lifecycleScope.launch {
+                val galleryUri = withContext(Dispatchers.IO) {
+                    MediaStoreImageSaver.save(this@MainActivity, file, file.name, mimeType)
+                }
+                if (galleryUri != null) {
+                    toast("사진첩의 AnyPaste 폴더에 저장했습니다.")
+                    openDownloadedUri(galleryUri, mimeType)
+                } else {
+                    toast("사진첩 저장에 실패해 다운로드 파일을 엽니다.")
+                    openDownloadedUri(
+                        FileProvider.getUriForFile(this@MainActivity, "$packageName.fileprovider", file),
+                        mimeType,
+                    )
+                }
+            }
+            return
+        }
         val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+        openDownloadedUri(uri, mimeType)
+    }
+
+    private fun openDownloadedUri(uri: Uri, mimeType: String) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, mimeType)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

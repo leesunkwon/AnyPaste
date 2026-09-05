@@ -42,6 +42,13 @@
     <color name="app_pink">#FFB4E6</color>
     <color name="app_pink_weak">#48253D</color>
 
+    <color name="home_canvas_top">#162A57</color>
+    <color name="home_canvas_bottom">#0A0B0D</color>
+    <color name="home_card_top">#2A4F9B</color>
+    <color name="home_card_bottom">#111C3C</color>
+    <color name="home_surface_overlay">#24FFFFFF</color>
+    <color name="home_surface_overlay_pressed">#38FFFFFF</color>
+
     <color name="black">@color/app_ink</color>
     <color name="white">@color/app_surface</color>
     <color name="background">@color/app_background</color>

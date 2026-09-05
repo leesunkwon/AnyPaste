@@ -2,34 +2,67 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@drawable/bg_home_canvas"
     android:orientation="vertical"
-    android:paddingHorizontal="20dp"
-    android:paddingTop="20dp">
+    android:paddingStart="@dimen/screen_gutter"
+    android:paddingTop="@dimen/space_20"
+    android:paddingEnd="@dimen/screen_gutter">
 
-    <TextView
-        style="@style/TextAppearance.AnyPaste.Overline"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ANYPASTE / LIVE CLIPBOARD" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_home_icon"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="@color/ink"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            style="@style/TextAppearance.AnyPaste.Overline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_10"
+            android:layout_weight="1"
+            android:text="ANYPASTE / LIVE"
+            android:textColor="@color/ink_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_home_surface"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/space_12"
+            android:text="5분 보관"
+            android:textColor="@color/ink"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_home_greeting"
         style="@style/TextAppearance.AnyPaste.ScreenTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="안녕하세요" />
+        android:layout_marginTop="@dimen/space_24"
+        android:text="안녕하세요"
+        android:textColor="@color/ink" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_dashboard_chip"
+        android:layout_marginTop="@dimen/space_8"
+        android:background="@drawable/bg_home_surface"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp">
+        android:paddingHorizontal="@dimen/space_12"
+        android:paddingVertical="@dimen/space_8">
 
         <View
             android:layout_width="7dp"
@@ -40,8 +73,8 @@
             android:id="@+id/tv_home_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:textColor="@color/primary_contrast"
+            android:layout_marginStart="@dimen/space_6"
+            android:textColor="@color/ink"
             android:textSize="13sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -58,8 +91,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="28dp"
-            android:paddingBottom="28dp">
+            android:paddingTop="@dimen/space_28"
+            android:paddingBottom="@dimen/space_20">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -72,13 +105,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="최근 항목" />
+                    android:text="최근 항목"
+                    android:textColor="@color/ink" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="최근 1개만 보관"
-                    android:textColor="@color/ink_tertiary"
+                    android:text="최근 1개"
+                    android:textColor="@color/ink_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -87,56 +121,59 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="@dimen/space_28"
                 android:indeterminateTint="@color/primary"
                 android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/tv_home_recent_empty"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_dashboard_card"
+                android:layout_height="248dp"
+                android:layout_marginTop="@dimen/space_14"
+                android:background="@drawable/bg_home_latest_card"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="24dp"
+                android:padding="@dimen/space_24"
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:background="@drawable/bg_dashboard_chip"
+                    android:background="@drawable/bg_home_icon"
                     android:gravity="center"
-                    android:text="+"
-                    android:textColor="@color/primary"
-                    android:textSize="32sp" />
+                    android:text="↗"
+                    android:textColor="@color/ink"
+                    android:textSize="30sp" />
 
                 <TextView
                     style="@style/TextAppearance.AnyPaste.BodyStrong"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="아직 받은 항목이 없어요" />
+                    android:layout_marginTop="@dimen/space_16"
+                    android:text="아직 받은 항목이 없어요"
+                    android:textColor="@color/ink" />
 
                 <TextView
                     style="@style/TextAppearance.AnyPaste.Caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="@dimen/space_6"
                     android:gravity="center"
-                    android:text="아래에서 새 항목을 보내 보세요." />
+                    android:text="아래 보내기 버튼으로 새 항목을 전송해 보세요."
+                    android:textAlignment="center"
+                    android:textColor="@color/ink_secondary" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/item_clipboard_first"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_dashboard_hero"
+                android:layout_marginTop="@dimen/space_14"
+                android:background="@drawable/bg_home_latest_card"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="@dimen/space_20">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -148,16 +185,16 @@
                         android:id="@+id/iv_clipboard_first_type"
                         android:layout_width="52dp"
                         android:layout_height="52dp"
-                        android:background="@drawable/bg_dashboard_dock"
+                        android:background="@drawable/bg_home_icon"
                         android:contentDescription="전송 항목 유형"
-                        android:padding="14dp"
+                        android:padding="@dimen/space_14"
                         android:src="@drawable/ic_text"
                         android:tint="@color/ink" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="@dimen/space_12"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -167,7 +204,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:maxLines="2"
-                            android:textColor="@color/on_brand"
+                            android:textColor="@color/ink"
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
@@ -175,10 +212,10 @@
                             android:id="@+id/tv_clipboard_first_meta"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
+                            android:layout_marginTop="@dimen/space_2"
                             android:ellipsize="end"
                             android:maxLines="1"
-                            android:textColor="@color/on_brand"
+                            android:textColor="@color/ink_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
 
@@ -187,8 +224,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_dashboard_expiry"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="6dp"
+                        android:paddingHorizontal="@dimen/space_10"
+                        android:paddingVertical="@dimen/space_6"
                         android:textColor="@color/on_brand"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -198,11 +235,11 @@
                     android:id="@+id/tv_home_clipboard_preview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:background="@drawable/bg_dashboard_dock"
+                    android:layout_marginTop="@dimen/space_18"
+                    android:background="@drawable/bg_home_surface"
                     android:ellipsize="end"
                     android:maxLines="3"
-                    android:padding="14dp"
+                    android:padding="@dimen/space_14"
                     android:textColor="@color/ink"
                     android:textSize="14sp"
                     android:visibility="gone" />
@@ -212,7 +249,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="176dp"
                     android:layout_marginTop="@dimen/space_16"
-                    android:background="@drawable/bg_dashboard_dock"
+                    android:background="@drawable/bg_home_surface"
                     android:contentDescription="받은 이미지 미리보기"
                     android:scaleType="centerCrop"
                     android:visibility="gone" />
@@ -220,7 +257,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="@dimen/space_18"
                     android:orientation="horizontal">
 
                     <TextView
@@ -228,7 +265,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_dashboard_dock"
+                        android:background="@drawable/bg_home_surface"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -240,9 +277,9 @@
                         android:id="@+id/btn_home_clipboard_detail"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/space_8"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_dashboard_dock"
+                        android:background="@drawable/bg_home_surface"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
@@ -254,110 +291,30 @@
             </LinearLayout>
 
             <TextView
-                style="@style/TextAppearance.AnyPaste.SectionTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="바로 보내기" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/btn_send_text"
-                    android:layout_width="0dp"
-                    android:layout_height="124dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dashboard_card"
-                    android:clickable="true"
-                    android:contentDescription="텍스트 보내기"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_text"
-                        android:tint="@color/primary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="텍스트"
-                        android:textColor="@color/ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btn_send_image"
-                    android:layout_width="0dp"
-                    android:layout_height="124dp"
-                    android:layout_marginHorizontal="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dashboard_pink"
-                    android:clickable="true"
-                    android:contentDescription="이미지 보내기"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_image"
-                        android:tint="@color/on_brand" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="이미지"
-                        android:textColor="@color/on_brand"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btn_send_file"
-                    android:layout_width="0dp"
-                    android:layout_height="124dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dashboard_green"
-                    android:clickable="true"
-                    android:contentDescription="파일 보내기"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_file"
-                        android:tint="@color/teal" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="파일"
-                        android:textColor="@color/ink"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
                 style="@style/TextAppearance.AnyPaste.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="새 항목을 보내면 기존 항목은 교체되고 5분 뒤 자동으로 사라집니다." />
+                android:layout_marginTop="@dimen/space_20"
+                android:gravity="center"
+                android:text="새 항목이 들어오면 기존 항목은 교체되고 5분 후 사라집니다."
+                android:textAlignment="center"
+                android:textColor="@color/ink_secondary" />
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/btn_home_send"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="@dimen/space_16"
+        android:background="@drawable/bg_home_send"
+        android:clickable="true"
+        android:contentDescription="보내기"
+        android:focusable="true"
+        android:gravity="center"
+        android:stateListAnimator="@animator/dashboard_press"
+        android:text="보내기"
+        android:textColor="@color/on_neutral_solid"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 </LinearLayout>

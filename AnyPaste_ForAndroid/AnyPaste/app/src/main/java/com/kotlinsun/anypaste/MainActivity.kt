@@ -550,9 +550,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
     }
 
     private fun bindHomeActions(root: View) {
-        root.onClick(R.id.btn_send_text) { openSend(ClipboardType.TEXT) }
-        root.onClick(R.id.btn_send_image) { openSend(ClipboardType.IMAGE, openPicker = true) }
-        root.onClick(R.id.btn_send_file) { openSend(ClipboardType.FILE, openPicker = true) }
+        root.onClick(R.id.btn_home_send) { openSend(ClipboardType.TEXT) }
         root.onClick(R.id.btn_home_clipboard_primary) {
             viewModel.state.value.clipboardItems.firstOrNull()?.let { item ->
                 if (item.resolvedType() == ClipboardType.TEXT) copyTextItem(item) else downloadItem(item)
@@ -1624,11 +1622,7 @@ class MainActivity : AppCompatActivity(), BottomTabScreenHost {
         icon.apply {
             setImageResource(typeIcon(item))
             setBackgroundResource(
-                when (type) {
-                    ClipboardType.TEXT -> R.drawable.bg_icon_primary
-                    ClipboardType.IMAGE -> R.drawable.bg_icon_teal
-                    ClipboardType.FILE -> R.drawable.bg_icon_purple
-                },
+                R.drawable.bg_home_icon,
             )
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
